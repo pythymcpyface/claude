@@ -6,7 +6,7 @@
 PROJECT_DIR="${1:-$PWD}"
 CLAUDE_DIR="$PROJECT_DIR/.claude"
 PROJECT_CLAUDE="$CLAUDE_DIR/CLAUDE.md"
-GLOBAL_CLAUDE="$HOME/.claude/CLAUDE.md"
+TRAITS_DIR="$HOME/.claude/templates/traits"
 
 # Skip if already exists
 if [ -f "$PROJECT_CLAUDE" ]; then
@@ -141,18 +141,20 @@ CONFIG_FILES=""
 [ -f "jest.config.js" ] || [ -f "jest.config.ts" ] && CONFIG_FILES="$CONFIG_FILES jest config"
 [ -f "vitest.config.ts" ] && CONFIG_FILES="$CONFIG_FILES vitest config"
 
-# Generate the project-specific CLAUDE.md
-cat > "$PROJECT_CLAUDE" << 'HEADER'
-# Project Configuration
+# ==========================================
+# GENERATE CLAUDE.md from TRAITS
+# ==========================================
 
-This file extends ~/.claude/CLAUDE.md with project-specific context.
-Auto-generated based on detected project structure.
+# 1. Header
+if [ -f "$TRAITS_DIR/common-header.md" ]; then
+  cat "$TRAITS_DIR/common-header.md" > "$PROJECT_CLAUDE"
+else
+  echo "# Project Configuration" > "$PROJECT_CLAUDE"
+fi
 
----
-
-HEADER
-
+# 2. Project Specifics (Dynamic)
 cat >> "$PROJECT_CLAUDE" << EOF
+
 ## Project: $PROJECT_NAME
 
 ### Stack
@@ -173,168 +175,68 @@ EOF
 [ -d "tests" ] || [ -d "test" ] || [ -d "__tests__" ] && echo "- Tests: tests/ or __tests__/" >> "$PROJECT_CLAUDE"
 [ -d "docs" ] && echo "- Documentation: docs/" >> "$PROJECT_CLAUDE"
 
-# Add stack-specific guidance
-cat >> "$PROJECT_CLAUDE" << 'EOF'
+echo "" >> "$PROJECT_CLAUDE"
 
----
+# 3. Critical Constraints
+if [ -f "$TRAITS_DIR/critical-constraints.md" ]; then
+  cat "$TRAITS_DIR/critical-constraints.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
+fi
 
-## Stack-Specific Guidelines
-
-EOF
-
-# TypeScript/Node.js specific
+# 4. Stack Specific Guidelines
 if [ "$STACK" = "TypeScript" ] || [ "$STACK" = "Node.js" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-### TypeScript/Node.js
-- Use strict TypeScript (`strict: true` in tsconfig)
-- Prefer `interface` over `type` for object shapes
-- Use `unknown` over `any`, narrow with type guards
-- Async/await over raw Promises
-- Use named exports for better tree-shaking
-
-### Commands
-```bash
-npm run dev          # Development server
-npm run build        # Production build
-npm test             # Run tests
-npm run lint         # Lint code
-npx tsc --noEmit     # Type check
-```
-
-EOF
+  if [ -f "$TRAITS_DIR/stack-node.md" ]; then
+    cat "$TRAITS_DIR/stack-node.md" >> "$PROJECT_CLAUDE"
+    echo "" >> "$PROJECT_CLAUDE"
+  fi
+elif [ "$STACK" = "Rust" ]; then
+  if [ -f "$TRAITS_DIR/stack-rust.md" ]; then
+    cat "$TRAITS_DIR/stack-rust.md" >> "$PROJECT_CLAUDE"
+    echo "" >> "$PROJECT_CLAUDE"
+  fi
+elif [ "$STACK" = "Go" ]; then
+  if [ -f "$TRAITS_DIR/stack-go.md" ]; then
+    cat "$TRAITS_DIR/stack-go.md" >> "$PROJECT_CLAUDE"
+    echo "" >> "$PROJECT_CLAUDE"
+  fi
+elif [ "$STACK" = "Python" ]; then
+  if [ -f "$TRAITS_DIR/stack-python.md" ]; then
+    cat "$TRAITS_DIR/stack-python.md" >> "$PROJECT_CLAUDE"
+    echo "" >> "$PROJECT_CLAUDE"
+  fi
 fi
 
-# React/Next.js specific
-if echo "$FRAMEWORKS" | grep -qE 'React|Next'; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-### React Patterns
-- Functional components with hooks
-- Keep components small and focused
-- Extract custom hooks for reusable logic
-- Use React.memo() only when profiling shows need
-- Prefer composition over prop drilling
-
-EOF
+# 5. Token Optimization & Delegation
+if [ -f "$TRAITS_DIR/token-optimization.md" ]; then
+  cat "$TRAITS_DIR/token-optimization.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# Rust specific
-if [ "$STACK" = "Rust" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-### Rust
-- Follow Rust API guidelines
-- Use `Result` for recoverable errors, `panic!` only for bugs
-- Prefer `&str` over `String` in function parameters
-- Use `clippy` warnings as errors
-- Document public APIs with `///` comments
-
-### Commands
-```bash
-cargo run            # Run project
-cargo build --release # Production build
-cargo test           # Run tests
-cargo clippy         # Lint
-cargo fmt            # Format
-```
-
-EOF
+if [ -f "$TRAITS_DIR/delegation.md" ]; then
+  cat "$TRAITS_DIR/delegation.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# Go specific
-if [ "$STACK" = "Go" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-### Go
-- Follow Effective Go guidelines
-- Use `error` return values, not panics
-- Keep interfaces small (1-3 methods)
-- Use `context.Context` for cancellation
-- Table-driven tests
-
-### Commands
-```bash
-go run .             # Run project
-go build             # Build
-go test ./...        # Run tests
-go vet ./...         # Static analysis
-golangci-lint run    # Lint
-```
-
-EOF
+# 6. Memory
+if [ -f "$TRAITS_DIR/memory.md" ]; then
+  cat "$TRAITS_DIR/memory.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# Python specific
-if [ "$STACK" = "Python" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-### Python
-- Use type hints (PEP 484)
-- Follow PEP 8 style guide
-- Use dataclasses or Pydantic for data structures
-- Prefer `pathlib` over `os.path`
-- Use context managers for resources
-
-### Commands
-```bash
-python -m pytest     # Run tests
-ruff check .         # Lint
-mypy .               # Type check
-black .              # Format
-```
-
-EOF
+# 7. Dynamic Context
+if [ -f "$TRAITS_DIR/dynamic-context.md" ]; then
+  cat "$TRAITS_DIR/dynamic-context.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# Database-specific guidance
-if [ -n "$DATABASE" ]; then
-cat >> "$PROJECT_CLAUDE" << EOF
-### Database ($DATABASE)
-- Use migrations for schema changes
-- Parameterized queries only (no string concatenation)
-- Index foreign keys and frequently queried columns
-- Consider loading extended skill: \`skills/extended/database-integrity.md\`
-
-EOF
+# 8. Available Commands
+if [ -f "$TRAITS_DIR/available-commands.md" ]; then
+  cat "$TRAITS_DIR/available-commands.md" >> "$PROJECT_CLAUDE"
+  echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# Add token optimization reminder
+# 9. Files to Skip (Dynamic based on stack)
 cat >> "$PROJECT_CLAUDE" << 'EOF'
----
-
-## Token Optimization (Project-Specific)
-
-### Delegate These Operations
-EOF
-
-if [ "$STACK" = "TypeScript" ] || [ "$STACK" = "Node.js" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-- `npm test` -> `mcp__ultra-mcp__debug-issue`
-- `npm run build` -> `mcp__ultra-mcp__debug-issue`
-- Large bundle analysis -> `mcp__ultra-mcp__analyze-code`
-EOF
-fi
-
-if [ "$STACK" = "Rust" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-- `cargo test` -> `mcp__ultra-mcp__debug-issue`
-- `cargo build` -> `mcp__ultra-mcp__debug-issue`
-- `cargo clippy` output -> `mcp__ultra-mcp__analyze-code`
-EOF
-fi
-
-if [ "$STACK" = "Go" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-- `go test ./...` -> `mcp__ultra-mcp__debug-issue`
-- `go build` -> `mcp__ultra-mcp__debug-issue`
-EOF
-fi
-
-if [ "$STACK" = "Python" ]; then
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-- `pytest` -> `mcp__ultra-mcp__debug-issue`
-- Large log analysis -> `mcp__ultra-mcp__analyze-code`
-EOF
-fi
-
-cat >> "$PROJECT_CLAUDE" << 'EOF'
-
 ### Files to Skip Reading
 - `node_modules/`, `vendor/`, `target/`, `__pycache__/`
 - `dist/`, `build/`, `.next/`, `out/`
