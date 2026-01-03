@@ -1,0 +1,13 @@
+/projects
+/backup
+/debug
+/file-history
+/plugins
+/session-env
+/shell-snapshots
+/statsig
+/todos
+/telemetry
+/plans
+history.jsonl
+stats-cache.json

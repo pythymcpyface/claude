@@ -1,0 +1,57 @@
+{
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/generate-project-claude.sh \"$PWD\""
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/detect-project.sh \"$PWD\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/delegate-check.sh \"$ARGUMENTS\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/context-summary.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "claude-mem@thedotmack": true,
+    "context-management@claude-code-workflows": false,
+    "tdd-workflows@claude-code-workflows": false,
+    "full-stack-orchestration@claude-code-workflows": false,
+    "agent-orchestration@claude-code-workflows": false,
+    "seo-content-creation@claude-code-workflows": false,
+    "seo-technical-optimization@claude-code-workflows": false,
+    "security-scanning@claude-code-workflows": false,
+    "security-compliance@claude-code-workflows": false,
+    "seo-analysis-monitoring@claude-code-workflows": false,
+    "hr-legal-compliance@claude-code-workflows": false,
+    "content-marketing@claude-code-workflows": false,
+    "accessibility-compliance@claude-code-workflows": false,
+    "unit-testing@claude-code-workflows": false,
+    "rust-analyzer-lsp@claude-plugins-official": true
+  }
+}

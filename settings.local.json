@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(cat:*)",
+      "Bash(du:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "command": "bash ~/.claude/scripts/validate-bash.sh \"$TOOL_INPUT\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash ~/.claude/scripts/generate-project-claude.sh \"$PWD\"",
+            "timeout": 10000
+          },
+          {
+            "command": "bash ~/.claude/scripts/detect-project.sh \"$PWD\"",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "bash ~/.claude/scripts/context-summary.sh",
+            "timeout": 5000
+          }
+        ]
+      }
+    ]
+  }
+}
