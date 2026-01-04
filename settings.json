@@ -1,5 +1,6 @@
 {
-  "model": "opus",
+  "model": "haiku",
+  "includeCoAuthoredBy": false,
   "hooks": {
     "SessionStart": [
       {
