@@ -1,6 +1,11 @@
 {
-  "model": "haiku",
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "${ANTHROPIC_AUTH_TOKEN}",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000"
+  },
   "includeCoAuthoredBy": false,
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -12,6 +17,10 @@
           {
             "type": "command",
             "command": "bash ~/.claude/scripts/detect-project.sh \"$PWD\""
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/track-usage.sh --init"
           }
         ]
       }
@@ -30,6 +39,10 @@
     "SessionEnd": [
       {
         "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/track-usage.sh --status"
+          },
           {
             "type": "command",
             "command": "bash ~/.claude/scripts/context-summary.sh"
