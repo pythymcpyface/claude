@@ -2,6 +2,9 @@
 /backup
 /debug
 /file-history
+/cache
+/paste-cache
+/downloads
 /plugins
 /session-env
 /shell-snapshots

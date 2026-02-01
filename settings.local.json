@@ -6,7 +6,8 @@
       "Bash(du:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(brew cleanup:*)"
     ]
   },
   "hooks": {
