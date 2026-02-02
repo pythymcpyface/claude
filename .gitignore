@@ -13,4 +13,5 @@
 /telemetry
 /plans
 history.jsonl
-stats-cache.json
+stats-cache.json# Ralph Loop state files
+.claude/ralph-loop.local.md
