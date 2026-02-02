@@ -23,7 +23,8 @@ Before any code is written, the following phases must be completed **using Opus*
 ├─────────────────────────────────────────────────────────────────┤
 │ Phase 3: Specification Breakdown (ITERATIVE)                    │
 │   - Break down requirements until atomic                        │
-│   - Repeat 3-5 times until no further breakdown possible       │
+│   - Repeat 5-7 times until NO FURTHER BREAKDOWN IS POSSIBLE    │
+│   - Specifications must be SO SMALL they seem ridiculous       │
 ├─────────────────────────────────────────────────────────────────┤
 │ Phase 4: Risks & Mitigations Document                          │
 │   - Technical risks, operational risks, quality risks           │
@@ -264,7 +265,9 @@ Once PROJECT-PLAN.md exists, the project-specific CLAUDE.md should reference it 
 
 ## Phase 3: Specification Breakdown (ITERATIVE)
 
-This is the **most important phase**. Repeat 3-5 times until specifications are atomic.
+This is the **most important phase**. Specifications must be broken down until they are so small that they seem ridiculous. A specification should be implementable in 15-30 minutes by a competent developer.
+
+**Repeat 5-7 times** until NO FURTHER BREAKDOWN IS POSSIBLE. When you think a specification is atomic, ask: "Can this be split?" If yes, split it. Ask again. Repeat until the answer is NO.
 
 ### 3.1 First Pass: Functional Requirements Breakdown
 
@@ -1308,6 +1311,57 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 - Move to next specification in IMPLEMENTATION-ROADMAP.md
 - Repeat from Step 1
 
+# AFTER ALL SPECIFICATIONS COMPLETE
+
+## Step 11: Generate Project Documentation
+Before outputting completion promise, generate comprehensive project documentation:
+
+### 11.1 Create README.md
+```markdown
+# [Project Name]
+
+[One-line description]
+
+## Overview
+[What this system does and why it matters]
+
+## Installation
+\`\`\`bash
+[Installation commands]
+\`\`\`
+
+## Usage
+\`\`\`bash
+[Usage examples]
+\`\`\`
+
+## API Documentation
+[If applicable - endpoints, request/response formats]
+
+## Testing
+\`\`\`bash
+npm test
+\`\`\`
+
+## Development
+- Stack: [list technologies]
+- Project Structure: [brief description]
+
+## License
+[Specify license]
+```
+
+### 11.2 Create CONTRIBUTING.md (if open source)
+### 11.3 Create CHANGELOG.md with version history
+### 11.4 Create API.md if REST API (document all endpoints)
+### 11.5 Create docs/ folder for additional documentation
+
+Documentation MUST be:
+- Clear and concise
+- Include examples
+- Accurate (matches actual implementation)
+- Professional quality
+
 # QUALITY GATES
 
 ## Before Moving to Next Phase:
@@ -1348,6 +1402,7 @@ Output <promise>SYSTEM_COMPLETE</promise> ONLY when:
 - PROGRESS.md shows 100% completion
 - Code review passes with no critical issues
 - Quality verified
+- Project documentation generated (README.md, API docs, etc.)
 
 Begin with the first specification in IMPLEMENTATION-ROADMAP.md (Phase 1, Foundation).
 " --max-iterations 200
@@ -1369,11 +1424,18 @@ After completing all phases, your project will have:
     ├── IMPLEMENTATION-ROADMAP.md # Junior-proof step-by-step guide
     ├── TDD-MASTER-DOCUMENT.md   # Every test case for every spec
     └── PROGRESS.md              # Tracking (created during Ralph Loop)
+
+# Project Documentation (generated at end of Ralph Loop)
+├── README.md                    # Project overview, installation, usage
+├── CONTRIBUTING.md              # Contribution guidelines (if applicable)
+├── CHANGELOG.md                 # Version history
+├── API.md                       # API documentation (if REST API)
+└── docs/                        # Additional documentation
 ```
 
 **Each document links to others. Each specification references risks. Each test references specifications.**
 
-**The result: Junior developers can implement without failure because every decision is made, every risk is mitigated, and every test is specified.**
+**The result: Junior developers can implement without failure because every decision is made, every risk is mitigated, and every test is specified. The project is fully documented and ready for production use.**
 
 ---
 
