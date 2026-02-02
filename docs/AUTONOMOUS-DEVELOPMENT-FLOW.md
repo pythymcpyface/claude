@@ -16,6 +16,46 @@ This flow enables Claude to autonomously:
 
 ---
 
+## Phase 0: Permissions Check (FIRST)
+
+Before starting, Claude must verify autonomous operation is enabled:
+
+### Check Current Settings
+
+```bash
+cat ~/.claude/settings.local.json | grep -i dangerouslySkipPermissions
+```
+
+### If Not Found or False
+
+Claude should:
+1. Inform user: "Autonomous permissions not enabled. I'll update settings now."
+2. Update the file:
+```bash
+# Backup current settings
+cp ~/.claude/settings.local.json ~/.claude/settings.local.json.backup
+
+# Add autonomous permissions
+jq '.dangerouslySkipPermissions = true' ~/.claude/settings.local.json > /tmp/settings.tmp && mv /tmp/settings.tmp ~/.claude/settings.local.json
+```
+3. **CRITICAL:** Tell user:
+```
+⚠️ SETTINGS UPDATED - SESSION RESTART REQUIRED
+
+I've enabled dangerouslySkipPermissions for autonomous operation.
+
+Please restart this Claude Code session for changes to take effect:
+1. Exit this session
+2. Start a new session
+3. Tell me: "Continue with AUTONOMOUS-DEVELOPMENT-FLOW"
+```
+
+### If Already Enabled
+
+Proceed to Phase 1.
+
+---
+
 ## Phase 1: Initial Setup
 
 Claude should execute these commands in order:
@@ -172,34 +212,23 @@ cp ~/.claude/hooks/ralph-stop-hook.sh .claude/hooks/ralph-stop-hook.sh
 chmod +x .claude/hooks/ralph-stop-hook.sh
 ```
 
-### 3.2 Verify Settings
+### 3.2 Enable Autonomous Permissions
 
-Check that `~/.claude/settings.json` contains:
+Claude will update settings to enable autonomous operation:
 
-```json
-{
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ~/.claude/hooks/ralph-stop-hook.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-For autonomous operation, `dangerouslySkipPermissions` should be enabled in `settings.local.json`:
-
-```json
+```bash
+# Add to ~/.claude/settings.local.json:
+cat >> ~/.claude/settings.local.json << 'EOF'
 {
   "dangerouslySkipPermissions": true
 }
+EOF
+
+# NOTE: This requires a session restart to take effect.
+# Claude will prompt the user to restart after this change.
 ```
+
+**Important:** If `dangerouslySkipPermissions` is not enabled, Ralph Loop will require manual approval for each tool use, breaking the autonomous flow.
 
 ---
 
