@@ -109,3 +109,15 @@ fi
 # Ensure .claude directory exists in the project before writing cache
 mkdir -p "$CACHE_DIR"
 echo "$CURRENT_HASH" > "$CACHE_FILE"
+
+# 6. Auto-generate Ralph Loop stop hook for projects
+RALPH_HOOK_GLOBAL="$HOME/.claude/hooks/ralph-stop-hook.sh"
+RALPH_HOOK_PROJECT="$CACHE_DIR/hooks/ralph-stop-hook.sh"
+
+if [ -f "$RALPH_HOOK_GLOBAL" ]; then
+  mkdir -p "$CACHE_DIR/hooks"
+  if [ ! -f "$RALPH_HOOK_PROJECT" ]; then
+    cp "$RALPH_HOOK_GLOBAL" "$RALPH_HOOK_PROJECT"
+    chmod +x "$RALPH_HOOK_PROJECT"
+  fi
+fi
