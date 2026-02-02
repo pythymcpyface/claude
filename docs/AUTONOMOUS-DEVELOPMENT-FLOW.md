@@ -16,43 +16,29 @@ This flow enables Claude to autonomously:
 
 ---
 
-## Phase 0: Permissions Check (FIRST)
+## Phase 0: Project Setup Check (FIRST)
 
-Before starting, Claude must verify autonomous operation is enabled:
+Before starting, Claude must check if this project has been initialized for autonomous development:
 
-### Check Current Settings
+### Check for Project Settings
 
 ```bash
-cat ~/.claude/settings.local.json | grep -i dangerouslySkipPermissions
+test -f .claude/settings.local.json && echo "EXISTS" || echo "NOT_FOUND"
 ```
 
-### If Not Found or False
-
-Claude should:
-1. Inform user: "Autonomous permissions not enabled. I'll update settings now."
-2. Update the file:
-```bash
-# Backup current settings
-cp ~/.claude/settings.local.json ~/.claude/settings.local.json.backup
-
-# Add autonomous permissions
-jq '.dangerouslySkipPermissions = true' ~/.claude/settings.local.json > /tmp/settings.tmp && mv /tmp/settings.tmp ~/.claude/settings.local.json
-```
-3. **CRITICAL:** Tell user:
-```
-⚠️ SETTINGS UPDATED - SESSION RESTART REQUIRED
-
-I've enabled dangerouslySkipPermissions for autonomous operation.
-
-Please restart this Claude Code session for changes to take effect:
-1. Exit this session
-2. Start a new session
-3. Tell me: "Continue with AUTONOMOUS-DEVELOPMENT-FLOW"
-```
-
-### If Already Enabled
+### If Settings Exist
 
 Proceed to Phase 1.
+
+### If Settings Don't Exist
+
+Inform user:
+```
+🔧 Project not yet configured for autonomous development.
+I'll create the necessary project-local configuration now.
+```
+
+Then proceed to Phase 1 to create all required files.
 
 ---
 
@@ -65,10 +51,135 @@ Claude should execute these commands in order:
 ```bash
 mkdir -p .claude/docs
 mkdir -p .claude/hooks
+mkdir -p .claude/scripts
 mkdir -p src tests
 ```
 
-### 1.2 Create Tracking Documents
+### 1.2 Create Project-Specific Settings
+
+Create `.claude/settings.local.json` with autonomous permissions:
+
+```bash
+cat > .claude/settings.local.json << 'EOF'
+{
+  "dangerouslySkipPermissions": true,
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/ralph-stop-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+```
+
+This ensures:
+- Autonomous operation (no permission prompts)
+- Ralph Loop stop hook is configured for this project
+
+### 1.3 Create Ralph Loop Stop Hook (Project-Local)
+
+Create the stop hook that manages the Ralph Loop iterations:
+
+```bash
+cat > .claude/hooks/ralph-stop-hook.sh << 'HOOK_EOF'
+#!/bin/bash
+# Ralph Loop Stop Hook - Project-local version
+# Prevents session exit when a ralph-loop is active
+# Feeds Claude's output back as input to continue the loop
+
+set -euo pipefail
+
+# Use current project directory
+BASE_DIR="${PWD}"
+
+# Read hook input from stdin
+HOOK_INPUT=$(cat)
+
+# Check if ralph-loop is active (project-local state)
+RALPH_STATE_FILE="${BASE_DIR}/.claude/ralph-loop.local.md"
+
+if [[ ! -f "$RALPH_STATE_FILE" ]]; then
+  exit 0  # No active loop - allow exit
+fi
+
+# Parse markdown frontmatter
+FRONTMATTER=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$RALPH_STATE_FILE")
+ITERATION=$(echo "$FRONTMATTER" | grep '^iteration:' | sed 's/iteration: *//')
+MAX_ITERATIONS=$(echo "$FRONTMATTER" | grep '^max_iterations:' | sed 's/max_iterations: *//')
+COMPLETION_PROMISE=$(echo "$FRONTMATTER" | grep '^completion_promise:' | sed 's/completion_promise: *//' | sed 's/^"\(.*\)"$/\1/')
+
+# Validate iteration count
+if [[ ! "$ITERATION" =~ ^[0-9]+$ ]]; then
+  echo "Ralph loop: State corrupted. Stopping." >&2
+  rm "$RALPH_STATE_FILE"
+  exit 0
+fi
+
+# Check max iterations
+if [[ $MAX_ITERATIONS -gt 0 ]] && [[ $ITERATION -ge $MAX_ITERATIONS ]]; then
+  echo "Ralph loop: Max iterations reached." >&2
+  rm "$RALPH_STATE_FILE"
+  exit 0
+fi
+
+# Get transcript and check for completion promise
+TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path' 2>/dev/null || echo "")
+
+if [[ -f "$TRANSCRIPT_PATH" ]] && grep -q '"role":"assistant"' "$TRANSCRIPT_PATH"; then
+  LAST_LINE=$(grep '"role":"assistant"' "$TRANSCRIPT_PATH" | tail -1)
+  LAST_OUTPUT=$(echo "$LAST_LINE" | jq -r '.message.content | map(select(.type == "text")) | map(.text) | join("\n")' 2>/dev/null || echo "")
+
+  if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
+    PROMISE_TEXT=$(echo "$LAST_OUTPUT" | perl -0777 -pe 's/.*?<promise>(.*?)<\/promise>.*/$1/s; s/^\s+|\s+$//g; s/\s+/ /g' 2>/dev/null || echo "")
+
+    if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; then
+      echo "Ralph loop: Complete!" >&2
+      rm "$RALPH_STATE_FILE"
+      exit 0
+    fi
+  fi
+fi
+
+# Continue loop - feed prompt back
+NEXT_ITERATION=$((ITERATION + 1))
+PROMPT_TEXT=$(awk '/^---$/{i++; next} i>=2' "$RALPH_STATE_FILE")
+
+if [[ -z "$PROMPT_TEXT" ]]; then
+  echo "Ralph loop: State invalid. Stopping." >&2
+  rm "$RALPH_STATE_FILE"
+  exit 0
+fi
+
+# Update iteration
+TEMP_FILE="${RALPH_STATE_FILE}.tmp.$$"
+sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$RALPH_STATE_FILE" > "$TEMP_FILE"
+mv "$TEMP_FILE" "$RALPH_STATE_FILE"
+
+# Build system message
+if [[ "$COMPLETION_PROMISE" != "null" ]] && [[ -n "$COMPLETION_PROMISE" ]]; then
+  SYSTEM_MSG="Ralph iteration $NEXT_ITERATION | Complete with: <promise>$COMPLETION_PROMISE</promise>"
+else
+  SYSTEM_MSG="Ralph iteration $NEXT_ITERATION"
+fi
+
+# Block exit and feed prompt back
+jq -n --arg prompt "$PROMPT_TEXT" --arg msg "$SYSTEM_MSG" \
+  '{"decision": "block", "reason": $prompt, "systemMessage": $msg}' 2>/dev/null || exit 0
+
+exit 0
+HOOK_EOF
+
+chmod +x .claude/hooks/ralph-stop-hook.sh
+```
+
+### 1.4 Create Tracking Documents
 
 Create `.claude/docs/SPECIFICATION.md`:
 
