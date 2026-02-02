@@ -1,6 +1,6 @@
 # Autonomous Development Flow
 
-**Context:** Critical software development with zero tolerance for bugs. You are the Senior Engineer. The software is integral to the functioning of a hospital. Junior developers will implement from your specifications. If this project fails, hospital operations are compromised and you lose your job.
+**Context:** You are the Senior Engineer creating detailed specifications for implementation by junior developers.
 
 **Goal:** Create specifications so detailed and atomic that implementation is mechanical and cannot fail.
 
@@ -15,6 +15,9 @@ Before any code is written, the following phases must be completed **using Opus*
 │ Phase 1: Initial Requirements Gathering                          │
 │   - User input, domain exploration, stakeholder needs           │
 ├─────────────────────────────────────────────────────────────────┤
+│ Phase 1 Complete: Generate Project CLAUDE.md                    │
+│   - Create project-specific context from planning documents     │
+├─────────────────────────────────────────────────────────────────┤
 │ Phase 2: Project Plan Document (v1)                             │
 │   - High-level architecture, technology stack, timeline         │
 ├─────────────────────────────────────────────────────────────────┤
@@ -23,7 +26,7 @@ Before any code is written, the following phases must be completed **using Opus*
 │   - Repeat 3-5 times until no further breakdown possible       │
 ├─────────────────────────────────────────────────────────────────┤
 │ Phase 4: Risks & Mitigations Document                          │
-│   - Clinical risks, technical risks, operational risks          │
+│   - Technical risks, operational risks, quality risks           │
 ├─────────────────────────────────────────────────────────────────┤
 │ Phase 5: Project Plan Update (v2)                               │
 │   - Incorporate risks, adjust roadmap, add contingency          │
@@ -53,11 +56,11 @@ Claude should ask the user:
 ```
 Please describe the software system to be built. Include:
 
-1. **Operational Context**: What hospital function does this support? What workflow?
+1. **Context**: What function does this support? What workflow?
 2. **Users**: Who will use this? (roles, access levels, external systems)
 3. **Data**: What data is involved? (sensitivity, volume, retention)
 4. **Integration**: Existing systems to integrate with? (APIs, databases, messaging)
-5. **Compliance**: Regulatory requirements? (HIPAA, SOC2, internal policies)
+5. **Compliance**: Regulatory requirements? (industry standards, internal policies)
 6. **Constraints**: Technology restrictions, budget, timeline, team size
 7. **Success Definition**: What does "done" look like specifically?
 ```
@@ -67,17 +70,74 @@ Please describe the software system to be built. Include:
 Using Opus, explore:
 
 ```markdown
-As a Senior Software Engineer specializing in mission-critical systems:
+As a Senior Software Engineer:
 
-1. Analyze the user's requirements for operational impact implications
-2. Identify ALL stakeholders (end users, operations, compliance, legal, hospital leadership)
+1. Analyze the user's requirements for system impact implications
+2. Identify ALL stakeholders (end users, operations, compliance, legal, leadership)
 3. Map the workflow step-by-step
-4. Identify critical failure points and their consequences
+4. Identify failure points and their consequences
 5. Research relevant standards and regulatory requirements
 6. List similar systems and their known failure modes
 
 Output a comprehensive domain analysis document.
 ```
+
+---
+
+## Phase 1 Complete: Generate Project CLAUDE.md
+
+After completing requirements gathering and domain exploration, generate a project-specific CLAUDE.md file. This file will be used by junior developers (and Ralph Loop) to understand the project context.
+
+### 1.1 Create `.claude/CLAUDE.md`
+
+This file should contain:
+
+```markdown
+# Project: [Project Name]
+
+## Project Context
+[Brief description of what this system does and why it matters]
+
+## Stack
+- **Language**: [detected from project]
+- **Frameworks**: [detected from project]
+- **Database/ORM**: [if applicable]
+- **Testing**: [framework being used]
+
+## Key Directories
+- Source: [src/, lib/, app/, etc.]
+- Tests: [tests/, __tests__/, etc.]
+- Documentation: docs/
+
+## Project Documentation References
+- `.claude/docs/PROJECT-PLAN.md` - Complete project context
+- `.claude/docs/SPECIFICATIONS.md` - Atomic specifications
+- `.claude/docs/RISKS-AND-MITIGATIONS.md` - Risk analysis
+- `.claude/docs/IMPLEMENTATION-ROADMAP.md` - Step-by-step implementation guide
+- `.claude/docs/TDD-MASTER-DOCUMENT.md` - All test cases
+
+## Development Standards
+- Follow specifications exactly - no deviations
+- All tests must pass before committing
+- TDD approach: write tests first, then implementation
+- When in doubt, consult the project documentation
+
+## Quality Gates
+- No TypeScript errors (if applicable)
+- No lint warnings
+- Test coverage >80% on business logic
+- Code review before merge
+
+---
+
+*Auto-generated from planning documents. Edit to add project-specific notes.*
+```
+
+### 1.2 Generate from Planning Documents
+
+Once PROJECT-PLAN.md exists, the project-specific CLAUDE.md should reference it and all other planning documents that will be created in subsequent phases.
+
+**Important:** This is created AFTER Phase 1 because it references the planning documents that are created throughout the planning process. The file should be updated as each phase completes to include references to new documentation.
 
 ---
 
@@ -96,7 +156,7 @@ Output a comprehensive domain analysis document.
 
 [One paragraph overview for stakeholders]
 
-## 2. Operational Context
+## 2. System Context
 
 ### 2.1 Function/Service Area
 - Area: [specify]
@@ -105,12 +165,12 @@ Output a comprehensive domain analysis document.
 
 ### 2.2 Current State (As-Is)
 - Current process: [detailed description]
-- Pain points: [list with operational impact]
+- Pain points: [list with impact]
 - Risk concerns: [list]
 
 ### 2.3 Future State (To-Be)
 - Proposed solution: [description]
-- Operational benefits: [specific outcomes]
+- Benefits: [specific outcomes]
 - Reliability improvements: [specific]
 
 ## 3. Requirements Summary
@@ -204,7 +264,7 @@ Output a comprehensive domain analysis document.
 
 ## Phase 3: Specification Breakdown (ITERATIVE)
 
-This is the **most critical phase**. Repeat 3-5 times until specifications are atomic.
+This is the **most important phase**. Repeat 3-5 times until specifications are atomic.
 
 ### 3.1 First Pass: Functional Requirements Breakdown
 
@@ -256,7 +316,7 @@ Transform each atomic specification into:
 ### User Story
 As a [user role],
 I want to [action],
-So that [operational benefit].
+So that [benefit].
 
 ### Acceptance Criteria
 1. [Specific criterion]
@@ -317,9 +377,9 @@ So that [operational benefit].
 - Encryption: [at rest, in transit]
 - Audit logging: [what, when, who]
 
-**Operational Safety:**
+**Safety & Reliability:**
 - Failure mode: [what can go wrong]
-- Operational consequence: [severity]
+- Consequence: [severity]
 - Safeguards: [prevention, detection, mitigation]
 - Fallback behavior: [what happens on failure]
 
@@ -386,13 +446,13 @@ If ANY answer is "no", REWRITE or SPLIT the specification.
 **Version:** 1.0
 **Last Updated:** [DATE]
 
-## 1. Operational Risks
+## 1. System Risks
 
-### 1.1 System Failure Risks
+### 1.1 Failure Risks
 
 | Risk ID | Risk | Probability | Impact | Severity | Mitigation | Owner | Status |
 |---------|------|-------------|--------|----------|------------|-------|--------|
-| O-001 | [Description] | [Low/Med/High] | [1-5] | [PxDxS] | [Actions] | [Who] | [Open/Mitigated] |
+| S-001 | [Description] | [Low/Med/High] | [1-5] | [PxDxS] | [Actions] | [Who] | [Open/Mitigated] |
 
 **Severity Calculation:**
 - PxDxS = Probability × Detection × Severity
@@ -499,11 +559,10 @@ Changes to make:
 ```markdown
 ## 10. Guidance for Junior Developers
 
-### 10.1 Criticality Mindset
-- Every line of code affects hospital operations
+### 10.1 Development Mindset
 - When in doubt, ASK before implementing
 - Never make assumptions about workflows
-- If this fails, we all lose our jobs
+- Follow specifications exactly
 
 ### 10.2 Development Standards
 - All code must be reviewed before merge
@@ -518,7 +577,7 @@ Changes to make:
 | Specification unclear | Stop, ask Senior Engineer |
 | Specification seems wrong | Stop, flag the issue |
 | Test is failing | Don't proceed, investigate |
-| Not sure about operational impact | Stop, ask Senior Engineer |
+| Not sure about system impact | Stop, ask Senior Engineer |
 | Found a bug | Report immediately, don't fix without approval |
 | Need to make an assumption | Don't. Get clarification |
 
@@ -543,7 +602,7 @@ This document must be so detailed that a junior developer **cannot fail** if the
 
 **Audience:** Junior Developers
 **Purpose:** Step-by-step implementation instructions
-**Critical:** Follow exactly. Do not deviate.
+**Important:** Follow exactly. Do not deviate.
 
 ## How to Use This Document
 
@@ -558,7 +617,7 @@ This document must be so detailed that a junior developer **cannot fail** if the
 - [ ] I have read the PROJECT-PLAN.md
 - [ ] I have read the SPECIFICATIONS.md
 - [ ] I have read the RISKS-AND-MITIGATIONS.md
-- [ ] I understand the operational context and criticality
+- [ ] I understand the system context and requirements
 - [ ] I have set up my development environment
 - [ ] I can run the test suite successfully
 
@@ -666,8 +725,8 @@ For EVERY specification implementation:
    - Test database operations
    - Test API endpoints
 
-3. **E2E Tests** (Required for critical workflows):
-   - Test complete operational scenarios
+3. **E2E Tests** (Required for key workflows):
+   - Test complete end-to-end scenarios
    - Test error recovery
    - Test performance under load
 
@@ -679,7 +738,7 @@ Before marking any item complete:
 - [ ] All tests pass
 - [ ] No TypeScript errors
 - [ ] No ESLint warnings
-- [ ] Operational safety reviewed
+- [ ] Safety and reliability reviewed
 - [ ] Security reviewed
 - [ ] Performance reviewed
 - [ ] Documentation complete
@@ -737,7 +796,7 @@ This document contains **every test case** for **every specification**.
 
 **Purpose:** Complete test specification for all functional requirements
 **Standard:** Every specification must have corresponding tests
-**Coverage:** 100% of critical code paths, 80% overall minimum
+**Coverage:** 100% of business logic code paths, 80% overall minimum
 
 ## Test Organization
 
@@ -753,7 +812,7 @@ tests/
 │   ├── api/
 │   └── services/
 └── e2e/
-    ├── critical-workflows/
+    ├── workflows/
     ├── error-scenarios/
     └── performance/
 ```
@@ -798,7 +857,7 @@ describe('SPEC-[ID]: [Specification Title]', () => {
     });
   });
 
-  describe('Operational Safety', () => {
+  describe('Safety & Reliability', () => {
     it('should not corrupt data on failure', () => {
       // Test case
     });
@@ -1023,7 +1082,7 @@ describe('POST /notes Integration', () => {
 
 **E2E Tests:**
 ```typescript
-describe('Critical Workflow: Create Note', () => {
+describe('Workflow: Create Note', () => {
   it('should allow user to create note', async () => {
     // Simulate user login
     // Navigate to target
@@ -1053,7 +1112,7 @@ describe('Critical Workflow: Create Note', () => {
 **Total Test Count:** [Calculate total]
 
 **Minimum Coverage Targets:**
-- Critical code paths: 100%
+- Business logic code paths: 100%
 - All code: 80%
 - Security-critical code: 100%
 
@@ -1083,12 +1142,12 @@ export const invalidNotes = {
 };
 ```
 
-### Critical Scenarios
+### Test Scenarios
 
 ```typescript
-// tests/fixtures/critical-scenarios.ts
-export const criticalScenarios = {
-  criticalOperation: {
+// tests/fixtures/test-scenarios.ts
+export const testScenarios = {
+  keyOperation: {
     // Complete context
     // Workflow steps
     // Expected outcomes
@@ -1163,13 +1222,13 @@ describe('Security: Note Access', () => {
 
 ## Test Execution Order
 
-**Critical:** Tests must run in this order for workflow validation:
+**Important:** Tests should run in this order for workflow validation:
 
 1. Unit Tests (fast, isolated)
 2. Integration Tests (database, API)
 3. Security Tests (authorization, injection)
 4. Performance Tests (load, stress)
-5. E2E Tests (critical workflows)
+5. E2E Tests (end-to-end workflows)
 
 **No specification is complete until ALL its tests pass.**
 ```
@@ -1184,13 +1243,7 @@ Once all planning documents are complete and verified, start Ralph Loop:
 
 ```bash
 /ralph-loop "
-You are implementing a critical software system with ZERO tolerance for bugs.
-
-# CRITICAL CONTEXT
-- This software is integral to hospital functioning
-- You are the Senior Engineer
-- Junior developers will implement from your specifications
-- If this fails, hospital operations are compromised and you lose your job
+You are implementing a software system from detailed specifications.
 
 # MANDATORY READING (Read in order)
 1. .claude/docs/PROJECT-PLAN.md - Complete project context
@@ -1230,11 +1283,11 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 - Verify ALL tests pass (green)
 - If any fail, fix the code (not the tests)
 
-## Step 6: Operational Safety Review
+## Step 6: Safety Review
 - Read the code you just wrote
 - Ask: What could go wrong?
 - Ask: What are the consequences if this fails?
-- If any safety concern exists, address it NOW
+- If any concern exists, address it NOW
 
 ## Step 7: Code Quality Checks
 - Run: npm run lint
@@ -1284,17 +1337,17 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 3. NEVER deviate from specifications
 4. NEVER guess - if unsure, note it in PROGRESS.md
 5. NEVER implement features not in specifications
-6. ALWAYS consider operational safety first
+6. ALWAYS consider quality and safety first
 7. ALWAYS write tests before code
 8. ALWAYS verify all tests pass before committing
 
 # COMPLETION
-Output <promise>CRITICAL_SYSTEM_COMPLETE</promise> ONLY when:
+Output <promise>SYSTEM_COMPLETE</promise> ONLY when:
 - ALL specifications from SPECIFICATIONS.md are implemented
 - ALL tests from TDD-MASTER-DOCUMENT.md pass
 - PROGRESS.md shows 100% completion
 - Code review passes with no critical issues
-- Operational safety verified
+- Quality verified
 
 Begin with the first specification in IMPLEMENTATION-ROADMAP.md (Phase 1, Foundation).
 " --max-iterations 200
@@ -1307,13 +1360,15 @@ Begin with the first specification in IMPLEMENTATION-ROADMAP.md (Phase 1, Founda
 After completing all phases, your project will have:
 
 ```
-.claude/docs/
-├── PROJECT-PLAN.md              # Complete project context (v2)
-├── SPECIFICATIONS.md            # Atomic, complete specifications
-├── RISKS-AND-MITIGATIONS.md     # All risks and mitigations
-├── IMPLEMENTATION-ROADMAP.md    # Junior-proof step-by-step guide
-├── TDD-MASTER-DOCUMENT.md       # Every test case for every spec
-└── PROGRESS.md                  # Tracking (created during Ralph Loop)
+.claude/
+├── CLAUDE.md                    # Project-specific context (created after Phase 1)
+└── docs/
+    ├── PROJECT-PLAN.md          # Complete project context (v2)
+    ├── SPECIFICATIONS.md        # Atomic, complete specifications
+    ├── RISKS-AND-MITIGATIONS.md # All risks and mitigations
+    ├── IMPLEMENTATION-ROADMAP.md # Junior-proof step-by-step guide
+    ├── TDD-MASTER-DOCUMENT.md   # Every test case for every spec
+    └── PROGRESS.md              # Tracking (created during Ralph Loop)
 ```
 
 **Each document links to others. Each specification references risks. Each test references specifications.**
@@ -1322,4 +1377,4 @@ After completing all phases, your project will have:
 
 ---
 
-**Remember:** You are the Senior Engineer. The hospital operations and your livelihood depend on you. Take the time to plan thoroughly. If this fails, you lose your job.
+**Remember:** You are the Senior Engineer. Take the time to plan thoroughly. Quality specifications enable quality implementation.
