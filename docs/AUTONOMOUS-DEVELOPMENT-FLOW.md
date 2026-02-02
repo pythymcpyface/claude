@@ -229,7 +229,7 @@ Once PROJECT-PLAN.md exists, the project-specific CLAUDE.md should reference it 
 - Junior Developers: [number, experience level]
 - QA/Testing: [resources]
 - DevOps: [resources]
-- Clinical SME: [availability]
+- Subject Matter Expert: [availability]
 
 ### 6.2 Infrastructure
 - Development: [environments]
@@ -242,8 +242,8 @@ Once PROJECT-PLAN.md exists, the project-specific CLAUDE.md should reference it 
 
 ## 8. Success Criteria
 
-### 8.1 Clinical Success
-- [Specific patient outcome improvements]
+### 8.1 Success Metrics
+- [Specific outcome improvements]
 - [Workflow efficiency gains]
 
 ### 8.2 Technical Success
@@ -301,7 +301,7 @@ For each specification item:
 6. **Data Impact**: What data is read/written? What are validation rules?
 7. **Performance**: Response time requirements? Concurrency considerations?
 8. **Security**: Who can access? What auditing is required?
-9. **Clinical Safety**: What are failure modes? What are clinical consequences?
+9. **Safety**: What are failure modes? What are consequences?
 
 If ANY answer reveals complexity, SPLIT the specification further.
 ```
@@ -386,7 +386,7 @@ So that [benefit].
 **Testing Requirements:**
 - Unit tests: [number, coverage]
 - Integration tests: [scenarios]
-- E2E tests: [clinical workflows]
+- E2E tests: [key workflows]
 - Performance tests: [scenarios]
 
 **Dependencies:**
@@ -395,7 +395,7 @@ So that [benefit].
 
 **Implementation Notes for Junior Developers:**
 - [Specific guidance on common mistakes]
-- [Specific guidance on clinical considerations]
+- [Specific guidance on system considerations]
 - [Specific guidance on testing approach]
 ```
 
@@ -552,7 +552,7 @@ Changes to make:
 3. Add contingency buffers for high-risk items
 4. Update team structure based on skill requirements
 5. Update technology choices based on non-functional requirements
-6. Add specific gates and reviews for clinical safety
+6. Add specific gates and reviews for quality and safety
 
 ### 5.2 Add "Junior Developer Guidance" Section
 
@@ -953,7 +953,7 @@ describe('Note Model', () => {
     });
   });
 
-  describe('Clinical Safety', () => {
+  describe('Safety & Reliability', () => {
     it('should preserve data integrity', () => {
       // Test round-trip serialization
     });
