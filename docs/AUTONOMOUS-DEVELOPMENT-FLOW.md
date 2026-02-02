@@ -1,6 +1,6 @@
 # Autonomous Development Flow
 
-**Context:** Hospital software development with zero tolerance for bugs. You are the Senior Engineer. Junior developers will implement from your specifications. Any failure means lives are at risk and jobs are lost.
+**Context:** Critical software development with zero tolerance for bugs. You are the Senior Engineer. The software is integral to the functioning of a hospital. Junior developers will implement from your specifications. If this project fails, hospital operations are compromised and you lose your job.
 
 **Goal:** Create specifications so detailed and atomic that implementation is mechanical and cannot fail.
 
@@ -53,11 +53,11 @@ Claude should ask the user:
 ```
 Please describe the software system to be built. Include:
 
-1. **Clinical Context**: Which hospital department? What clinical workflow?
-2. **Users**: Who will use this? (doctors, nurses, admins, patients)
-3. **Data**: What patient/clinical data is involved?
-4. **Integration**: Existing systems to integrate with? (EHR, HL7, FHIR)
-5. **Compliance**: HIPAA, FDA, Joint Commission requirements?
+1. **Operational Context**: What hospital function does this support? What workflow?
+2. **Users**: Who will use this? (roles, access levels, external systems)
+3. **Data**: What data is involved? (sensitivity, volume, retention)
+4. **Integration**: Existing systems to integrate with? (APIs, databases, messaging)
+5. **Compliance**: Regulatory requirements? (HIPAA, SOC2, internal policies)
 6. **Constraints**: Technology restrictions, budget, timeline, team size
 7. **Success Definition**: What does "done" look like specifically?
 ```
@@ -67,13 +67,13 @@ Please describe the software system to be built. Include:
 Using Opus, explore:
 
 ```markdown
-As a Senior Software Engineer specializing in healthcare systems:
+As a Senior Software Engineer specializing in mission-critical systems:
 
-1. Analyze the user's requirements for clinical safety implications
-2. Identify ALL stakeholders (patients, clinicians, IT, compliance, legal)
-3. Map the clinical workflow step-by-step
+1. Analyze the user's requirements for operational impact implications
+2. Identify ALL stakeholders (end users, operations, compliance, legal, hospital leadership)
+3. Map the workflow step-by-step
 4. Identify critical failure points and their consequences
-5. Research relevant healthcare standards (HL7 FHIR, HIPAA, IHE profiles)
+5. Research relevant standards and regulatory requirements
 6. List similar systems and their known failure modes
 
 Output a comprehensive domain analysis document.
@@ -94,24 +94,24 @@ Output a comprehensive domain analysis document.
 
 ## 1. Executive Summary
 
-[One paragraph overview for hospital leadership]
+[One paragraph overview for stakeholders]
 
-## 2. Clinical Context
+## 2. Operational Context
 
-### 2.1 Department/Service Line
-- Department: [specify]
+### 2.1 Function/Service Area
+- Area: [specify]
 - Primary Workflow: [describe]
-- Patient Population: [describe]
+- Impact Scope: [who/what is affected]
 
 ### 2.2 Current State (As-Is)
 - Current process: [detailed description]
-- Pain points: [list with clinical impact]
-- Safety concerns: [list]
+- Pain points: [list with operational impact]
+- Risk concerns: [list]
 
 ### 2.3 Future State (To-Be)
 - Proposed solution: [description]
-- Clinical benefits: [specific outcomes]
-- Safety improvements: [specific]
+- Operational benefits: [specific outcomes]
+- Reliability improvements: [specific]
 
 ## 3. Requirements Summary
 
@@ -121,16 +121,16 @@ Output a comprehensive domain analysis document.
 ### 3.2 Non-Functional Requirements
 - Performance: [specific metrics]
 - Reliability: [uptime, data loss tolerance]
-- Security: [HIPAA, encryption, audit]
+- Security: [encryption, audit, access control]
 - Usability: [workflow integration, training needs]
 - Scalability: [concurrent users, data volume]
 - Maintainability: [documentation, testing]
 
 ### 3.3 Regulatory & Compliance
-- HIPAA requirements: [list]
-- FDA classification (if applicable): [specify]
-- Joint Commission standards: [relevant standards]
-- Local regulations: [state-specific]
+- Regulatory requirements: [HIPAA, SOC2, etc.]
+- Industry standards: [relevant standards]
+- Internal policies: [organization-specific]
+- Local regulations: [jurisdiction-specific]
 
 ## 4. Technical Approach
 
@@ -254,9 +254,9 @@ Transform each atomic specification into:
 ## Specification ID: [XX.YY.ZZZ]
 
 ### User Story
-As a [clinician role],
+As a [user role],
 I want to [action],
-So that [clinical benefit].
+So that [operational benefit].
 
 ### Acceptance Criteria
 1. [Specific criterion]
@@ -313,13 +313,13 @@ So that [clinical benefit].
 
 **Security Requirements:**
 - Authorization: [who can access]
-- Data sensitivity: [PHI level]
+- Data sensitivity: [classification level]
 - Encryption: [at rest, in transit]
 - Audit logging: [what, when, who]
 
-**Clinical Safety:**
+**Operational Safety:**
 - Failure mode: [what can go wrong]
-- Clinical consequence: [severity]
+- Operational consequence: [severity]
 - Safeguards: [prevention, detection, mitigation]
 - Fallback behavior: [what happens on failure]
 
@@ -362,7 +362,7 @@ Review each specification and challenge:
    - Are all data types and constraints explicit?
 
 4. **Is this safe?**
-   - What's the worst clinical outcome if this is wrong?
+   - What's the worst outcome if this is wrong?
    - Have all failure modes been addressed?
    - Are there race conditions? Timing issues? Edge cases?
 
@@ -386,13 +386,13 @@ If ANY answer is "no", REWRITE or SPLIT the specification.
 **Version:** 1.0
 **Last Updated:** [DATE]
 
-## 1. Clinical Risks
+## 1. Operational Risks
 
-### 1.1 Patient Safety Risks
+### 1.1 System Failure Risks
 
 | Risk ID | Risk | Probability | Impact | Severity | Mitigation | Owner | Status |
 |---------|------|-------------|--------|----------|------------|-------|--------|
-| C-001 | [Description] | [Low/Med/High] | [1-5] | [PxDxS] | [Actions] | [Who] | [Open/Mitigated] |
+| O-001 | [Description] | [Low/Med/High] | [1-5] | [PxDxS] | [Actions] | [Who] | [Open/Mitigated] |
 
 **Severity Calculation:**
 - PxDxS = Probability × Detection × Severity
@@ -401,9 +401,9 @@ If ANY answer is "no", REWRITE or SPLIT the specification.
 - Medium: 10 ≤ PxDxS < 50
 - Low: PxDxS < 10
 
-### 1.2 Clinical Workflow Risks
+### 1.2 Workflow Integration Risks
 
-[Analyze how the system integrates into clinical workflows]
+[Analyze how the system integrates into existing workflows]
 
 ### 1.3 Data Integrity Risks
 
@@ -499,10 +499,11 @@ Changes to make:
 ```markdown
 ## 10. Guidance for Junior Developers
 
-### 10.1 Safety-First Mindset
-- Every line of code affects patient care
+### 10.1 Criticality Mindset
+- Every line of code affects hospital operations
 - When in doubt, ASK before implementing
-- Never make assumptions about clinical workflows
+- Never make assumptions about workflows
+- If this fails, we all lose our jobs
 
 ### 10.2 Development Standards
 - All code must be reviewed before merge
@@ -517,7 +518,7 @@ Changes to make:
 | Specification unclear | Stop, ask Senior Engineer |
 | Specification seems wrong | Stop, flag the issue |
 | Test is failing | Don't proceed, investigate |
-| Not sure about clinical impact | Stop, ask Clinical SME |
+| Not sure about operational impact | Stop, ask Senior Engineer |
 | Found a bug | Report immediately, don't fix without approval |
 | Need to make an assumption | Don't. Get clarification |
 
@@ -557,7 +558,7 @@ This document must be so detailed that a junior developer **cannot fail** if the
 - [ ] I have read the PROJECT-PLAN.md
 - [ ] I have read the SPECIFICATIONS.md
 - [ ] I have read the RISKS-AND-MITIGATIONS.md
-- [ ] I understand the clinical context
+- [ ] I understand the operational context and criticality
 - [ ] I have set up my development environment
 - [ ] I can run the test suite successfully
 
@@ -613,7 +614,7 @@ This document must be so detailed that a junior developer **cannot fail** if the
    ```
 
 2. For each interface:
-   - Add JSDoc comments explaining clinical relevance
+   - Add JSDoc comments explaining purpose and usage
    - Add validation schemas
    - Add TypeScript strict types
 
@@ -665,8 +666,8 @@ For EVERY specification implementation:
    - Test database operations
    - Test API endpoints
 
-3. **E2E Tests** (Required for clinical workflows):
-   - Test complete clinical scenarios
+3. **E2E Tests** (Required for critical workflows):
+   - Test complete operational scenarios
    - Test error recovery
    - Test performance under load
 
@@ -678,7 +679,7 @@ Before marking any item complete:
 - [ ] All tests pass
 - [ ] No TypeScript errors
 - [ ] No ESLint warnings
-- [ ] Clinical safety reviewed
+- [ ] Operational safety reviewed
 - [ ] Security reviewed
 - [ ] Performance reviewed
 - [ ] Documentation complete
@@ -712,9 +713,9 @@ For each specification, considering the complete project context:
    - Is everything specified?
    - Are all decisions made?
 
-3. **Is this testable to hospital standards?**
+3. **Is this testable to production standards?**
    - Can we prove this works in all scenarios?
-   - Can we demonstrate safety?
+   - Can we demonstrate reliability and safety?
 
 4. **Is this compatible with the overall architecture?**
    - Does it integrate correctly?
@@ -736,7 +737,7 @@ This document contains **every test case** for **every specification**.
 
 **Purpose:** Complete test specification for all functional requirements
 **Standard:** Every specification must have corresponding tests
-**Coverage:** 100% of clinical code paths, 80% overall minimum
+**Coverage:** 100% of critical code paths, 80% overall minimum
 
 ## Test Organization
 
@@ -752,7 +753,7 @@ tests/
 │   ├── api/
 │   └── services/
 └── e2e/
-    ├── clinical-workflows/
+    ├── critical-workflows/
     ├── error-scenarios/
     └── performance/
 ```
@@ -797,7 +798,7 @@ describe('SPEC-[ID]: [Specification Title]', () => {
     });
   });
 
-  describe('Clinical Safety', () => {
+  describe('Operational Safety', () => {
     it('should not corrupt data on failure', () => {
       // Test case
     });
@@ -1022,18 +1023,18 @@ describe('POST /notes Integration', () => {
 
 **E2E Tests:**
 ```typescript
-describe('Clinical Workflow: Create Note', () => {
-  it('should allow clinician to create patient note', async () => {
-    // Simulate clinician login
-    // Navigate to patient
+describe('Critical Workflow: Create Note', () => {
+  it('should allow user to create note', async () => {
+    // Simulate user login
+    // Navigate to target
     // Create note
-    // Verify note appears in patient record
+    // Verify note appears in record
   });
 
-  it('should allow creation during active patient encounter', async () => {
-    // Simulate active encounter
+  it('should allow creation during active session', async () => {
+    // Simulate active session
     // Create note
-    // Verify note linked to encounter
+    // Verify note linked to session
   });
 });
 ```
@@ -1052,7 +1053,7 @@ describe('Clinical Workflow: Create Note', () => {
 **Total Test Count:** [Calculate total]
 
 **Minimum Coverage Targets:**
-- Clinical code paths: 100%
+- Critical code paths: 100%
 - All code: 80%
 - Security-critical code: 100%
 
@@ -1082,13 +1083,13 @@ export const invalidNotes = {
 };
 ```
 
-### Clinical Scenarios
+### Critical Scenarios
 
 ```typescript
-// tests/fixtures/clinical-scenarios.ts
-export const clinicalScenarios = {
-  emergencyAdmission: {
-    // Complete patient context
+// tests/fixtures/critical-scenarios.ts
+export const criticalScenarios = {
+  criticalOperation: {
+    // Complete context
     // Workflow steps
     // Expected outcomes
   },
@@ -1162,13 +1163,13 @@ describe('Security: Note Access', () => {
 
 ## Test Execution Order
 
-**Critical:** Tests must run in this order for clinical workflow validation:
+**Critical:** Tests must run in this order for workflow validation:
 
 1. Unit Tests (fast, isolated)
 2. Integration Tests (database, API)
 3. Security Tests (authorization, injection)
 4. Performance Tests (load, stress)
-5. E2E Tests (clinical workflows)
+5. E2E Tests (critical workflows)
 
 **No specification is complete until ALL its tests pass.**
 ```
@@ -1183,13 +1184,13 @@ Once all planning documents are complete and verified, start Ralph Loop:
 
 ```bash
 /ralph-loop "
-You are implementing a hospital software system with ZERO tolerance for bugs.
+You are implementing a critical software system with ZERO tolerance for bugs.
 
 # CRITICAL CONTEXT
-- Hospital setting: Patient lives depend on correct code
+- This software is integral to hospital functioning
 - You are the Senior Engineer
 - Junior developers will implement from your specifications
-- Any bug means people die and families lose their livelihood
+- If this fails, hospital operations are compromised and you lose your job
 
 # MANDATORY READING (Read in order)
 1. .claude/docs/PROJECT-PLAN.md - Complete project context
@@ -1229,10 +1230,10 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 - Verify ALL tests pass (green)
 - If any fail, fix the code (not the tests)
 
-## Step 6: Clinical Safety Review
+## Step 6: Operational Safety Review
 - Read the code you just wrote
 - Ask: What could go wrong?
-- Ask: What are the clinical consequences?
+- Ask: What are the consequences if this fails?
 - If any safety concern exists, address it NOW
 
 ## Step 7: Code Quality Checks
@@ -1283,17 +1284,17 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 3. NEVER deviate from specifications
 4. NEVER guess - if unsure, note it in PROGRESS.md
 5. NEVER implement features not in specifications
-6. ALWAYS consider clinical safety first
+6. ALWAYS consider operational safety first
 7. ALWAYS write tests before code
 8. ALWAYS verify all tests pass before committing
 
 # COMPLETION
-Output <promise>HOSPITAL_SYSTEM_COMPLETE</promise> ONLY when:
+Output <promise>CRITICAL_SYSTEM_COMPLETE</promise> ONLY when:
 - ALL specifications from SPECIFICATIONS.md are implemented
 - ALL tests from TDD-MASTER-DOCUMENT.md pass
 - PROGRESS.md shows 100% completion
 - Code review passes with no critical issues
-- Clinical safety verified
+- Operational safety verified
 
 Begin with the first specification in IMPLEMENTATION-ROADMAP.md (Phase 1, Foundation).
 " --max-iterations 200
@@ -1321,4 +1322,4 @@ After completing all phases, your project will have:
 
 ---
 
-**Remember:** You are the Senior Engineer. The hospital and your team depend on you. Take the time to plan thoroughly. Lives depend on it.
+**Remember:** You are the Senior Engineer. The hospital operations and your livelihood depend on you. Take the time to plan thoroughly. If this fails, you lose your job.
