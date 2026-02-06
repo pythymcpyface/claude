@@ -70,6 +70,35 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 ---
 
+## Phase 3.5: Requirements Breakdown
+
+**Goal**: Generate complete REQUIREMENTS.md with atomic requirements
+
+**CRITICAL**: Complete all requirements work before any specifications
+
+**Actions**:
+1. **Generate initial requirements** from user input and clarifying questions
+2. **Iterative breakdown loop (3-5 passes)**:
+   - For each requirement, ask: "Can this be split into smaller, independently testable units?"
+   - Break down until atomic (single function, single decision point, single file)
+   - Stop when requirements seem "ridiculously small"
+3. **Generate `.claude/docs/REQUIREMENTS.md`** with:
+   - Numbered REQ-001, REQ-002, etc.
+   - User story format for each
+   - Acceptance criteria (binary, measurable)
+   - Dependencies between requirements
+   - Priority (Must-have / Should-have / Nice-to-have)
+
+**Atomic Requirement Indicators**:
+- Can be implemented in a single function or small set of functions
+- Has clear, binary acceptance criteria (pass/fail)
+- Independent of other requirements (minimal dependencies)
+- Testable in isolation
+
+**Template**: Use `.claude/docs/templates/REQUIREMENTS-TEMPLATE.md`
+
+---
+
 ## Phase 4: Architecture Design
 
 **Goal**: Design multiple implementation approaches with different trade-offs
@@ -82,19 +111,67 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 ---
 
-## Phase 5: Implementation
+## Phase 4.5: TDD Strategy Generation
 
-**Goal**: Build the feature
+**Goal**: Generate complete SPECIFICATIONS.md and TDD-STRATEGY.md
+
+**CRITICAL**: Complete all specs and test planning before implementation
+
+**Actions**:
+1. **For each REQ-XXX**, generate SPEC-XXX using the existing template
+2. **Generate `.claude/docs/SPECIFICATIONS.md`** containing all specs
+3. **Generate `.claude/docs/TDD-STRATEGY.md`** with:
+   - Test case for every acceptance criterion
+   - Happy path tests
+   - Sad path/edge case tests
+   - Integration tests
+   - Test fixtures needed
+
+**Coverage Targets**:
+- **Unit tests**: Each acceptance criterion gets at least one test
+- **Edge cases**: Minimum 2-3 per requirement
+- **Integration tests**: For requirement dependencies
+- **Coverage goal**: >80% on business logic
+
+**Templates**:
+- Specifications: `.claude/docs/templates/SPEC-TEMPLATE.md`
+- TDD Strategy: `.claude/docs/templates/TDD-STRATEGY-TEMPLATE.md`
+
+**Document Generation Order**:
+1. Complete `REQUIREMENTS.md` (all requirements broken down)
+2. Complete `SPECIFICATIONS.md` (all specs from requirements)
+3. Complete `TDD-STRATEGY.md` (all test cases mapped)
+4. **THEN** begin implementation
+
+---
+
+## Phase 5: Implementation (Strict TDD)
+
+**Goal**: Build the feature following Red-Green-Refactor loop
 
 **DO NOT START WITHOUT USER APPROVAL**
+
+**CRITICAL**: Only starts after ALL documents (REQUIREMENTS.md, SPECIFICATIONS.md, TDD-STRATEGY.md) are complete
+
+**TDD Loop for each SPEC-XXX (in dependency order)**:
+1. **Read test cases** from TDD-STRATEGY.md for this spec
+2. **Write failing test** (RED) - create test file with test case
+3. **Run test**, confirm it fails with expected error
+4. **Write minimal implementation** to make test pass
+5. **Run test**, confirm it passes (GREEN)
+6. **Refactor** if needed (REFACTOR)
+7. **Run `.claude/scripts/tdd-gate.sh`** to verify TDD compliance
+8. **Run `.claude/scripts/quality-gate.sh`** to verify code quality
+9. **Commit** if gates pass
 
 **Actions**:
 1. Wait for explicit user approval
 2. Read all relevant files identified in previous phases
-3. Implement following chosen architecture
-4. Follow codebase conventions strictly
-5. Write clean, well-documented code
-6. Update todos as you progress
+3. Read REQUIREMENTS.md, SPECIFICATIONS.md, and TDD-STRATEGY.md
+4. For each SPEC-XXX, follow TDD loop above
+5. Follow codebase conventions strictly
+6. Write clean, well-documented code
+7. Update todos as you progress
 
 ---
 
@@ -120,6 +197,19 @@ If the user says "whatever you think is best", provide your recommendation and g
    - What was built
    - Key decisions made
    - Files modified
+   - Documents generated (REQUIREMENTS.md, SPECIFICATIONS.md, TDD-STRATEGY.md)
    - Suggested next steps
+
+---
+
+## Document Artifacts
+
+This workflow generates three planning documents before implementation:
+
+1. **`.claude/docs/REQUIREMENTS.md`** - Atomic requirements (REQ-001, REQ-002, etc.)
+2. **`.claude/docs/SPECIFICATIONS.md`** - Technical specifications (SPEC-001, SPEC-002, etc.)
+3. **`.claude/docs/TDD-STRATEGY.md`** - Test case mapping (TEST-XXX-XXX)
+
+These documents provide complete visibility into scope before coding begins.
 
 ---
