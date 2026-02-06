@@ -14,6 +14,24 @@ You are helping a developer implement a new feature. Follow a systematic approac
 - **Read files identified by agents**: When launching agents, ask them to return lists of the most important files to read. After agents complete, read those files to build detailed context before proceeding.
 - **Simple and elegant**: Prioritize readable, maintainable, architecturally sound code
 - **Use TodoWrite**: Track all progress throughout
+- **Branch-per-feature**: All work happens on a feature branch named after the work being done
+
+---
+
+## Phase 0: Branch Setup
+
+**Goal**: Create and checkout a feature branch
+
+**Actions**:
+1. Generate a branch name from the feature description (use kebab-case, max 50 chars)
+2. Ask user to confirm or modify the branch name
+3. Create and checkout the branch: `git checkout -b <branch-name>`
+4. **Store branch name as variable** `$BRANCH_NAME` for documentation naming
+
+**Example**:
+- Feature: "Add user authentication with OAuth"
+- Branch name: `add-user-auth-oauth`
+- Documentation directory: `.claude/docs/$BRANCH_NAME/`
 
 ---
 
@@ -82,7 +100,7 @@ If the user says "whatever you think is best", provide your recommendation and g
    - For each requirement, ask: "Can this be split into smaller, independently testable units?"
    - Break down until atomic (single function, single decision point, single file)
    - Stop when requirements seem "ridiculously small"
-3. **Generate `.claude/docs/REQUIREMENTS.md`** with:
+3. **Generate `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`** with:
    - Numbered REQ-001, REQ-002, etc.
    - User story format for each
    - Acceptance criteria (binary, measurable)
@@ -96,6 +114,7 @@ If the user says "whatever you think is best", provide your recommendation and g
 - Testable in isolation
 
 **Template**: Use `.claude/docs/templates/REQUIREMENTS-TEMPLATE.md`
+**Output**: `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
 
 ---
 
@@ -119,8 +138,8 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 **Actions**:
 1. **For each REQ-XXX**, generate SPEC-XXX using the existing template
-2. **Generate `.claude/docs/SPECIFICATIONS.md`** containing all specs
-3. **Generate `.claude/docs/TDD-STRATEGY.md`** with:
+2. **Generate `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`** containing all specs
+3. **Generate `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`** with:
    - Test case for every acceptance criterion
    - Happy path tests
    - Sad path/edge case tests
@@ -136,11 +155,14 @@ If the user says "whatever you think is best", provide your recommendation and g
 **Templates**:
 - Specifications: `.claude/docs/templates/SPEC-TEMPLATE.md`
 - TDD Strategy: `.claude/docs/templates/TDD-STRATEGY-TEMPLATE.md`
+**Outputs**:
+- `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`
+- `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
 
 **Document Generation Order**:
-1. Complete `REQUIREMENTS.md` (all requirements broken down)
-2. Complete `SPECIFICATIONS.md` (all specs from requirements)
-3. Complete `TDD-STRATEGY.md` (all test cases mapped)
+1. Complete `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md` (all requirements broken down)
+2. Complete `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md` (all specs from requirements)
+3. Complete `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md` (all test cases mapped)
 4. **THEN** begin implementation
 
 ---
@@ -151,10 +173,10 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 **DO NOT START WITHOUT USER APPROVAL**
 
-**CRITICAL**: Only starts after ALL documents (REQUIREMENTS.md, SPECIFICATIONS.md, TDD-STRATEGY.md) are complete
+**CRITICAL**: Only starts after ALL documents ($BRANCH_NAME/REQUIREMENTS.md, $BRANCH_NAME/SPECIFICATIONS.md, $BRANCH_NAME/TDD-STRATEGY.md) are complete
 
 **TDD Loop for each SPEC-XXX (in dependency order)**:
-1. **Read test cases** from TDD-STRATEGY.md for this spec
+1. **Read test cases** from `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md` for this spec
 2. **Write failing test** (RED) - create test file with test case
 3. **Run test**, confirm it fails with expected error
 4. **Write minimal implementation** to make test pass
@@ -167,7 +189,7 @@ If the user says "whatever you think is best", provide your recommendation and g
 **Actions**:
 1. Wait for explicit user approval
 2. Read all relevant files identified in previous phases
-3. Read REQUIREMENTS.md, SPECIFICATIONS.md, and TDD-STRATEGY.md
+3. Read `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`, `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`, and `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
 4. For each SPEC-XXX, follow TDD loop above
 5. Follow codebase conventions strictly
 6. Write clean, well-documented code
@@ -187,29 +209,47 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 ---
 
-## Phase 7: Summary
+## Phase 7: Summary and Merge
 
-**Goal**: Document what was accomplished
+**Goal**: Document what was accomplished and merge the feature branch
 
 **Actions**:
 1. Mark all todos complete
-2. Summarize:
+2. Add documentation directory to `.gitignore`:
+   ```bash
+   echo ".claude/docs/$BRANCH_NAME/" >> .gitignore
+   ```
+3. Commit the `.gitignore` change if modified
+4. Merge the feature branch to main:
+   ```bash
+   git checkout main
+   git merge --no-ff $BRANCH_NAME -m "feat: complete $BRANCH_NAME"
+   ```
+5. Push to remote:
+   ```bash
+   git push origin main
+   ```
+6. Optionally delete the feature branch:
+   ```bash
+   git branch -d $BRANCH_NAME
+   ```
+7. Summarize:
    - What was built
    - Key decisions made
    - Files modified
-   - Documents generated (REQUIREMENTS.md, SPECIFICATIONS.md, TDD-STRATEGY.md)
+   - Documents generated ($BRANCH_NAME/REQUIREMENTS.md, $BRANCH_NAME/SPECIFICATIONS.md, $BRANCH_NAME/TDD-STRATEGY.md)
    - Suggested next steps
 
 ---
 
 ## Document Artifacts
 
-This workflow generates three planning documents before implementation:
+This workflow generates three planning documents before implementation, named after the feature branch:
 
-1. **`.claude/docs/REQUIREMENTS.md`** - Atomic requirements (REQ-001, REQ-002, etc.)
-2. **`.claude/docs/SPECIFICATIONS.md`** - Technical specifications (SPEC-001, SPEC-002, etc.)
-3. **`.claude/docs/TDD-STRATEGY.md`** - Test case mapping (TEST-XXX-XXX)
+1. **`.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`** - Atomic requirements (REQ-001, REQ-002, etc.)
+2. **`.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`** - Technical specifications (SPEC-001, SPEC-002, etc.)
+3. **`.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`** - Test case mapping (TEST-XXX-XXX)
 
-These documents provide complete visibility into scope before coding begins.
+The documentation directory is added to `.gitignore` at the end of the workflow, keeping planning documents local but preserving the branch-per-feature workflow in git history.
 
 ---
