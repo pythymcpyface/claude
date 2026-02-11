@@ -1,0 +1,520 @@
+---
+description: Generate planning documentation ONLY. Reads research/feasibility docs, outputs .claude/docs/*.md files. Does NOT write code or create implementation plans.
+argument-hint: Project context (optional - reads existing research/feasibility docs)
+---
+
+# Start Project - DOCUMENTATION GENERATION ONLY
+
+## ⛔ THIS COMMAND DOES NOT WRITE CODE ⛔
+
+**PURPOSE**: Generate planning documentation from existing research/feasibility documents.
+**OUTPUT**: `.claude/docs/` directory with markdown files only.
+**STOPPING POINT**: After documentation generation is complete.
+
+**WHAT THIS COMMAND DOES:**
+- ✅ Read existing research/feasibility documents
+- ✅ Generate `.claude/docs/*.md` planning documents
+- ✅ Generate `.claude/scripts/*.sh` helper scripts (not executed)
+
+**WHAT THIS COMMAND DOES NOT DO:**
+- ❌ Write ANY application code
+- ❌ Create ANY implementation plans
+- ❌ Create ANY source files (src/, tests/, config files, etc.)
+- ❌ Run ANY setup commands
+- ❌ Install ANY dependencies
+- ❌ Execute ANY scripts
+
+---
+
+## Workflow
+
+1. Read existing research/feasibility documents
+2. Generate all planning documentation
+3. Validate documentation completeness
+4. Present summary and **STOP**
+
+---
+
+## Step 1: Read Existing Research Documents
+
+First, discover and read any existing project documentation:
+
+```bash
+# Find research/feasibility documents
+Glob -pattern "*.md" -path .
+Grep -pattern "research|feasibility|requirements" -glob "*.md" -i
+```
+
+Read any discovered research, feasibility, or requirements documents to understand the project context.
+
+---
+
+## Step 2: Generate All Documentation
+
+### 2.1 Create Directory Structure
+
+```bash
+mkdir -p .claude/docs .claude/scripts
+```
+
+### 2.2 Generate `.claude/CLAUDE.md`
+
+```markdown
+# Project: [Project Name]
+
+## Project Context
+[Brief description]
+
+## Stack
+- **Language**: [from requirements]
+- **Frameworks**: [from requirements]
+- **Database/ORM**: [if applicable]
+- **Testing**: [from requirements]
+
+## Key Directories
+- Source: [to be determined]
+- Tests: [to be determined]
+
+## Project Documentation References
+- `.claude/docs/PROJECT-PLAN.md` - Complete project context
+- `.claude/docs/SPECIFICATIONS.md` - Atomic specifications
+- `.claude/docs/RISKS-AND-MITIGATIONS.md` - Risk analysis
+- `.claude/docs/IMPLEMENTATION-ROADMAP.md` - Step-by-step guide with checkpoints
+- `.claude/docs/TDD-MASTER-DOCUMENT.md` - All test cases
+- `.claude/docs/TEST-FIXTURES.md` - Test data fixtures
+- `.claude/docs/INTEGRATION-TESTS.md` - Cross-specification tests
+- `.claude/docs/DEPENDENCY-GRAPH.md` - Specification dependencies
+- `.claude/docs/PARALLEL-GROUPS.md` - Parallel execution groups
+- `.claude/docs/CRITICAL-PATH.md` - Implementation priority
+- `.claude/docs/GIT-STRATEGY.md` - Git workflow and conventions
+
+## Development Standards
+- Follow specifications exactly
+- TDD approach: tests first, implementation after
+- All tests must pass before committing
+
+## Quality Gates
+- No TypeScript errors (if applicable)
+- No lint warnings
+- Test coverage >80% on business logic
+- Code review before merge
+
+---
+
+*Auto-generated from planning documents.*
+```
+
+### 2.3 Generate `.claude/docs/PROJECT-PLAN.md`
+
+Use template from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 2:
+- Executive Summary
+- System Context (function, current state, future state)
+- Requirements Summary (functional, non-functional, compliance)
+- Technical Approach (architecture, tech stack, development approach)
+- High-Level Roadmap
+- Resource Requirements
+- Risk Summary (high-level)
+- Success Criteria
+- Assumptions & Constraints
+
+### 2.4 Generate `.claude/docs/GIT-STRATEGY.md`
+
+```markdown
+# Git Strategy
+
+## Branching Model
+- `main` - Production-ready code
+- `develop` - Integration branch (if using)
+- `feat/spec-XXX` - Feature branches per specification
+
+## Commit Convention
+```
+feat(spec-XXX): brief description
+fix(spec-XXX): brief description
+docs: brief description
+refactor: brief description
+test: brief description
+chore: brief description
+```
+
+## Commit Process
+1. Write tests first (failing)
+2. Implement specification
+3. Verify all tests pass
+4. Run quality-gate.sh
+5. Commit with conventional format
+6. NEVER commit broken tests
+
+## PROGRESS Tracking
+Update `.claude/docs/PROGRESS.md` after each completed specification.
+```
+
+### 2.5 Generate Initial `.claude/docs/SPECIFICATIONS.md`
+
+Break down requirements into specifications. Each specification must include:
+- Specification ID (e.g., SPEC-001)
+- User Story
+- Acceptance Criteria
+- Functional Specification (Input, Processing, Output, Database, API, Error Handling, Edge Cases)
+- Performance Requirements
+- Security Requirements
+- Safety & Reliability
+- Testing Requirements
+- Dependencies (Requires/Required by)
+
+**Start with first pass breakdown.**
+
+---
+
+## Step 3: Iterate Specifications Until Atomic (3-5 times)
+
+For each iteration:
+
+### 3.1 Read Current Specifications
+```bash
+Read .claude/docs/SPECIFICATIONS.md
+```
+
+### 3.2 Challenge Each Specification
+
+For each specification, ask:
+1. **Atomicity**: Can this be split?
+2. **Dependencies**: What must exist first?
+3. **Edge Cases**: ALL possible inputs/states?
+4. **Error Conditions**: How can this fail?
+5. **Integration Points**: What other systems?
+6. **Data Impact**: Validation rules?
+7. **Performance**: Response time?
+8. **Security**: Who can access?
+9. **Safety**: Failure modes?
+
+If ANY answer reveals complexity, **SPLIT**.
+
+### 3.3 Update Specifications
+Use `Edit` to update SPECIFICATIONS.md with more granular specs.
+
+### 3.4 Track Iterations
+Use `TodoWrite` to track breakdown iterations.
+
+### 3.5 Stop When
+- Specifications are SO SMALL they seem ridiculous
+- Each spec implementable in 15-30 minutes
+- NO FURTHER BREAKDOWN IS POSSIBLE
+
+---
+
+## Step 4: Generate Supporting Documents
+
+### 4.1 Generate `.claude/docs/DEPENDENCY-GRAPH.md`
+
+Parse all specifications and create dependency graph:
+
+```markdown
+# Specification Dependency Graph
+
+## Complete Graph
+[Generate based on Requires/Required by from specs]
+
+## Format Example
+SPEC-001: Project Setup (no dependencies)
+    ↓
+SPEC-002: Core Types (depends on: SPEC-001)
+    ↓
+SPEC-003: Database Schema (depends on: SPEC-002)
+```
+
+### 4.2 Generate `.claude/docs/PARALLEL-GROUPS.md`
+
+Identify specifications with identical dependencies that can run in parallel:
+
+```markdown
+# Parallel Execution Groups
+
+## Group A: [Foundation]
+Specifications: SPEC-004, SPEC-005, SPEC-006
+Can run in parallel: Yes
+Dependencies: SPEC-002, SPEC-003
+```
+
+### 4.3 Generate `.claude/docs/CRITICAL-PATH.md`
+
+Identify specifications that block the most other specs:
+
+```markdown
+# Critical Path Specifications
+
+## Critical Path (Implement First)
+1. SPEC-001: Project Setup (blocks: all)
+2. SPEC-002: Core Types (blocks: 15 specs)
+3. SPEC-003: Error Handling (blocks: 12 specs)
+
+## Leaf Specifications (Implement Last)
+- SPEC-047: Logging (nothing depends on it)
+```
+
+### 4.4 Generate `.claude/docs/TEST-FIXTURES.md`
+
+Create test data fixtures for valid and invalid inputs:
+
+```markdown
+# Test Data Fixtures
+
+## Valid Fixtures
+[JSON fixtures for valid inputs]
+
+## Invalid Fixtures
+[JSON fixtures for error testing]
+```
+
+### 4.5 Generate `.claude/docs/INTEGRATION-TESTS.md`
+
+Create integration tests that span multiple specifications:
+
+```markdown
+# Integration Test Matrix
+
+## IT-001: [Workflow Name]
+**Specifications:** [list]
+**Test:** [steps]
+**Expected Result:** [outcome]
+```
+
+### 4.6 Generate `.claude/docs/RISKS-AND-MITIGATIONS.md`
+
+Use template from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 4:
+- System Risks
+- Technical Risks
+- Operational Risks
+- Security & Compliance Risks
+- Project Risks
+- Mitigation Strategies
+
+### 4.7 Update `.claude/docs/PROJECT-PLAN.md` to v2
+
+Incorporate:
+- Insights from specifications
+- Risk mitigation activities
+- Contingency buffers
+- Quality gates
+
+### 4.8 Generate `.claude/docs/IMPLEMENTATION-ROADMAP.md`
+
+Create step-by-step instructions from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 6:
+- Pre-implementation checklist
+- Phase-by-phase implementation steps
+- **Checkpoint definitions** (user review points)
+- Verification steps
+- Testing requirements
+- Code review checklist
+
+### 4.9 Generate `.claude/docs/TDD-MASTER-DOCUMENT.md`
+
+Create complete test specifications from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 8:
+- Test organization structure
+- Test template for each specification
+- Test specifications by specification ID
+- Complete test matrix
+- Test data strategy
+- Performance test specifications
+- Security test specifications
+
+---
+
+## Step 5: Generate Scripts
+
+### 5.1 Create `.claude/scripts/quality-gate.sh`
+
+```bash
+#!/bin/bash
+# Quality Gate Verification
+# Run before each commit during Ralph Loop
+
+echo "🔍 Running Quality Gates..."
+
+# 1. Tests
+npm test --silent 2>&1 | tail -5
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failing"
+  exit 1
+fi
+
+# 2. TypeScript
+npx tsc --noEmit 2>&1 | head -10
+if [ $? -ne 0 ]; then
+  echo "❌ TypeScript errors"
+  exit 1
+fi
+
+# 3. Lint
+npm run lint 2>&1 | tail -5
+if [ $? -ne 0 ]; then
+  echo "❌ Lint errors"
+  exit 1
+fi
+
+# 4. Coverage
+npm run test:coverage 2>&1 | grep -E "Lines|Statements|Branches|Functions"
+
+echo "✅ All quality gates passed"
+exit 0
+```
+
+### 5.2 Create `.claude/scripts/validate-planning.sh`
+
+```bash
+#!/bin/bash
+# Planning Document Validation
+
+BASE_DIR=".claude/docs"
+ERRORS=0
+
+for doc in CLAUDE.md PROJECT-PLAN.md SPECIFICATIONS.md RISKS-AND-MITIGATIONS.md \
+           IMPLEMENTATION-ROADMAP.md TDD-MASTER-DOCUMENT.md GIT-STRATEGY.md \
+           TEST-FIXTURES.md INTEGRATION-TESTS.md DEPENDENCY-GRAPH.md \
+           PARALLEL-GROUPS.md CRITICAL-PATH.md; do
+  if [ ! -f "$BASE_DIR/$doc" ]; then
+    echo "❌ Missing: $doc"
+    ERRORS=$((ERRORS + 1))
+  fi
+done
+
+if [ $ERRORS -eq 0 ]; then
+  echo "✅ All planning documents validated"
+  exit 0
+else
+  echo "❌ Found $ERRORS missing documents"
+  exit 1
+fi
+```
+
+### 5.3 Create `.claude/scripts/setup-env.sh`
+
+Use the full script from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 0.
+
+---
+
+## Step 6: Validate All Documentation
+
+### 6.1 Run Validation Script
+```bash
+bash .claude/scripts/validate-planning.sh
+```
+
+### 6.2 Manual Validation Checklist
+
+- [ ] All documents exist
+- [ ] Each SPEC-XXX has corresponding tests in TDD-MASTER-DOCUMENT.md
+- [ ] All dependencies resolve (no broken references)
+- [ ] No circular dependencies
+- [ ] Each spec has time estimate
+- [ ] All risks have mitigations
+- [ ] Checkpoints defined in roadmap
+- [ ] Integration tests cover critical workflows
+
+### 6.3 If Validation Fails
+
+Fix issues and re-validate until all checks pass.
+
+---
+
+## Step 7: Present Summary to User (THEN HARD STOP)
+
+After validation passes, present this summary to the user, then **ABSOLUTELY STOP. NO MORE ACTIONS.**
+
+```markdown
+## Documentation Generation Complete
+
+### Documents Generated (13):
+- ✅ `.claude/CLAUDE.md` - Project configuration
+- ✅ `.claude/docs/PROJECT-PLAN.md` (v2) - Complete project context
+- ✅ `.claude/docs/SPECIFICATIONS.md` - [N] atomic specifications
+- ✅ `.claude/docs/RISKS-AND-MITIGATIONS.md` - Risk analysis
+- ✅ `.claude/docs/IMPLEMENTATION-ROADMAP.md` - Step-by-step with checkpoints
+- ✅ `.claude/docs/TDD-MASTER-DOCUMENT.md` - All test cases
+- ✅ `.claude/docs/TEST-FIXTURES.md` - Test data fixtures
+- ✅ `.claude/docs/INTEGRATION-TESTS.md` - Cross-specification tests
+- ✅ `.claude/docs/DEPENDENCY-GRAPH.md` - Specification dependencies
+- ✅ `.claude/docs/PARALLEL-GROUPS.md` - Parallel execution groups
+- ✅ `.claude/docs/CRITICAL-PATH.md` - Implementation priority
+- ✅ `.claude/docs/GIT-STRATEGY.md` - Git workflow
+
+### Scripts Generated (3):
+- ✅ `.claude/scripts/setup-env.sh` - Environment setup
+- ✅ `.claude/scripts/quality-gate.sh` - Quality verification
+- ✅ `.claude/scripts/validate-planning.sh` - Planning validation
+
+### Statistics:
+- Total Specifications: [N]
+- Critical Path Specs: [N]
+- Parallel Groups: [N]
+- Total Test Cases: [N]
+- Integration Tests: [N]
+
+### Validation: ✅ PASSED
+
+---
+
+## DOCUMENTATION GENERATION COMPLETE
+
+The /start-project command is now COMPLETE. NO further actions will be taken.
+
+**Your documentation is ready for review.**
+
+### Next Steps (YOU must do these manually):
+
+**Step 1: Review the Planning**
+- Read `.claude/docs/SPECIFICATIONS.md` to review specifications
+- Read `.claude/docs/IMPLEMENTATION-ROADMAP.md` to see the plan
+- Read `.claude/docs/DEPENDENCY-GRAPH.md` to see dependencies
+
+**Step 2: Environment Setup (when ready)**
+```bash
+bash .claude/scripts/setup-env.sh
+```
+
+**Step 3: Start Implementation (when ready)**
+```bash
+/ralph-loop
+```
+
+**THIS COMMAND WILL NOT CONTINUE AUTOMATICALLY.**
+**You must explicitly run the commands above when you are ready.**
+
+---
+
+## Critical Rules
+
+1. **DO NOT enter Plan Mode** - this is documentation generation, not implementation planning
+2. **Complete ALL documentation files** before finishing
+3. **Iterate specifications 3-5 times** - don't stop too soon
+4. **Specifications must be RIDICULOUSLY small** - when in doubt, split
+5. **Every spec needs tests** in TDD-MASTER-DOCUMENT.md
+6. **Validate all documents** before presenting summary
+7. **NEVER create implementation plans** - only generate documentation
+8. **NEVER write code** - only markdown files
+
+---
+
+## ⛔ ABSOLUTE STOP - END OF COMMAND ⛔
+
+**After presenting the documentation summary, this command is COMPLETE.**
+
+**DO NOT:**
+- ❌ Create any implementation plans
+- ❌ Create any source files (src/, tests/, config files, etc.)
+- ❌ Install any dependencies (npm install, yarn, pnpm, etc.)
+- ❌ Run any build commands
+- ❌ Run any test commands
+- ❌ Execute ANY bash commands except mkdir for .claude directories
+
+**THIS COMMAND GENERATES DOCUMENTATION ONLY.**
+**User must run `/ralph-loop` when ready to begin implementation.**
+
+---
+
+## Next Steps (for user)
+
+When ready to implement:
+1. Review generated documentation in `.claude/docs/`
+2. Run `bash .claude/scripts/setup-env.sh` to set up environment
+3. Run `/ralph-loop` to begin implementation

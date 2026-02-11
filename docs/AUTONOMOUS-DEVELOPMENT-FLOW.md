@@ -6,53 +6,160 @@
 
 ---
 
+## Flow Trigger: Documentation Generation vs Implementation Planning
+
+**IMPORTANT: Distinguish between documentation generation and implementation planning.**
+
+### /start-project = Documentation Generation ONLY
+
+When `/start-project` is invoked:
+- **DO NOT enter Plan Mode**
+- Read existing research/feasibility documents
+- Generate `.claude/docs/*.md` planning documents
+- Present summary and STOP
+- NO implementation plans
+- NO code generation
+
+### Implementation Planning = Enter Plan Mode
+
+**ONLY enter Plan Mode when:**
+- User explicitly asks to plan implementation of a specification
+- User asks to "implement" or "build" a specific feature
+- `/feature-dev` or `/bug-fix` commands are invoked
+
+**IMPORTANT:** /start-project generates documentation, NOT implementation plans.
+
+---
+
+## Documentation Generation Flow
+
+When `/start-project` is invoked, follow these steps:
+
+1. Read existing research/feasibility documents in the project
+2. Generate `.claude/CLAUDE.md` with project context
+3. Create `.claude/docs/` directory if it doesn't exist
+4. Proceed through Phases 2-8.5 to generate ALL planning documents
+
+**⚠️ ABSOLUTE STOP POINT AFTER PHASE 8.5**
+- Phase 8.5 (Planning Validation) is the END of autonomous planning
+- DO NOT proceed to Phase 0 (Environment Setup) automatically
+- DO NOT proceed to Phase 9 (Ralph Loop) automatically
+- DO NOT create source files (src/, tests/, etc.)
+- DO NOT create config files (tsconfig.json, jest.config.js, etc.)
+- DO NOT install dependencies (npm install, yarn, pnpm, etc.)
+- DO NOT run build commands (npm run build, tsc, etc.)
+- DO NOT run test commands (npm test, jest, etc.)
+- DO NOT run setup-env.sh - USER must do this manually
+- DO NOT start /ralph-loop - USER must do this manually
+- PRESENT SUMMARY AND STOP - WAIT for user to proceed
+
+**The ONLY files created during this flow are:**
+- `.claude/CLAUDE.md`
+- `.claude/docs/*.md` (planning documents only)
+- `.claude/scripts/*.sh` (setup and validation scripts only, NOT executed)
+
+This happens automatically - no additional user prompt required for documentation generation.
+
+---
+
 ## Overview: The Planning Phases
 
 Before any code is written, the following phases must be completed **using Opus** for maximum quality:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ Phase 1: Initial Requirements Gathering                          │
-│   - User input, domain exploration, stakeholder needs           │
+│ AUTONOMOUS PLANNING PHASE (Complete Automatic Execution)      │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 1 Complete: Generate Project CLAUDE.md                    │
-│   - Create project-specific context from planning documents     │
+│ Phase 1: Initial Requirements Gathering (In Plan Mode)         │
+│   - User input via AskUserQuestion, domain exploration         │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 2: Project Plan Document (v1)                             │
+│ Phase 2: Project Plan Document (v1) (In Plan Mode)          │
 │   - High-level architecture, technology stack, timeline         │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 3: Specification Breakdown (ITERATIVE)                    │
+│ PLAN MODE EXIT → AUTOMATIC: Generate Project Documentation     │
+│   - Create .claude/CLAUDE.md, PROJECT-PLAN.md, etc.       │
+├─────────────────────────────────────────────────────────────────┤
+│ Phase 3: Specification Breakdown (ITERATIVE, 3-5 times)     │
 │   - Break down requirements until atomic                        │
-│   - Repeat 5-7 times until NO FURTHER BREAKDOWN IS POSSIBLE    │
-│   - Specifications must be SO SMALL they seem ridiculous       │
+│   - Generate DEPENDENCY-GRAPH.md from spec dependencies       │
+│   - Specifications must be SO SMALL they seem ridiculous     │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 4: Risks & Mitigations Document                          │
-│   - Technical risks, operational risks, quality risks           │
+│ Phase 4: Risks & Mitigations Document                      │
+│   - Technical, operational, security, project risks           │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 5: Project Plan Update (v2)                               │
-│   - Incorporate risks, adjust roadmap, add contingency          │
+│ Phase 5: Project Plan Update (v2)                           │
+│   - Incorporate risks, adjust roadmap, add contingency       │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 6: Junior-Developer Roadmap                               │
-│   - Step-by-step instructions that cannot be misinterpreted     │
+│ Phase 6: Junior-Developer Roadmap with CHECKPOINTS           │
+│   - Step-by-step instructions with user review checkpoints    │
+│   - Generate PARALLEL-GROUPS.md for concurrent implementation│
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 7: Final Specification Review                            │
-│   - One more breakdown pass with updated project context        │
+│ Phase 7: Final Specification Review                          │
+│   - One more breakdown pass with complete context             │
+│   - Identify CRITICAL-PATH specs (blocks others)             │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 8: TDD Master Document                                   │
-│   - Test cases for every single specification                  │
+│ Phase 8: TDD Master Document                               │
+│   - Test cases for every single specification                │
+│   - Generate TEST-FIXTURES.md with test data                │
+│   - Generate INTEGRATION-TESTS.md for cross-spec tests      │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 9: Ralph Loop Implementation                             │
-│   - Execute using detailed specifications and TDD document      │
+│ Phase 8.5: Planning Validation                               │
+│   - Validate all documents are complete and consistent        │
+│   - Check all specs have tests, dependencies resolve        │
+│   - Present summary to user for approval                     │
+├─────────────────────────────────────────────────────────────────┤
+│ ⚠️ DOCUMENTATION COMPLETE - ABSOLUTE STOP POINT ⚠️          │
+│                                                               │
+│ Planning phase complete. NO automatic continuation.               │
+│ User must manually proceed to implementation phases.             │
+└─────────────────────────────────────────────────────────────────┘
+
+                    [User must manually continue]
+
+┌─────────────────────────────────────────────────────────────────┐
+│ OPTIONAL MANUAL IMPLEMENTATION PHASE                           │
+│ (Requires explicit user commands to start)                      │
+├─────────────────────────────────────────────────────────────────┤
+│ Phase 0: Environment Setup (Manual: bash .claude/scripts/...) │
+│   - Run setup-env.sh to initialize project structure           │
+│   - Install dependencies, create directories                    │
+├─────────────────────────────────────────────────────────────────┤
+│ Phase 9: Ralph Loop Implementation (Manual: /ralph-loop)     │
+│   - Execute with CHECKPOINTS for user review                   │
+│   - Generate PROGRESS.md with live status                       │
+│   - Resume capability via --resume-from flag                    │
+│   - Quality gates before each commit                            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Phase 1: Initial Requirements Gathering
+## Phase 1: Read Existing Research Documents
 
-### 1.1 User Input Session
+**Note:** /start-project reads existing research/feasibility documents, it does NOT gather requirements via AskUserQuestion.
 
-Claude should ask the user:
+### 1.1 Discover Research Documents
+
+```bash
+# Find research/feasibility documents
+Glob -pattern "*.md" -path .
+Grep -pattern "research|feasibility|requirements" -glob "*.md" -i
+```
+
+### 1.2 Read and Extract Requirements
+
+Read discovered documents and extract:
+- System context and function
+- User roles and workflows
+- Data requirements
+- Integration requirements
+- Compliance requirements
+- Technical constraints
+- Success criteria
+
+### 1.3 Clarification (If Needed)
+
+If research documents are incomplete, use `AskUserQuestion` to gather missing information:
 
 ```
 Please describe the software system to be built. Include:
@@ -87,27 +194,27 @@ Output a comprehensive domain analysis document.
 
 ## Phase 1 Complete: Generate Project CLAUDE.md
 
-After completing requirements gathering and domain exploration, generate a project-specific CLAUDE.md file. This file will be used by junior developers (and Ralph Loop) to understand the project context.
+After reading all research documents, **AUTOMATICALLY generate** the project-specific CLAUDE.md file.
 
-### 1.1 Create `.claude/CLAUDE.md`
+### 1.1 Create `.claude/CLAUDE.md` IMMEDIATELY After Plan Mode Exit
 
-This file should contain:
+This file MUST be created as the FIRST action after plan mode completes. It should contain:
 
 ```markdown
-# Project: [Project Name]
+# Project: [Project Name from PROJECT-PLAN.md]
 
 ## Project Context
-[Brief description of what this system does and why it matters]
+[Brief description from PROJECT-PLAN.md Executive Summary]
 
 ## Stack
-- **Language**: [detected from project]
-- **Frameworks**: [detected from project]
-- **Database/ORM**: [if applicable]
-- **Testing**: [framework being used]
+- **Language**: [from PROJECT-PLAN.md Technology Stack section]
+- **Frameworks**: [from PROJECT-PLAN.md Technology Stack section]
+- **Database/ORM**: [if applicable - from PROJECT-PLAN.md]
+- **Testing**: [from PROJECT-PLAN.md Development Approach]
 
 ## Key Directories
-- Source: [src/, lib/, app/, etc.]
-- Tests: [tests/, __tests__/, etc.]
+- Source: [to be determined based on stack]
+- Tests: [to be determined based on stack]
 - Documentation: docs/
 
 ## Project Documentation References
@@ -116,6 +223,12 @@ This file should contain:
 - `.claude/docs/RISKS-AND-MITIGATIONS.md` - Risk analysis
 - `.claude/docs/IMPLEMENTATION-ROADMAP.md` - Step-by-step implementation guide
 - `.claude/docs/TDD-MASTER-DOCUMENT.md` - All test cases
+- `.claude/docs/TEST-FIXTURES.md` - Test data fixtures
+- `.claude/docs/INTEGRATION-TESTS.md` - Cross-specification tests
+- `.claude/docs/DEPENDENCY-GRAPH.md` - Specification dependencies
+- `.claude/docs/PARALLEL-GROUPS.md` - Parallel execution groups
+- `.claude/docs/CRITICAL-PATH.md` - Implementation priority
+- `.claude/docs/GIT-STRATEGY.md` - Git workflow and conventions
 
 ## Development Standards
 - Follow specifications exactly - no deviations
@@ -134,15 +247,47 @@ This file should contain:
 *Auto-generated from planning documents. Edit to add project-specific notes.*
 ```
 
-### 1.2 Generate from Planning Documents
+### 1.2 Automatic Generation (MANDATORY)
 
-Once PROJECT-PLAN.md exists, the project-specific CLAUDE.md should reference it and all other planning documents that will be created in subsequent phases.
+**CRITICAL: These actions happen IMMEDIATELY and AUTOMATICALLY after reading research documents.**
 
-**Important:** This is created AFTER Phase 1 because it references the planning documents that are created throughout the planning process. The file should be updated as each phase completes to include references to new documentation.
+Execute these steps AUTOMATICALLY without waiting for user input:
+
+```markdown
+# AUTOMATIC Post-Plan Mode Actions (Execute Immediately)
+
+## Step 1: Create Directory Structure
+```bash
+mkdir -p .claude/docs
+mkdir -p .claude/scripts
+```
+
+## Step 2: Generate .claude/CLAUDE.md IMMEDIATELY
+[Using the template in section 1.1 above, populate with gathered information from plan mode]
+
+## Step 3: Generate .claude/docs/PROJECT-PLAN.md
+[Using the template in Phase 2, populate with gathered information from plan mode]
+
+## Step 4: Confirm to User
+"Project CLAUDE.md and initial PROJECT-PLAN.md created. Ready to proceed with Phase 3: Specification Breakdown."
+```
+
+**DO NOT WAIT for user confirmation. Execute these steps automatically.**
+
+### 1.3 CLAUDE.md Content Based on Research Documents
+
+The CLAUDE.md MUST be generated based on:
+- Project name from research documents
+- Technology stack from research documents
+- All references to planning documents (updated as each is created)
+
+**Important:** The CLAUDE.md is created AUTOMATICALLY after reading research documents and should be updated as each subsequent phase completes to include references to all planning documents.
 
 ---
 
 ## Phase 2: Project Plan Document (v1)
+
+**Note:** Generate from information extracted from research documents.
 
 ### 2.1 Create `.claude/docs/PROJECT-PLAN.md`
 
@@ -1238,7 +1383,578 @@ describe('Security: Note Access', () => {
 
 ---
 
-## Phase 9: Ralph Loop Implementation
+## Phase 8.5: Planning Validation (NEW)
+
+Before proceeding to Ralph Loop, validate that all planning is complete and consistent.
+
+### 8.5.1 Validation Checklist
+
+Run through this checklist before presenting to user:
+
+```markdown
+# Planning Validation Checklist
+
+## Document Completeness
+- [ ] `.claude/CLAUDE.md` exists with project context
+- [ ] `.claude/docs/PROJECT-PLAN.md` (v2) exists
+- [ ] `.claude/docs/SPECIFICATIONS.md` exists with atomic specs
+- [ ] `.claude/docs/RISKS-AND-MITIGATIONS.md` exists
+- [ ] `.claude/docs/IMPLEMENTATION-ROADMAP.md` exists
+- [ ] `.claude/docs/TDD-MASTER-DOCUMENT.md` exists
+- [ ] `.claude/docs/GIT-STRATEGY.md` exists
+- [ ] `.claude/docs/TEST-FIXTURES.md` exists
+- [ ] `.claude/docs/INTEGRATION-TESTS.md` exists
+- [ ] `.claude/docs/DEPENDENCY-GRAPH.md` exists
+- [ ] `.claude/docs/PARALLEL-GROUPS.md` exists
+- [ ] `.claude/docs/CRITICAL-PATH.md` exists
+
+## Specification Validation
+- [ ] Each SPEC-XXX has corresponding test section in TDD-MASTER-DOCUMENT.md
+- [ ] All "Requires" dependencies reference valid specification IDs
+- [ ] All "Required by" dependencies reference valid specification IDs
+- [ ] No circular dependencies exist
+- [ ] Each specification has time estimate (15-30 min target)
+- [ ] Each specification has measurable acceptance criteria
+- [ ] Each specification has explicit error handling
+
+## Roadmap Validation
+- [ ] All specifications from SPECIFICATIONS.md appear in IMPLEMENTATION-ROADMAP.md
+- [ ] Checkpoints are defined at logical boundaries
+- [ ] Quality gates are specified for each checkpoint
+- [ ] Test requirements are specified for each specification
+
+## Risk Validation
+- [ ] All identified risks have mitigation strategies
+- [ ] All mitigations have assigned owners/responsibilities
+- [ ] High-severity risks have contingency plans
+- [ ] Risk probability × impact × detection (PxDxD) is calculated
+
+## Test Validation
+- [ ] All specifications have unit tests specified
+- [ ] Integration tests cover cross-specification workflows
+- [ ] Security tests specified for sensitive data operations
+- [ ] Performance tests specified for critical paths
+- [ ] Test fixtures exist for valid and invalid inputs
+
+## User Approval Required
+Before proceeding to Phase 0, present summary to user and wait for explicit approval.
+```
+
+### 8.5.2 Dependency Validation Script
+
+Create `.claude/scripts/validate-planning.sh`:
+
+```bash
+#!/bin/bash
+# Validate planning document completeness
+
+BASE_DIR=".claude/docs"
+ERRORS=0
+
+# Check all documents exist
+for doc in CLAUDE.md PROJECT-PLAN.md SPECIFICATIONS.md RISKS-AND-MITIGATIONS.md \
+           IMPLEMENTATION-ROADMAP.md TDD-MASTER-DOCUMENT.md GIT-STRATEGY.md \
+           TEST-FIXTURES.md INTEGRATION-TESTS.md DEPENDENCY-GRAPH.md \
+           PARALLEL-GROUPS.md CRITICAL-PATH.md; do
+  if [ ! -f "$BASE_DIR/$doc" ]; then
+    echo "❌ Missing: $doc"
+    ERRORS=$((ERRORS + 1))
+  fi
+done
+
+# Check specification references
+if [ -f "$BASE_DIR/SPECIFICATIONS.md" ]; then
+  SPEC_IDS=$(grep -oE 'SPEC-[0-9]+' "$BASE_DIR/SPECIFICATIONS.md" | sort -u)
+  for spec in $SPEC_IDS; do
+    if ! grep -q "$spec" "$BASE_DIR/TDD-MASTER-DOCUMENT.md"; then
+      echo "⚠️  $spec has no tests in TDD-MASTER-DOCUMENT.md"
+    fi
+  done
+fi
+
+if [ $ERRORS -eq 0 ]; then
+  echo "✅ All validation checks passed"
+  exit 0
+else
+  echo "❌ Found $ERRORS errors"
+  exit 1
+fi
+```
+
+---
+
+## Supporting Planning Documents
+
+### Dependency Graph
+
+Create `.claude/docs/DEPENDENCY-GRAPH.md`:
+
+```markdown
+# Specification Dependency Graph
+
+Visual representation of specification dependencies.
+
+## Format
+```
+SPEC-001: Project Setup (no dependencies)
+    ↓
+SPEC-002: Core Types (depends on: SPEC-001)
+    ↓
+SPEC-003: Database Schema (depends on: SPEC-002)
+    ├─→ SPEC-004: Note Creation API (depends on: SPEC-002, SPEC-003)
+    ├─→ SPEC-005: Note List API (depends on: SPEC-002, SPEC-003)
+    └─→ SPEC-006: Note Update API (depends on: SPEC-002, SPEC-003)
+```
+
+## Complete Dependency Graph
+
+[Generate graph based on SPECIFICATIONS.md dependencies]
+
+## Dependency Rules
+- No circular dependencies allowed
+- Leaf specifications (nothing depends on them) implemented last
+- Critical path specifications implemented first
+```
+
+### Parallel Execution Groups
+
+Create `.claude/docs/PARALLEL-GROUPS.md`:
+
+```markdown
+# Parallel Execution Groups
+
+Specifications that can be implemented concurrently because they share identical dependencies.
+
+## Group A: Foundation
+Specifications: [List]
+Can run in parallel: Yes
+Dependencies: None
+
+## Group B: Core Features
+Specifications: [List]
+Can run in parallel: Yes
+Dependencies: Group A
+
+## Sequential Requirements
+[Specifications that must run sequentially due to shared resources]
+```
+
+### Critical Path Identification
+
+Create `.claude/docs/CRITICAL-PATH.md`:
+
+```markdown
+# Critical Path Specifications
+
+Specifications that block the maximum number of other specifications.
+
+## Critical Path (Implement First)
+1. **SPEC-001**: Project Setup
+   - Blocks: All other specifications
+   - Priority: P0
+
+2. **SPEC-002**: Core Types
+   - Blocks: 15 specifications
+   - Priority: P0
+
+3. **SPEC-003**: Error Handling
+   - Blocks: 12 specifications
+   - Priority: P0
+
+## Leaf Specifications (Implement Last)
+- **SPEC-047**: Logging (optional, nothing depends on it)
+- **SPEC-046**: Analytics (optional)
+- **SPEC-045**: Metrics reporting
+
+## Priority Levels
+- **P0**: Critical path - blocks 5+ specifications
+- **P1**: High priority - blocks 2-4 specifications
+- **P2**: Normal priority - blocks 1 specification
+- **P3**: Low priority - leaf specification
+```
+
+### Test Data Fixtures
+
+Create `.claude/docs/TEST-FIXTURES.md`:
+
+```markdown
+# Test Data Fixtures
+
+Reusable test data for all specifications.
+
+## Valid Fixtures
+
+### Note Fixtures
+\`\`\`json
+{
+  "minimalNote": {"title": "Test Note"},
+  "fullNote": {
+    "title": "Complete Note",
+    "content": "This is full content",
+    "tags": ["important", "work"]
+  },
+  "maxLengthNote": {
+    "title": "...200 chars...",
+    "content": "...5000 chars..."
+  }
+}
+\`\`\`
+
+### User Fixtures
+\`\`\`json
+{
+  "validUser": {
+    "email": "user@example.com",
+    "password": "SecurePass123!",
+    "name": "Test User"
+  }
+}
+\`\`\`
+
+## Invalid Fixtures (for error testing)
+
+### Invalid Notes
+\`\`\`json
+{
+  "noTitle": {"content": "No title provided"},
+  "oversizeTitle": {"title": "...201 chars..."},
+  "oversizeContent": {"title": "Valid", "content": "...5001 chars..."}
+}
+\`\`\`
+
+### Invalid Users
+\`\`\`json
+{
+  "noEmail": {"password": "Pass123!"},
+  "invalidEmail": {"email": "not-an-email", "password": "Pass123!"},
+  "weakPassword": {"email": "user@example.com", "password": "weak"}
+}
+\`\`\`
+```
+
+### Integration Test Matrix
+
+Create `.claude/docs/INTEGRATION-TESTS.md`:
+
+```markdown
+# Integration Test Matrix
+
+Tests that span multiple specifications to verify end-to-end workflows.
+
+## IT-001: Complete Note Lifecycle
+**Specifications:** SPEC-004 (create), SPEC-005 (read), SPEC-006 (update), SPEC-007 (delete)
+
+**Test:**
+1. Create note via SPEC-004 endpoint
+2. Read note via SPEC-005 endpoint
+3. Verify data matches
+4. Update note via SPEC-006 endpoint
+5. Verify update persisted
+6. Delete note via SPEC-007 endpoint
+7. Verify note no longer accessible
+
+**Expected Result:** Note successfully created, read, updated, deleted
+
+## IT-002: Authenticated User Workflow
+**Specifications:** SPEC-010 (login), SPEC-011 (session), SPEC-004 (create note)
+
+**Test:**
+1. Login via SPEC-010 endpoint
+2. Receive session token via SPEC-011
+3. Create note using session token
+4. Verify note owned by authenticated user
+5. Attempt to access another user's note
+6. Verify access denied
+
+**Expected Result:** User can only access their own data
+
+## Integration Test Coverage Matrix
+
+| Workflow | Specifications | Status |
+|----------|---------------|--------|
+| Note CRUD | SPEC-004, 005, 006, 007 | ✅ Covered |
+| User Authentication | SPEC-010, 011, 012 | ✅ Covered |
+| [More workflows] | [specs] | [status] |
+```
+
+### Progress Dashboard Template
+
+Create `.claude/docs/PROGRESS.md` (template):
+
+```markdown
+# Implementation Progress
+
+**Last Updated:** [DATE]
+**Current Phase:** [Foundation / Core Features / Integration / Polish]
+**Overall Progress:** ██░░░░░░░░░░ 10%
+
+## Statistics
+- Total Specifications: 47
+- Completed: 5 (10%)
+- In Progress: 1
+- Not Started: 41
+- Tests Passing: 5/5 (100%)
+- Tests Failing: 0
+- ETA: [calculated from completed specs]
+
+## Completed Specifications
+- [x] SPEC-001: Project Setup ✓ (committed 2025-02-02 14:23)
+- [x] SPEC-002: Core Types ✓ (committed 2025-02-02 14:45)
+- [x] SPEC-003: Error Handling ✓ (committed 2025-02-02 15:12)
+- [x] SPEC-004: Database Schema ✓ (committed 2025-02-02 15:45)
+- [x] SPEC-005: Note Creation API ✓ (committed 2025-02-02 16:30)
+
+## In Progress
+- [ ] SPEC-006: Note List API
+  - Status: Tests passing, implementation in progress
+  - Estimated completion: 30 min
+
+## Not Started
+- [ ] SPEC-007 through SPEC-047
+
+## Upcoming Checkpoint
+**Checkpoint 1: Foundation Complete**
+Target: SPEC-001 through SPEC-010
+Current: SPEC-006 (5/10 complete)
+ETA: 2.5 hours
+
+## Quality Gate Status
+- All tests passing: ✅
+- No TypeScript errors: ✅
+- No lint warnings: ✅
+- Coverage >80%: ✅ (82%)
+
+## Next Actions
+1. Complete SPEC-006: Note List API
+2. Run integration tests
+3. Commit and move to SPEC-007
+```
+
+### Ralph Loop Resume State
+
+Create `.claude/docs/RALPH-STATE.md` (template):
+
+```markdown
+# Ralph Loop State
+
+**Last Updated:** [DATE]
+
+## Current Position
+**Last Completed:** SPEC-XXX
+**Next Up:** SPEC-[XXX+1]: [Specification Title]
+
+## Artifacts Created
+[Track files created for completed specifications]
+
+## Tests Status
+- ✅ SPEC-XXX tests passing
+- ✅ All previous tests still passing
+- ⏳ SPEC-[XXX+1] tests not yet written
+
+## Resume Command
+\`\`\`bash
+/ralph-loop "--resume-from=SPEC-[XXX+1]"
+\`\`\`
+
+## Notes
+[Any issues encountered, decisions made, etc.]
+```
+
+---
+
+# MANUAL IMPLEMENTATION PHASE
+
+**IMPORTANT:** The following phases require explicit user commands to execute. They are NOT part of the autonomous planning flow.
+
+---
+
+## Phase 0: Environment Setup
+
+Before starting Ralph Loop, run environment setup to initialize the project structure.
+
+### 0.1 Create Setup Script
+
+Create `.claude/scripts/setup-env.sh`:
+
+```bash
+#!/bin/bash
+# Environment Setup Script
+# Run before starting Ralph Loop implementation
+
+set -euo pipefail
+
+PROJECT_DIR="${1:-$PWD}"
+CLAUDE_DIR="$PROJECT_DIR/.claude"
+
+echo "🔧 Setting up project environment..."
+
+# Read project configuration for tech stack
+if [ -f "$CLAUDE_DIR/docs/PROJECT-PLAN.md" ]; then
+  # Detect stack from project plan
+  echo "📖 Reading project configuration..."
+else
+  echo "⚠️  PROJECT-PLAN.md not found. Using defaults."
+fi
+
+# Create directory structure
+echo "📁 Creating directory structure..."
+mkdir -p "$PROJECT_DIR/src"/{api,models,services,utils,middleware}
+mkdir -p "$PROJECT_DIR/tests"/{unit,integration,e2e}
+mkdir -p "$PROJECT_DIR/docs"
+mkdir -p "$PROJECT_DIR/config"
+
+# Initialize package.json if not exists
+if [ ! -f "$PROJECT_DIR/package.json" ]; then
+  echo "📦 Initializing package.json..."
+  cd "$PROJECT_DIR"
+  npm init -y
+fi
+
+# Install dependencies
+echo "📥 Installing dependencies..."
+npm install --silent --no-audit --no-fund
+
+# Create config files from templates
+echo "⚙️  Creating configuration files..."
+
+# TypeScript config
+if [ ! -f "$PROJECT_DIR/tsconfig.json" ]; then
+  cat > "$PROJECT_DIR/tsconfig.json" << 'EOF'
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "lib": ["ES2022"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests"]
+}
+EOF
+fi
+
+# Jest config
+if [ ! -f "$PROJECT_DIR/jest.config.js" ]; then
+  cat > "$PROJECT_DIR/jest.config.js" << 'EOF'
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/src', '<rootDir>/tests'],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/**/*.d.ts',
+    '!src/**/*.interface.ts'
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  }
+};
+EOF
+fi
+
+# ESLint config
+if [ ! -f "$PROJECT_DIR/.eslintrc.js" ]; then
+  cat > "$PROJECT_DIR/.eslintrc.js" << 'EOF'
+module.exports = {
+  parser: '@typescript-eslint/parser',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: 'module'
+  },
+  rules: {
+    '@typescript-eslint/no-explicit-any': 'error',
+    '@typescript-eslint/explicit-function-return-type': 'warn'
+  }
+};
+EOF
+fi
+
+# .gitignore
+if [ ! -f "$PROJECT_DIR/.gitignore" ]; then
+  cat > "$PROJECT_DIR/.gitignore" << 'EOF'
+node_modules/
+dist/
+coverage/
+.env
+*.log
+.DS_Store
+ claude/
+EOF
+fi
+
+# Create PROGRESS.md if not exists
+if [ ! -f "$CLAUDE_DIR/docs/PROGRESS.md" ]; then
+  cat > "$CLAUDE_DIR/docs/PROGRESS.md" << 'EOF'
+# Implementation Progress
+
+**Last Updated:** [DATE]
+
+## Statistics
+- Total Specifications: [from SPECIFICATIONS.md]
+- Completed: 0
+- In Progress: 0
+- Not Started: [total]
+
+## Completed Specifications
+None yet.
+
+## In Progress
+None yet.
+
+## Not Started
+All specifications.
+
+---
+Environment ready. Run `/ralph-loop` to begin implementation.
+EOF
+fi
+
+echo "✅ Environment setup complete!"
+echo ""
+echo "Next steps:"
+echo "  1. Review generated configuration files"
+echo "  2. Run tests: npm test"
+echo "  3. Start Ralph Loop: /ralph-loop"
+```
+
+### 0.2 Run Setup Script
+
+```bash
+bash .claude/scripts/setup-env.sh
+```
+
+### 0.3 Verify Setup
+
+```bash
+# Verify directories exist
+ls -la src/ tests/
+
+# Run tests (should pass with 0 tests)
+npm test
+
+# Verify TypeScript compiles
+npx tsc --noEmit
+```
+
+---
+
+## Phase 9: Ralph Loop Implementation (UPDATED)
 
 ### 9.1 The Final Ralph Loop Prompt
 
@@ -1254,17 +1970,37 @@ You are implementing a software system from detailed specifications.
 3. .claude/docs/RISKS-AND-MITIGATIONS.md - Every risk
 4. .claude/docs/IMPLEMENTATION-ROADMAP.md - Step-by-step instructions
 5. .claude/docs/TDD-MASTER-DOCUMENT.md - Every test case
+6. .claude/docs/TEST-FIXTURES.md - Test data fixtures
+7. .claude/docs/INTEGRATION-TESTS.md - Cross-specification tests
+8. .claude/docs/DEPENDENCY-GRAPH.md - Specification dependencies
+9. .claude/docs/PARALLEL-GROUPS.md - Parallel execution groups
+10. .claude/docs/CRITICAL-PATH.md - Implementation priority
+
+# RESUME CAPABILITY
+
+If interrupted, check .claude/docs/RALPH-STATE.md for resume position.
+Use --resume-from flag to continue from specific specification.
+
+# CHECKPOINT SYSTEM
+
+Before each checkpoint defined in IMPLEMENTATION-ROADMAP.md:
+1. Pause implementation
+2. Present checkpoint summary to user
+3. Wait for user approval to continue
+4. Update checkpoint status in PROGRESS.md
 
 # STRICT TDD PROCESS (Never Deviate)
 
-For EACH specification in IMPLEMENTATION-ROADMAP.md order:
+For EACH specification in IMPLEMENTATION-ROADMAP.md order (respecting CRITICAL-PATH.md):
 
 ## Step 1: Read Specification
 - Read the complete specification from SPECIFICATIONS.md
 - Read corresponding tests from TDD-MASTER-DOCUMENT.md
+- Check DEPENDENCY-GRAPH.md for prerequisite specs
 - Understand ALL acceptance criteria
 
 ## Step 2: Write Failing Tests
+- Use test fixtures from TEST-FIXTURES.md
 - Write ALL tests for this specification
 - Run tests: npm test
 - Verify tests FAIL (red)
@@ -1286,28 +2022,37 @@ For EACH specification in IMPLEMENTATION-ROADMAP.md order:
 - Verify ALL tests pass (green)
 - If any fail, fix the code (not the tests)
 
-## Step 6: Safety Review
+## Step 6: Run Quality Gates
+- Run: bash .claude/scripts/quality-gate.sh
+- If quality gate fails, STOP and fix
+- Do not proceed until all gates pass
+
+## Step 7: Safety Review
 - Read the code you just wrote
 - Ask: What could go wrong?
 - Ask: What are the consequences if this fails?
 - If any concern exists, address it NOW
 
-## Step 7: Code Quality Checks
-- Run: npm run lint
-- Run: npm run type-check
-- Fix any issues
-
 ## Step 8: Update Progress
-- Update .claude/docs/PROGRESS.md
-- Mark specification complete
-- Note any issues encountered
+- Update .claude/docs/PROGRESS.md with:
+  - Mark specification complete
+  - Update progress percentage
+  - Note time taken
+  - Any issues encountered
+- Update .claude/docs/RALPH-STATE.md with current position
 
 ## Step 9: Git Commit
+- Run quality gate script one more time
 - git add .
 - git commit -m \\"feat(spec-SPEC-ID): [specification title]\\"
 - Never commit broken tests
 
-## Step 10: Repeat
+## Step 10: Check for Checkpoint
+- Check if next specification is a checkpoint
+- If checkpoint, PAUSE and present summary
+- Wait for user approval
+
+## Step 11: Repeat
 - Move to next specification in IMPLEMENTATION-ROADMAP.md
 - Repeat from Step 1
 
@@ -1416,14 +2161,31 @@ After completing all phases, your project will have:
 
 ```
 .claude/
-├── CLAUDE.md                    # Project-specific context (created after Phase 1)
+├── CLAUDE.md                    # Project-specific context
+├── scripts/
+│   ├── setup-env.sh             # Environment setup script
+│   ├── quality-gate.sh          # Quality gate verification
+│   └── validate-planning.sh     # Planning validation script
 └── docs/
     ├── PROJECT-PLAN.md          # Complete project context (v2)
     ├── SPECIFICATIONS.md        # Atomic, complete specifications
     ├── RISKS-AND-MITIGATIONS.md # All risks and mitigations
-    ├── IMPLEMENTATION-ROADMAP.md # Junior-proof step-by-step guide
+    ├── IMPLEMENTATION-ROADMAP.md # Step-by-step guide with checkpoints
     ├── TDD-MASTER-DOCUMENT.md   # Every test case for every spec
-    └── PROGRESS.md              # Tracking (created during Ralph Loop)
+    ├── TEST-FIXTURES.md         # Test data fixtures
+    ├── INTEGRATION-TESTS.md     # Cross-specification tests
+    ├── DEPENDENCY-GRAPH.md      # Specification dependencies
+    ├── PARALLEL-GROUPS.md       # Parallel execution groups
+    ├── CRITICAL-PATH.md         # Implementation priority
+    ├── GIT-STRATEGY.md          # Git workflow and conventions
+    ├── PROGRESS.md              # Live progress tracking
+    └── RALPH-STATE.md           # Resume state tracking
+
+# Scripts (created during setup)
+.claude/scripts/
+├── setup-env.sh                 # Run before Ralph Loop
+├── quality-gate.sh              # Run before each commit
+└── validate-planning.sh         # Run before Ralph Loop
 
 # Project Documentation (generated at end of Ralph Loop)
 ├── README.md                    # Project overview, installation, usage
