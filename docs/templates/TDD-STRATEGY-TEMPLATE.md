@@ -34,6 +34,80 @@ Each test case must include:
 
 ---
 
+## Test Quality Requirements
+
+### Test Quality Indicators
+- **Descriptive names**: Each test should describe what, when, and then
+- **Single assertion per test**: Tests should verify one behavior
+- **Independence**: Tests should not depend on each other
+- **Deterministic**: No random data without seeding
+- **Fast**: Unit tests should run in milliseconds
+- **Readable**: Tests should serve as documentation
+
+### Test Quality Checklist
+| Quality Check | Description |
+|---------------|-------------|
+| Assertion quality | Tests have meaningful assertions (not just "no error") |
+| Test descriptions | Descriptive names, not generic `test()` or `it('')` |
+| Test isolation | Setup/teardown used for shared state |
+| Edge case coverage | Tests cover boundaries, empty, null, invalid inputs |
+| Test doubles | Mocks/stubs used appropriately for external dependencies |
+
+---
+
+## Property-Based Testing Guidance
+
+### When to Use Property-Based Testing
+- Complex business logic with many input combinations
+- Data transformation functions
+- State management operations
+- Serialization/deserialization
+- Any function where examples don't cover all cases
+
+### Properties to Define
+1. **Inverses**: `roundtrip(decode(x)) === x`
+2. **Idempotence**: `f(f(x)) === f(x)`
+3. **Commutativity**: `f(x, y) === f(y, x)`
+4. **Invariants**: Output always satisfies some condition
+5. **Associativity**: `f(f(x, y), z) === f(x, f(y, z))`
+
+### Property-Based Testing Tools
+- **JavaScript/TypeScript**: fast-check, jsverify
+- **Python**: Hypothesis, pytest-quickcheck
+- **Ruby**: rantly, rushcheck
+- **Java**: jqwik
+- **Haskell**: QuickCheck
+
+---
+
+## Mutation Testing Considerations
+
+### What is Mutation Testing?
+Mutation testing introduces small changes (mutations) to your code and verifies that your tests catch them. If tests pass despite code changes, the tests may be insufficient.
+
+### When to Use Mutation Testing
+- Critical business logic paths
+- Security-sensitive operations
+- Complex algorithms
+- Before major releases
+- Refactoring validation
+
+### Mutation Testing Tools
+- **JavaScript/TypeScript**: stryker-mutator
+- **Python**: mutmut, pytest-mut
+- **Ruby**: mutant
+- **Java**: PITest
+- **C#**: Stryker.NET
+
+### Mutation Score Targets
+- **Critical code**: >90% mutation score
+- **Business logic**: >80% mutation score
+- **Infrastructure code**: >60% mutation score
+
+---
+
+---
+
 ## Example TDD Strategy
 
 ### REQ-001: Email Format Validation
@@ -115,6 +189,15 @@ Each test case must include:
 
 ## Overview
 [Summary of testing approach]
+
+## Test Quality Requirements
+[Test quality indicators and checklist]
+
+## Property-Based Testing
+[Properties to verify for complex logic]
+
+## Mutation Testing Plan
+[Mutation testing targets and tools]
 
 ## Test Fixtures
 [Shared test data, mocks, utilities]

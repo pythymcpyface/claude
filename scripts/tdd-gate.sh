@@ -1,6 +1,7 @@
 #!/bin/bash
 # TDD Compliance Verification Script
 # Ensures tests exist before implementation code is written
+# Enhanced with test quality checks beyond coverage
 # Usage: bash .claude/scripts/tdd-gate.sh [file_path]
 
 set -euo pipefail
@@ -9,6 +10,7 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 FILE_PATH="${1:-}"
@@ -17,6 +19,7 @@ echo "🔍 TDD Compliance Gate"
 echo ""
 
 FAILURES=0
+WARNINGS=0
 
 # Function to check if implementation has corresponding test
 check_test_coverage() {
@@ -68,11 +71,129 @@ check_test_coverage() {
   fi
 }
 
+# Function to check test quality (beyond coverage)
+check_test_quality() {
+  local test_file="$1"
+  local quality_issues=0
+
+  echo -e "   ${BLUE}Quality Check:${NC} $test_file"
+
+  # Check for meaningful assertions
+  echo -n "      Assertion quality... "
+  if grep -q "expect\|assert\|should" "$test_file" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+  else
+    echo -e "${RED}✗${NC} No assertions found"
+    quality_issues=$((quality_issues + 1))
+  fi
+
+  # Check for test descriptions (avoid generic names)
+  echo -n "      Test descriptions... "
+  local generic_tests=$(grep -c "test()\|it('')" "$test_file" 2>/dev/null || echo 0)
+  if [ "$generic_tests" -eq 0 ]; then
+    echo -e "${GREEN}✓${NC}"
+  else
+    echo -e "${YELLOW}⚠${NC} $generic_tests generic test name(s)"
+    WARNINGS=$((WARNINGS + 1))
+  fi
+
+  # Check for setup/teardown if needed
+  echo -n "      Test isolation... "
+  if grep -q "beforeEach\|before\|setup\|tearDown" "$test_file" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC}"
+  else
+    echo -e "${BLUE}○${NC} No setup/teardown (may be needed)"
+  fi
+
+  # Check for edge case tests
+  echo -n "      Edge case coverage... "
+  local edge_indicators=$(grep -ci "edge\|boundary\|empty\|null\|invalid" "$test_file" 2>/dev/null || echo 0)
+  if [ "$edge_indicators" -ge 2 ]; then
+    echo -e "${GREEN}✓${NC}"
+  elif [ "$edge_indicators" -eq 1 ]; then
+    echo -e "${YELLOW}⚠${NC} Limited edge case coverage"
+    WARNINGS=$((WARNINGS + 1))
+  else
+    echo -e "${YELLOW}⚠${NC} No obvious edge case tests"
+    WARNINGS=$((WARNINGS + 1))
+  fi
+
+  return $quality_issues
+}
+
+# Function to check if acceptance criteria have tests
+check_acceptance_criteria_coverage() {
+  local tdd_strategy_file=".claude/docs/*/TDD-STRATEGY.md"
+  local found=0
+
+  for file in $tdd_strategy_file; do
+    if [ -f "$file" ]; then
+      found=1
+      echo ""
+      echo -e "${BLUE}📋 Acceptance Criteria Coverage${NC}"
+      echo "   Using: $file"
+
+      # Count test cases in TDD strategy
+      local total_tests=$(grep -c "^\\*\\*TEST-" "$file" 2>/dev/null || echo 0)
+
+      if [ "$total_tests" -gt 0 ]; then
+        echo -e "   ${GREEN}✓${NC} $total_tests test cases defined"
+      else
+        echo -e "   ${YELLOW}⚠${NC} No test cases found in TDD strategy"
+      fi
+      break
+    fi
+  done
+
+  if [ $found -eq 0 ]; then
+    echo ""
+    echo -e "${YELLOW}⚠ No TDD-STRATEGY.md found - skip acceptance criteria check${NC}"
+  fi
+}
+
+# Function to provide mutation testing guidance
+check_mutation_testing_ready() {
+  echo ""
+  echo -e "${BLUE}🧬 Mutation Testing Readiness${NC}"
+
+  # Check if tests are deterministic (no random data without seeding)
+  local has_random=0
+  if [ -d "tests" ] || [ -d "test" ] || [ -d "spec" ]; then
+    if grep -r "Math\.random\|random\|faker" --include="*.test.*" --include="*_spec.*" tests/ test/ spec/ 2>/dev/null | grep -v "seed" | grep -q .; then
+      has_random=1
+      echo -e "   ${YELLOW}⚠${NC} Tests use random data - consider seeding for mutation testing"
+    else
+      echo -e "   ${GREEN}✓${NC} Tests appear deterministic"
+    fi
+  fi
+
+  # Check for test doubles/mocks usage
+  echo -n "   Test doubles usage... "
+  if grep -r "mock\|stub\|spy" --include="*.test.*" --include="*_spec.*" tests/ test/ spec/ 2>/dev/null | grep -q .; then
+    echo -e "${GREEN}✓${NC} Mocks/stubs found"
+  else
+    echo -e "${BLUE}○${NC} No mocks detected (may need for mutation testing)"
+  fi
+
+  echo ""
+  echo -e "   ${BLUE}💡 Mutation Testing Tools${NC}"
+  echo "      JavaScript/TypeScript: stryker-mutator"
+  echo "      Python: mutmut, pytest-mut"
+  echo "      Ruby: mutant"
+  echo "      Java: PITest"
+}
+
 # If specific file provided, check only that file
 if [ -n "$FILE_PATH" ]; then
   echo "Checking: $FILE_PATH"
   if ! check_test_coverage "$FILE_PATH"; then
     FAILURES=$((FAILURES + 1))
+  fi
+  # Also run quality check on the test file if it exists
+  if [[ "$FILE_PATH" =~ ^src/(.*)\.ts$ ]] && [ -f "tests/${BASH_REMATCH[1]}.test.ts" ]; then
+    check_test_quality "tests/${BASH_REMATCH[1]}.test.ts" || true
+  elif [[ "$FILE_PATH" =~ ^src/(.*)\.js$ ]] && [ -f "tests/${BASH_REMATCH[1]}.test.js" ]; then
+    check_test_quality "tests/${BASH_REMATCH[1]}.test.js" || true
   fi
 else
   # Check all implementation files against test coverage
@@ -107,6 +228,12 @@ else
       check_test_coverage "$file" || FAILURES=$((FAILURES + 1))
     done < <(find . -name "*.py" -not -path "./tests/*" -not -path "./venv/*" -not -path "./.venv/*" | head -20)
   fi
+
+  # Run acceptance criteria coverage check
+  check_acceptance_criteria_coverage
+
+  # Run mutation testing readiness check
+  check_mutation_testing_ready
 fi
 
 # Summary
@@ -114,6 +241,9 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [ $FAILURES -eq 0 ]; then
   echo -e "${GREEN}✅ TDD compliance verified${NC}"
+  if [ $WARNINGS -gt 0 ]; then
+    echo -e "${YELLOW}⚠️ $WARNINGS warning(s) to review${NC}"
+  fi
   echo "All implementation files have corresponding tests."
   exit 0
 else
@@ -127,5 +257,11 @@ else
   echo "3. Write implementation (GREEN)"
   echo "4. Run test to confirm pass"
   echo "5. Refactor (REFACTOR)"
+  echo ""
+  echo "Test Quality Tips:"
+  echo "- Write descriptive test names (what, when, then)"
+  echo "- Test edge cases and boundaries"
+  echo "- Use setup/teardown for shared test data"
+  echo "- Consider mutation testing for critical paths"
   exit 1
 fi

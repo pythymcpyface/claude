@@ -123,30 +123,363 @@ Use template from AUTONOMOUS-DEVELOPMENT-FLOW.md Phase 2:
 # Git Strategy
 
 ## Branching Model
-- `main` - Production-ready code
-- `develop` - Integration branch (if using)
-- `feat/spec-XXX` - Feature branches per specification
+
+### Primary Branches
+- `main` - Production-ready code, always deployable
+- `develop` - Integration branch for feature aggregation (optional)
+
+### Feature Branches
+- `feat/spec-XXX` - One branch per specification
+  - Create from: `main` (or `develop` if using)
+  - Merge back to: `main` (or `develop`)
+  - Naming: `feat/spec-XXX` where XXX matches specification ID
+  - Lifecycle: Short-lived (hours to days)
+
+### Hotfix Branches
+- `hotfix/description` - Emergency production fixes
+  - Create from: `main`
+  - Merge back to: `main` AND `develop`
+  - Lifecycle: Critical path, expedited review
+
+### Support Branches (if needed)
+- `release/vX.Y.Z` - Release preparation
+- `bugfix/description` - Non-critical bug fixes
 
 ## Commit Convention
+
+### Format
 ```
-feat(spec-XXX): brief description
-fix(spec-XXX): brief description
-docs: brief description
-refactor: brief description
-test: brief description
-chore: brief description
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
 ```
 
-## Commit Process
-1. Write tests first (failing)
-2. Implement specification
-3. Verify all tests pass
-4. Run quality-gate.sh
-5. Commit with conventional format
-6. NEVER commit broken tests
+### Types
+- `feat(spec-XXX)` - New feature implementation
+- `fix(spec-XXX)` - Bug fix for specification
+- `docs` - Documentation only
+- `refactor` - Code refactoring (no behavior change)
+- `test` - Adding or updating tests
+- `chore` - Build process, dependencies, tooling
+- `perf` - Performance improvement
+- `style` - Code style (formatting, semicolons, etc.)
 
-## PROGRESS Tracking
-Update `.claude/docs/PROGRESS.md` after each completed specification.
+### Subject Rules
+- Use imperative mood ("add" not "added" or "adds")
+- Lowercase first letter
+- No period at end
+- Limit to 72 characters
+- Reference spec ID: `feat(spec-001): add user authentication`
+
+### Body Rules (optional but recommended)
+- Wrap at 72 characters
+- Explain WHAT and WHY (not HOW)
+- Reference specification requirements
+
+### Footer Rules
+- Reference issues: `Closes #123`
+- Breaking changes: `BREAKING CHANGE: <description>`
+
+### Examples
+```
+feat(spec-003): implement JWT token validation
+
+Add token validation middleware to protect API endpoints.
+Validates signature, expiration, and issuer.
+
+Closes #45
+```
+
+```
+fix(spec-007): handle null values in user profile
+
+Fixed null pointer when user profile lacks optional fields.
+Added defensive checks and default values.
+```
+
+## Workflow Per Specification
+
+### 1. Start Specification
+```bash
+# Create feature branch
+git checkout main
+git pull origin main
+git checkout -b feat/spec-XXX
+```
+
+### 2. Development
+```bash
+# Frequent small commits while working
+git add .
+git commit -m "wip(spec-XXX: description)"
+```
+
+### 3. Before Final Commit
+```bash
+# Run quality gates
+bash .claude/scripts/quality-gate.sh
+
+# Update progress tracking
+# Edit .claude/docs/PROGRESS.md
+```
+
+### 4. Final Commit
+```bash
+# Stage all changes
+git add .
+
+# Conventional commit format
+git commit -m "feat(spec-XXX): [specification title]
+
+- Implemented requirement X
+- Added tests for edge cases Y
+- Verified integration with Z
+
+All tests passing. Quality gates passed.
+"
+```
+
+### 5. Merge to Main
+```bash
+# Return to main
+git checkout main
+git pull origin main
+
+# Merge with squash (for clean history)
+git merge --squash feat/spec-XXX
+git commit -m "feat(spec-XXX): [specification title]"
+
+# OR merge commit (for preserving context)
+git merge feat-spec-XXX --no-ff
+
+# Push to remote
+git push origin main
+
+# Delete feature branch
+git branch -d feat/spec-XXX
+```
+
+## Commit Rules
+
+### ALWAYS
+- ✅ Run tests before commit
+- ✅ Run quality-gate.sh before commit
+- ✅ Keep commits atomic (one logical change)
+- ✅ Write clear commit messages
+- ✅ Reference specification ID
+
+### NEVER
+- ❌ Commit broken tests
+- ❌ Commit with lint errors
+- ❌ Commit with TypeScript errors
+- ❌ Commit unrelated changes together
+- ❌ Commit generated files (dist/, build/, .next/)
+- ❌ Commit secrets or API keys
+- ❌ Use `git commit --amend` on pushed commits
+- ❌ Force push to main
+
+## Code Review Process
+
+### Before Requesting Review
+- [ ] All tests pass locally
+- [ ] Quality gate script passes
+- [ ] Self-review completed
+- [ ] Code follows project conventions
+- [ ] Documentation updated (if applicable)
+
+### Review Criteria
+- Specification requirements met
+- Test coverage adequate
+- Error handling comprehensive
+- Security considerations addressed
+- Performance acceptable
+- Code is maintainable
+
+### After Review
+- Address all feedback
+- Run tests again
+- Update commit with `--fixup` or new commit
+- Request re-review if significant changes
+
+## Release Management
+
+### Versioning
+- Follow Semantic Versioning: `MAJOR.MINOR.PATCH`
+- MAJOR: Breaking changes
+- MINOR: New features (backward compatible)
+- PATCH: Bug fixes (backward compatible)
+
+### Pre-Release Checklist
+- [ ] All tests pass
+- [ ] Documentation updated
+- [ ] CHANGELOG.md updated
+- [ ] Version number bumped
+- [ ] Smoke tests passed
+- [ ] Rollback plan documented
+
+### Tagging
+```bash
+# Annotated tag
+git tag -a v1.2.3 -m "Release v1.2.3: description"
+git push origin v1.2.3
+```
+
+## Emergency Procedures
+
+### Hotfix Workflow
+```bash
+# 1. Create hotfix from main
+git checkout main
+git pull origin main
+git checkout -b hotfix/critical-issue
+
+# 2. Apply fix
+# ... make changes ...
+
+# 3. Test and commit
+git commit -m "hotfix: resolve critical production issue"
+
+# 4. Merge to main
+git checkout main
+git merge hotfix/critical-issue
+git push origin main
+
+# 5. Tag release
+git tag -a v1.2.4 -m "Hotfix v1.2.4"
+git push origin v1.2.4
+
+# 6. Merge to develop (if using)
+git checkout develop
+git merge hotfix/critical-issue
+
+# 7. Delete hotfix branch
+git branch -d hotfix/critical-issue
+```
+
+### Rollback Procedure
+```bash
+# Identify last good commit
+git log --oneline | head -10
+
+# Revert to last good state
+git revert HEAD
+git push origin main
+
+# OR reset (use with caution)
+git reset --hard <commit-hash>
+git push --force origin main  # DANGEROUS
+```
+
+## Git Hooks (Optional)
+
+### Pre-commit Hook
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+bash .claude/scripts/quality-gate.sh
+if [ $? -ne 0 ]; then
+  echo "❌ Quality gate failed. Commit aborted."
+  exit 1
+fi
+```
+
+### Pre-push Hook
+```bash
+#!/bin/bash
+# .git/hooks/pre-push
+# Run full test suite before push
+npm test
+if [ $? -ne 0 ]; then
+  echo "❌ Tests failed. Push aborted."
+  exit 1
+fi
+```
+
+## Progress Tracking
+
+Update `.claude/docs/PROGRESS.md` after each completed specification:
+
+```markdown
+# Implementation Progress
+
+## Completed Specifications
+- [x] SPEC-001: Project Setup ✓ (committed 2025-02-12 14:23)
+- [x] SPEC-002: Core Types ✓ (committed 2025-02-12 14:45)
+- [x] SPEC-003: Error Handling ✓ (committed 2025-02-12 15:12)
+
+## In Progress
+- [ ] SPEC-004: Database Schema (branch: feat/spec-004)
+
+## Not Started
+- [ ] SPEC-005: User Authentication API
+- [ ] SPEC-006: Session Management
+```
+
+## Repository Hygiene
+
+### .gitignore Requirements
+```
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AI
+.claude/memories/
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporary
+*.tmp
+.cache/
+```
+
+### Branch Cleanup
+```bash
+# Delete merged local branches
+git branch --merged | grep -v "main\|develop" | xargs git branch -d
+
+# Delete stale remote branches
+git remote prune origin
+```
+
+## Safety Reminders
+
+1. **Never force push to main/develop**
+2. **Never commit broken tests**
+3. **Never commit secrets**
+4. **Always pull before push**
+5. **Always review git diff before commit**
+6. **Always write meaningful commit messages**
+7. **Keep branches short-lived**
+8. **Merge frequently to reduce conflicts**
 ```
 
 ### 2.5 Generate Initial `.claude/docs/SPECIFICATIONS.md`
