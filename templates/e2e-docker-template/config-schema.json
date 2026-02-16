@@ -1,0 +1,242 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "E2E Docker Test Configuration",
+  "description": "Configuration schema for generating E2E Docker test infrastructure",
+  "type": "object",
+  "required": ["projectName", "services"],
+  "properties": {
+    "projectName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Project name in kebab-case (used for Docker network, containers)"
+    },
+    "services": {
+      "type": "object",
+      "required": ["database", "api", "frontend"],
+      "properties": {
+        "database": {
+          "type": "object",
+          "required": ["type"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["postgres", "mysql", "mongodb"],
+              "default": "postgres"
+            },
+            "image": {
+              "type": "string",
+              "default": "postgres:16-alpine"
+            },
+            "port": {
+              "type": "integer",
+              "default": 5433,
+              "minimum": 1024,
+              "maximum": 65535
+            },
+            "user": {
+              "type": "string",
+              "default": "test_user"
+            },
+            "password": {
+              "type": "string",
+              "default": "test_password"
+            },
+            "database": {
+              "type": "string",
+              "default": "test_db"
+            },
+            "useTmpfs": {
+              "type": "boolean",
+              "default": true,
+              "description": "Use RAM-based storage for faster tests"
+            }
+          }
+        },
+        "api": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "port": {
+              "type": "integer",
+              "default": 3001,
+              "minimum": 1024,
+              "maximum": 65535
+            },
+            "internalPort": {
+              "type": "integer",
+              "default": 3000
+            },
+            "healthEndpoint": {
+              "type": "string",
+              "default": "/health"
+            },
+            "envVars": {
+              "type": "object",
+              "additionalProperties": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "number" },
+                  { "type": "boolean" }
+                ]
+              }
+            },
+            "dockerfile": {
+              "type": "string",
+              "default": "Dockerfile"
+            },
+            "buildContext": {
+              "type": "string",
+              "default": "."
+            }
+          }
+        },
+        "frontend": {
+          "type": "object",
+          "required": [],
+          "properties": {
+            "port": {
+              "type": "integer",
+              "default": 5174,
+              "minimum": 1024,
+              "maximum": 65535
+            },
+            "internalPort": {
+              "type": "integer",
+              "default": 5173
+            },
+            "framework": {
+              "type": "string",
+              "enum": ["react", "vue", "svelte", "next", "nuxt", "vite"],
+              "default": "vite"
+            },
+            "dockerfile": {
+              "type": "string",
+              "default": "Dockerfile"
+            },
+            "buildContext": {
+              "type": "string",
+              "default": "./frontend"
+            },
+            "dockerfileTarget": {
+              "type": "string",
+              "default": "development"
+            },
+            "envVars": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "testUsers": {
+      "type": "array",
+      "description": "Test users to seed in database",
+      "default": [
+        {
+          "email": "test-user@example.com",
+          "password": "TestPassword123!",
+          "name": "Test User",
+          "role": "user",
+          "verified": true
+        },
+        {
+          "email": "test-admin@example.com",
+          "password": "TestPassword123!",
+          "name": "Test Admin",
+          "role": "admin",
+          "verified": true
+        }
+      ],
+      "items": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 },
+          "name": { "type": "string" },
+          "role": { "type": "string", "default": "user" },
+          "verified": { "type": "boolean", "default": true }
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "description": "Authentication configuration for tests",
+      "properties": {
+        "tokenStorageKey": {
+          "type": "string",
+          "default": "access_token"
+        },
+        "refreshTokenKey": {
+          "type": "string",
+          "default": "refresh_token"
+        },
+        "loginPath": {
+          "type": "string",
+          "default": "/login"
+        },
+        "dashboardPath": {
+          "type": "string",
+          "default": "/dashboard"
+        }
+      }
+    },
+    "ci": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["github", "gitlab", "circleci", "none"],
+          "default": "github"
+        },
+        "nodeVersion": {
+          "type": "string",
+          "default": "20"
+        },
+        "browsers": {
+          "type": "array",
+          "default": ["chromium"],
+          "items": {
+            "type": "string",
+            "enum": ["chromium", "firefox", "webkit"]
+          }
+        },
+        "timeoutMinutes": {
+          "type": "integer",
+          "default": 30
+        }
+      }
+    },
+    "testing": {
+      "type": "object",
+      "properties": {
+        "workers": {
+          "type": "integer",
+          "default": 4,
+          "description": "Default number of parallel test workers"
+        },
+        "retries": {
+          "type": "integer",
+          "default": 2,
+          "description": "Number of retries for failed tests in CI"
+        },
+        "timeout": {
+          "type": "integer",
+          "default": 30000,
+          "description": "Default test timeout in milliseconds"
+        },
+        "reportDir": {
+          "type": "string",
+          "default": "reports/e2e"
+        }
+      }
+    },
+    "secrets": {
+      "type": "array",
+      "description": "Environment variable names to pass from CI secrets",
+      "default": [],
+      "items": { "type": "string" }
+    }
+  }
+}
