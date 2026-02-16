@@ -1,0 +1,105 @@
+name: E2E Docker Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to run tests on'
+        required: false
+        default: 'chromium'
+        type: choice
+        options:
+          - chromium
+<% if (ci.browsers.includes('firefox')) { -%>
+          - firefox
+<% } -%>
+<% if (ci.browsers.includes('webkit')) { -%>
+          - webkit
+<% } -%>
+
+env:
+  NODE_VERSION: '<%= ci.nodeVersion %>'
+
+jobs:
+  e2e:
+    name: E2E Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: <%= ci.timeoutMinutes %>
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [<%= ci.browsers.join(', ') %>]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install backend dependencies
+        run: npm ci
+
+<% if (services.frontend.buildContext !== '.') { -%>
+      - name: Install frontend dependencies
+        run: cd <%= services.frontend.buildContext %> && npm ci
+<% } -%>
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Make run script executable
+        run: chmod +x scripts/run-e2e.sh
+
+      - name: Run E2E tests
+        run: ./scripts/run-e2e.sh
+        env:
+          BROWSER: ${{ matrix.browser }}
+          WORKERS: 2
+          CI: true
+<% secrets.forEach(secret => { -%>
+          <%= secret %>: ${{ secrets.<%= secret %> }}
+<% }); -%>
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}
+          path: <%= testing.reportDir %>/
+          retention-days: 7
+
+      - name: Upload Docker logs on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: docker-logs-${{ matrix.browser }}
+          path: |
+            /var/log/docker*
+            /tmp/docker*
+          retention-days: 3
+          if-no-files-found: ignore
+
+  # Summary job that requires all tests to pass
+  e2e-summary:
+    name: E2E Tests Summary
+    runs-on: ubuntu-latest
+    needs: e2e
+    if: always()
+
+    steps:
+      - name: Check test results
+        run: |
+          if [ "${{ needs.e2e.result }}" == "failure" ]; then
+            echo "::error::E2E tests failed"
+            exit 1
+          fi
+          echo "All E2E tests passed!"
