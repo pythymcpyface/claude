@@ -8,12 +8,19 @@ CLAUDE_DIR="$PROJECT_DIR/.claude"
 PROJECT_CLAUDE="$CLAUDE_DIR/CLAUDE.md"
 TRAITS_DIR="$HOME/.claude/templates/traits"
 
-# Skip if already exists
+# Always copy docs (even for non-project directories)
+mkdir -p "$CLAUDE_DIR/docs"
+GLOBAL_DOCS="$HOME/.claude/docs"
+if [ -f "$GLOBAL_DOCS/AUTONOMOUS-DEVELOPMENT-FLOW.md" ] && [ ! -f "$CLAUDE_DIR/docs/AUTONOMOUS-DEVELOPMENT-FLOW.md" ]; then
+  cp "$GLOBAL_DOCS/AUTONOMOUS-DEVELOPMENT-FLOW.md" "$CLAUDE_DIR/docs/"
+fi
+
+# Skip CLAUDE.md generation if already exists
 if [ -f "$PROJECT_CLAUDE" ]; then
   exit 0
 fi
 
-# Skip if not a project directory (no package.json, Cargo.toml, etc.)
+# Skip CLAUDE.md generation if not a project directory (no package.json, Cargo.toml, etc.)
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
 HAS_PROJECT=false
@@ -29,9 +36,6 @@ HAS_PROJECT=false
 if [ "$HAS_PROJECT" = false ]; then
   exit 0
 fi
-
-# Create .claude directory
-mkdir -p "$CLAUDE_DIR"
 
 # Detect project characteristics
 STACK=""
@@ -235,8 +239,17 @@ if [ -f "$TRAITS_DIR/available-commands.md" ]; then
   echo "" >> "$PROJECT_CLAUDE"
 fi
 
-# 9. Files to Skip (Dynamic based on stack)
+# 9. Project Documentation References
 cat >> "$PROJECT_CLAUDE" << 'EOF'
+
+## Project Documentation
+- `.claude/docs/AUTONOMOUS-DEVELOPMENT-FLOW.md` - Complete autonomous development workflow
+
+EOF
+
+# 10. Files to Skip (Dynamic based on stack)
+cat >> "$PROJECT_CLAUDE" << 'EOF'
+
 ### Files to Skip Reading
 - `node_modules/`, `vendor/`, `target/`, `__pycache__/`
 - `dist/`, `build/`, `.next/`, `out/`

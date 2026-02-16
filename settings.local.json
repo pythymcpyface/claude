@@ -7,7 +7,11 @@
       "Bash(grep:*)",
       "Bash(find:*)",
       "Bash(chmod:*)",
-      "Bash(brew cleanup:*)"
+      "Bash(brew cleanup:*)",
+      "Bash(numfmt:*)",
+      "Bash(bc:*)",
+      "Bash(xargs:*)",
+      "Bash(docker:*)"
     ]
   },
   "hooks": {
