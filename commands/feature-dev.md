@@ -130,7 +130,40 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 ---
 
-## Phase 4.5: TDD Strategy Generation
+## Phase 4.5: Architecture Validation
+
+**Goal**: Validate the chosen architecture against codebase patterns and best practices
+
+**CRITICAL**: Ensure architecture aligns with existing conventions before proceeding
+
+**Actions**:
+1. **Review the chosen architecture** from Phase 4 against codebase patterns
+2. **Verify design pattern alignment**:
+   - Matches existing architectural patterns
+   - Uses established naming conventions
+   - Follows module organization standards
+   - Compatible with existing error handling
+3. **Validate SOLID principles**:
+   - Single Responsibility: Each component has one job
+   - Open/Closed: Extensible without modification
+   - Liskov Substitution: Subtypes are substitutable
+   - Interface Segregation: Focused interfaces
+   - Dependency Inversion: Depend on abstractions
+4. **Check integration points**:
+   - External dependencies identified and justified
+   - Internal dependencies documented
+   - API boundaries clearly defined
+5. **Validate error handling strategy** for the proposed design
+6. **Create ADR** (Architecture Decision Record) if this is a significant architectural decision
+7. **Document findings** in `.claude/docs/$BRANCH_NAME/ARCHITECTURE-VALIDATION.md`
+8. **Present validation to user** with any concerns or adjustments needed
+
+**Template**: `.claude/docs/templates/ARCHITECTURE-VALIDATION.md`
+**Output**: `.claude/docs/$BRANCH_NAME/ARCHITECTURE-VALIDATION.md`
+
+---
+
+## Phase 4.6: TDD Strategy Generation
 
 **Goal**: Generate complete SPECIFICATIONS.md and TDD-STRATEGY.md
 
@@ -163,15 +196,34 @@ If the user says "whatever you think is best", provide your recommendation and g
 1. Complete `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md` (all requirements broken down)
 2. Complete `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md` (all specs from requirements)
 3. Complete `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md` (all test cases mapped)
-4. **THEN** begin implementation
+4. **THEN** stop and present documentation summary
+
+---
+
+# ⛔ DOCUMENTATION COMPLETE - STOP POINT ⛔
+
+**Planning Phase Complete.** All documentation has been generated:
+- `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
+- `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`
+- `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
+
+**DO NOT proceed to implementation automatically.**
+
+Present the documentation summary to the user and **WAIT** for explicit approval before continuing to Phase 5.
+
+The user must explicitly request implementation to proceed.
 
 ---
 
 ## Phase 5: Implementation (Strict TDD)
 
+**⚠️ MANUAL CONTINUATION ONLY - DO NOT START AUTOMATICALLY ⚠️**
+
 **Goal**: Build the feature following Red-Green-Refactor loop
 
-**DO NOT START WITHOUT USER APPROVAL**
+**REQUIRES EXPLICIT USER APPROVAL BEFORE STARTING**
+
+This phase ONLY begins when the user explicitly requests implementation to proceed after reviewing all documentation.
 
 **CRITICAL**: Only starts after ALL documents ($BRANCH_NAME/REQUIREMENTS.md, $BRANCH_NAME/SPECIFICATIONS.md, $BRANCH_NAME/TDD-STRATEGY.md) are complete
 
@@ -206,6 +258,73 @@ If the user says "whatever you think is best", provide your recommendation and g
 2. Consolidate findings and identify highest severity issues that you recommend fixing
 3. **Present findings to user and ask what they want to do** (fix now, fix later, or proceed as-is)
 4. Address issues based on user decision
+
+---
+
+## Phase 6.2: UX Review
+
+**Goal**: Validate user experience quality including usability, accessibility, and workflow validation
+
+**Design Assistance**: Use `/ui-ux` command for design intelligence, patterns, and tool recommendations
+
+**Actions**:
+1. **Review UX checklist**: Use `.claude/docs/templates/UX-CHECKLIST.md`
+2. **Verify user workflow**:
+   - Task completion is intuitive
+   - Navigation is clear and predictable
+   - Error messages are helpful and actionable
+3. **Check accessibility** (WCAG 2.1 AA):
+   - Color contrast ratios meet standards
+   - Keyboard navigation works
+   - Screen reader support is adequate
+   - Form inputs have proper labels
+4. **Validate mobile responsiveness**:
+   - Touch targets are at least 44x44 pixels
+   - Layout works on small screens
+   - No horizontal scrolling
+5. **Review edge cases**:
+   - Empty states have helpful guidance
+   - Loading states provide feedback
+   - Long text/content is handled gracefully
+6. **Document findings** in `.claude/docs/$BRANCH_NAME/UX-REVIEW.md` if applicable
+7. **Present findings to user** with severity levels
+
+**Template**: `.claude/docs/templates/UX-CHECKLIST.md`
+
+---
+
+## Phase 6.5: Security Review
+
+**Goal**: Verify security requirements are met before merging
+
+**CRITICAL**: Security vulnerabilities must be addressed before merge
+
+**Actions**:
+1. **Run security gate**: `bash .claude/scripts/security-gate.sh`
+2. **Review security checklist**: Use `.claude/docs/templates/SECURITY-CHECKLIST.md`
+3. **Verify OWASP Top 10 coverage**:
+   - A01: Broken Access Control
+   - A02: Cryptographic Failures
+   - A03: Injection (SQL, XSS, Command)
+   - A04: Insecure Design
+   - A05: Security Misconfiguration
+   - A06: Vulnerable Components
+   - A07: Authentication Failures
+   - A08: Data Integrity Failures
+   - A09: Logging Failures
+   - A10: Server-Side Request Forgery
+4. **Check for**:
+   - Hardcoded secrets (none allowed)
+   - Input validation on all user input
+   - Output encoding to prevent XSS
+   - Parameterized queries for database access
+   - Proper error handling (no information leakage)
+5. **Document security decisions** in `.claude/docs/$BRANCH_NAME/SECURITY-REVIEW.md` if applicable
+6. **Present findings to user** with severity levels (HIGH/MEDIUM/LOW)
+7. **Address all HIGH severity issues** before proceeding
+
+**Template**: `.claude/docs/templates/SECURITY-CHECKLIST.md`
+**Script**: `.claude/scripts/security-gate.sh`
 
 ---
 
