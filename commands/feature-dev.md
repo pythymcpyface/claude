@@ -18,20 +18,48 @@ You are helping a developer implement a new feature. Follow a systematic approac
 
 ---
 
-## Phase 0: Branch Setup
+## Phase 0: Worktree Setup
 
-**Goal**: Create and checkout a feature branch
+**Goal**: Create a git worktree for isolated feature development
 
 **Actions**:
 1. Generate a branch name from the feature description (use kebab-case, max 50 chars)
 2. Ask user to confirm or modify the branch name
-3. Create and checkout the branch: `git checkout -b <branch-name>`
-4. **Store branch name as variable** `$BRANCH_NAME` for documentation naming
+3. **Create a git worktree** (isolated working directory):
+   ```bash
+   # Determine worktree path (sibling to current repo)
+   REPO_ROOT=$(git rev-parse --show-toplevel)
+   REPO_NAME=$(basename "$REPO_ROOT")
+   WORKTREE_PATH="../${REPO_NAME}-${BRANCH_NAME}"
+
+   # Create worktree with new branch
+   git worktree add "$WORKTREE_PATH" -b $BRANCH_NAME
+   ```
+4. **Store variables for later use**:
+   - `$BRANCH_NAME` - for documentation naming
+   - `$WORKTREE_PATH` - for worktree location
+   - `$MAIN_REPO_PATH` - for returning to main repo ($REPO_ROOT)
+5. **Inform user** of the new worktree location and that a new Claude Code session should be started there:
+   > Worktree created at: `$WORKTREE_PATH`
+   >
+   > Open a new terminal and run:
+   > ```bash
+   > cd $WORKTREE_PATH
+   > claude
+   > ```
 
 **Example**:
 - Feature: "Add user authentication with OAuth"
 - Branch name: `add-user-auth-oauth`
+- Worktree path: `../myproject-add-user-auth-oauth`
 - Documentation directory: `.claude/docs/$BRANCH_NAME/`
+
+**Benefits of Worktrees**:
+- Isolated context window for this feature
+- Main repo remains untouched for parallel work
+- No stash needed when switching tasks
+- Each Claude instance has clean state
+- Enables parallel agent instances on different features
 
 ---
 
@@ -94,6 +122,25 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 **CRITICAL**: Complete all requirements work before any specifications
 
+**Workflow Options**:
+
+### Option A: Comprehensive Specification Workflow (Recommended for complex features)
+
+Use `/spec-workflow` for exhaustive specification:
+1. **Invoke spec-workflow**:
+   ```
+   /spec-workflow [feature description]
+   ```
+2. **This generates**:
+   - `USER-JOURNEYS.md` - Exhaustive journey analysis
+   - `REQUIREMENTS.md` - EARS-formatted requirements
+   - `TDD-STRATEGY.md` - Gherkin/BDD specifications
+   - `TRACEABILITY-MATRIX.md` - Bidirectional traceability
+   - `features/*.feature` - Executable Gherkin files
+3. **Skip to Phase 4** after spec-workflow completes
+
+### Option B: Standard Requirements Breakdown
+
 **Actions**:
 1. **Generate initial requirements** from user input and clarifying questions
 2. **Iterative breakdown loop (3-5 passes)**:
@@ -115,6 +162,12 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 **Template**: Use `.claude/docs/templates/REQUIREMENTS-TEMPLATE.md`
 **Output**: `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
+
+**Recommendation**: Use Option A (spec-workflow) for:
+- Complex features with multiple user roles
+- Features requiring exhaustive test coverage
+- Projects with compliance requirements
+- Features with security implications
 
 ---
 
@@ -330,34 +383,56 @@ This phase ONLY begins when the user explicitly requests implementation to proce
 
 ## Phase 7: Summary and Merge
 
-**Goal**: Document what was accomplished and merge the feature branch
+**Goal**: Document what was accomplished, merge the feature branch, and clean up worktree
 
 **Actions**:
-1. Mark all todos complete
-2. Add documentation directory to `.gitignore`:
+1. **Mark all todos complete**
+2. **Commit any remaining changes**:
+   ```bash
+   git add .
+   git commit -m "feat: complete $BRANCH_NAME" || echo "Nothing to commit"
+   ```
+3. **Add documentation directory to .gitignore** (in worktree):
    ```bash
    echo ".claude/docs/$BRANCH_NAME/" >> .gitignore
+   git add .gitignore
+   git commit -m "chore: add feature docs to gitignore" || echo "Nothing to commit"
    ```
-3. Commit the `.gitignore` change if modified
-4. Merge the feature branch to main:
+4. **Return to main repo and merge**:
    ```bash
-   git checkout main
+   # Navigate to main repo
+   cd $MAIN_REPO_PATH
+
+   # Pull latest changes
+   git pull --no-rebase
+
+   # Merge the feature branch
    git merge --no-ff $BRANCH_NAME -m "feat: complete $BRANCH_NAME"
    ```
-5. Push to remote:
+5. **Push to remote**:
    ```bash
    git push origin main
    ```
-6. Optionally delete the feature branch:
+6. **Clean up worktree**:
    ```bash
+   # Remove the worktree
+   git worktree remove $WORKTREE_PATH
+
+   # Optionally delete the feature branch
    git branch -d $BRANCH_NAME
+
+   # Prune any stale worktree references
+   git worktree prune
    ```
-7. Summarize:
+7. **Summarize**:
    - What was built
    - Key decisions made
    - Files modified
    - Documents generated ($BRANCH_NAME/REQUIREMENTS.md, $BRANCH_NAME/SPECIFICATIONS.md, $BRANCH_NAME/TDD-STRATEGY.md)
    - Suggested next steps
+   - Worktree cleaned up
+
+**Note**: The user can keep the worktree for further work by skipping step 6.
 
 ---
 

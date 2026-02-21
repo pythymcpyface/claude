@@ -810,6 +810,12 @@ bash .claude/scripts/setup-env.sh
 /ralph-loop
 ```
 
+**Alternative: For comprehensive specification** (recommended for complex projects):
+```bash
+/spec-workflow [feature description]
+```
+This generates exhaustive specifications with user journeys, EARS requirements, Gherkin tests, and traceability verification.
+
 **THIS COMMAND WILL NOT CONTINUE AUTOMATICALLY.**
 **You must explicitly run the commands above when you are ready.**
 

@@ -8,6 +8,14 @@
   },
   "includeCoAuthoredBy": false,
   "model": "opus",
+  "extraKnownMarketplaces": {
+    "everything-claude-code": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/everything-claude-code"
+      }
+    }
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -65,6 +73,7 @@
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": true,
+    "everything-claude-code@everything-claude-code": true,
     "context-management@claude-code-workflows": false,
     "tdd-workflows@claude-code-workflows": false,
     "full-stack-orchestration@claude-code-workflows": false,

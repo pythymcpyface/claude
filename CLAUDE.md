@@ -122,6 +122,34 @@ find . -name "*.ts" | head -30    # Limit file lists
 
 ---
 
+## Auto-Prettify Output
+
+When outputting formatted content, use the prettifier MCP tools for beautiful terminal rendering:
+
+| Content Type | Tool | When to Use |
+|--------------|------|-------------|
+| Markdown | `mcp__prettifier__format_markdown` | Headers, lists, bold, code blocks, tables |
+| JSON | `mcp__prettifier__format_json` | API responses, config files, data |
+| Code | `mcp__prettifier__format_code` | Syntax-highlighted code snippets |
+| YAML | `mcp__prettifier__format_yaml` | Configuration files |
+| Tables | `mcp__prettifier__format_table` | Tabular data display |
+| Auto-detect | `mcp__prettifier__format_raw` | Unknown content type |
+
+### Usage Pattern
+```
+mcp__prettifier__format_markdown({ "text": "# Heading\n\nContent here" })
+mcp__prettifier__format_json({ "text": "{\"key\": \"value\"}" })
+mcp__prettifier__format_code({ "text": "code here", "language": "python" })
+```
+
+### Exceptions
+Do NOT prettify when:
+- Writing code to files (use Write tool directly)
+- Outputting simple plain text
+- User requests raw output
+
+---
+
 ## Cross-Session Memory (claude-mem)
 
 ### Before Complex Tasks
