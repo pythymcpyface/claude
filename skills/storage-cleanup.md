@@ -1,3 +1,9 @@
+---
+name: storage-cleanup
+description: macOS disk space recovery with analysis-first approach. Analyzes caches, Docker, build artifacts, and node_modules for safe cleanup. Use when disk is >75% full or user requests cleanup.
+allowed-tools: Bash(df:*), Bash(du:*), Bash(docker:*), Bash(rm:*), Bash(find:*), Bash(yarn:*), Bash(pnpm:*), Bash(ollama:*), Bash(colima:*), Read, AskUserQuestion
+---
+
 # Storage Cleanup Skill
 
 macOS disk space recovery with analysis-first approach. Use when disk is >75% full or user requests cleanup.
