@@ -1,7 +1,7 @@
 ---
 name: storage-cleanup
 description: macOS disk space recovery with analysis-first approach. Analyzes caches, Docker, build artifacts, and node_modules for safe cleanup. Use when disk is >75% full or user requests cleanup.
-allowed-tools: Bash(df:*), Bash(du:*), Bash(docker:*), Bash(rm:*), Bash(find:*), Bash(yarn:*), Bash(pnpm:*), Bash(ollama:*), Bash(colima:*), Read, AskUserQuestion
+tools: Bash, Read, AskUserQuestion
 ---
 
 # Storage Cleanup Skill
@@ -12,10 +12,76 @@ macOS disk space recovery with analysis-first approach. Use when disk is >75% fu
 
 | Directory | Reason |
 |-----------|--------|
-| `~/.claude/plugins/cache/thedotmack/` | claude-mem persistent memory |
-| `~/.claude/sessions/` | Session state |
+| `~/.claude-mem/claude-mem.db` | Cross-session memory database (117MB typical) |
+| `~/.claude/plugins/cache/thedotmack/` | claude-mem plugin cache |
+| `~/.claude/sessions/` | Active session state |
 | `~/.claude/settings.json` | User configuration |
-| Any path containing `claude-mem` | Cross-session memory database |
+| `~/.claude/skills/` | Custom skills |
+| `~/.claude/commands/` | Custom commands |
+| Any path containing `claude-mem` | Cross-session memory system |
+
+---
+
+## Claude Code Storage Architecture
+
+### Storage Systems Comparison
+
+| System | Location | Typical Size | Purpose |
+|--------|----------|--------------|---------|
+| **Session caches** | `~/.claude/projects/*/` | 6-8GB | Full conversation transcripts (`.jsonl`) |
+| **claude-mem** | `~/.claude-mem/claude-mem.db` | 100-150MB | Extracted, searchable observations |
+| **Debug logs** | `~/.claude/debug/` | 500MB+ | Debug output from past sessions |
+| **Shell snapshots** | `~/.claude/shell-snapshots/` | 25-30MB | Shell state for session resumption |
+| **Todos** | `~/.claude/todos/` | 50-60MB | Persistent todo lists |
+| **File history** | `~/.claude/file-history/` | 50MB | File version history |
+| **Command history** | `~/.claude/history.jsonl` | 3-5MB | Prompt history |
+
+### Session Caches vs claude-mem: Key Differences
+
+| Use Case | Session Cache | claude-mem |
+|----------|--------------|------------|
+| Resume interrupted session | Required | No |
+| Search past work | No (not indexed) | Yes (FTS + semantic) |
+| Find modified files | Yes (in transcript) | Yes (extracted) |
+| Recall decisions | Difficult (raw text) | Yes (structured) |
+| Storage efficiency | ~6.7GB | ~117MB |
+
+**Important:** claude-mem contains *extracted knowledge* from sessions, not raw transcripts. Deleting session caches does NOT lose learned patterns - they're preserved in claude-mem.
+
+### Claude Code Analysis Commands
+
+```bash
+# Claude Code root directory breakdown
+du -sh ~/.claude/*/ 2>/dev/null | sort -rh | head -20
+
+# Project session caches (often the largest)
+du -sh ~/.claude/projects/*/ 2>/dev/null | sort -rh | head -20
+
+# Count debug files (can be thousands)
+ls ~/.claude/debug/ | wc -l
+
+# Count shell snapshots
+ls ~/.claude/shell-snapshots/ | wc -l
+
+# Count todos
+ls ~/.claude/todos/ | wc -l
+
+# Check claude-mem database size and record count
+ls -lh ~/.claude-mem/claude-mem.db
+sqlite3 ~/.claude-mem/claude-mem.db "SELECT COUNT(*) as observations FROM observations;"
+```
+
+### Claude Code Safe Cleanup Options
+
+| Clear? | Path | Typical Size | Risk | Regenerates |
+|--------|------|--------------|------|-------------|
+| [ ] | `~/.claude/debug/*` | 500MB+ | None | Yes, on next session |
+| [ ] | `~/.claude/shell-snapshots/*` | 25-30MB | Low | Yes, on next session |
+| [ ] | `~/.claude/todos/*` | 50-60MB | Low | Yes, on next session |
+| [ ] | `~/.claude/projects/<inactive>/` | 1-5GB each | Low* | Yes, on next session in that project |
+| [ ] | `~/.claude/file-history/*` | 50MB | Medium | No |
+
+*Only delete inactive project caches. Active project caches needed for session resumption.
 
 ---
 
@@ -86,6 +152,16 @@ du -sh ~/Library/Caches/CocoaPods 2>/dev/null || echo "0B"
 
 # Xcode derived data
 du -sh ~/Library/Developer/Xcode/DerivedData 2>/dev/null || echo "0B"
+
+# Claude Code caches
+du -sh ~/.claude/projects 2>/dev/null || echo "0B"
+du -sh ~/.claude/debug 2>/dev/null || echo "0B"
+du -sh ~/.claude/todos 2>/dev/null || echo "0B"
+du -sh ~/.claude/shell-snapshots 2>/dev/null || echo "0B"
+du -sh ~/.claude/file-history 2>/dev/null || echo "0B"
+
+# Claude Code - claude-mem database (PROTECTED - for info only)
+du -sh ~/.claude-mem 2>/dev/null || echo "0B"
 ```
 
 ### Build Artifacts Analysis
@@ -224,6 +300,37 @@ rm -rf <path>/dist <path>/build
 rm -rf <project>/node_modules
 ```
 
+#### Claude Code - Debug Logs
+```bash
+# Safe to clear - regenerates as needed
+rm -rf ~/.claude/debug/*
+```
+
+#### Claude Code - Shell Snapshots
+```bash
+# Safe to clear - regenerates on next session
+rm -rf ~/.claude/shell-snapshots/*
+```
+
+#### Claude Code - Todos
+```bash
+# Safe to clear - regenerates on next session
+rm -rf ~/.claude/todos/*
+```
+
+#### Claude Code - Inactive Project Caches
+```bash
+# Only clear projects NOT currently being worked on
+# claude-mem preserves the extracted knowledge
+rm -rf ~/.claude/projects/-Users-<username>-path-to-inactive-project/
+```
+
+#### Claude Code - File History
+```bash
+# Only if user confirmed - this is NOT regenerated
+rm -rf ~/.claude/file-history/*
+```
+
 ---
 
 ### Step 6: Verification
@@ -250,6 +357,9 @@ echo "Space recovered: [calculate from before/after]"
 | Playwright | `du -sh ~/Library/Caches/ms-playwright` |
 | Ollama | `ollama list` + `du -sh ~/.ollama/models` |
 | Build artifacts | `find ~ -type d -name ".next" -exec du -sh {} \;` |
+| Claude Code total | `du -sh ~/.claude/*/` |
+| Claude Code projects | `du -sh ~/.claude/projects/*/` |
+| claude-mem | `sqlite3 ~/.claude-mem/claude-mem.db "SELECT COUNT(*) FROM observations;"` |
 
 ---
 
