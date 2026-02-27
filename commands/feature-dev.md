@@ -39,14 +39,9 @@ You are helping a developer implement a new feature. Follow a systematic approac
    - `$BRANCH_NAME` - for documentation naming
    - `$WORKTREE_PATH` - for worktree location
    - `$MAIN_REPO_PATH` - for returning to main repo ($REPO_ROOT)
-5. **Inform user** of the new worktree location and that a new Claude Code session should be started there:
-   > Worktree created at: `$WORKTREE_PATH`
-   >
-   > Open a new terminal and run:
-   > ```bash
-   > cd $WORKTREE_PATH
-   > claude
-   > ```
+5. **Note the worktree location** for reference:
+   - Worktree created at: `$WORKTREE_PATH`
+   - Continue working in the current session (no session restart needed)
 
 **Example**:
 - Feature: "Add user authentication with OAuth"

@@ -40,14 +40,9 @@ You are helping a developer resolve a bug. Follow a systematic approach: underst
 5. **Store variables for later use**:
    - `$BRANCH_NAME` - for documentation naming
    - `$WORKTREE_PATH` - for worktree location
-6. **Inform user** of the new worktree location and that a new Claude Code session should be started there:
-   > Worktree created at: `$WORKTREE_PATH`
-   >
-   > Open a new terminal and run:
-   > ```bash
-   > cd $WORKTREE_PATH
-   > claude
-   > ```
+6. **Note the worktree location** for reference:
+   - Worktree created at: `$WORKTREE_PATH`
+   - Continue working in the current session (no session restart needed)
 
 **Example**:
 - Bug: "Login crashes when email is null"

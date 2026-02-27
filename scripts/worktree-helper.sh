@@ -60,10 +60,6 @@ cmd_create() {
     echo "Worktree created successfully!"
     echo "  Branch: $branch_name"
     echo "  Path: $worktree_path"
-    echo ""
-    echo "To start a new Claude Code session:"
-    echo "  cd $worktree_path"
-    echo "  claude"
 }
 
 cmd_list() {
