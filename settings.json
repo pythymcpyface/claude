@@ -4,7 +4,13 @@
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5",
     "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
-    "API_TIMEOUT_MS": "3000000"
+    "API_TIMEOUT_MS": "3000000",
+    "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
+    "MAX_THINKING_TOKENS": "0"
   },
   "includeCoAuthoredBy": false,
   "model": "opus",
@@ -22,15 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/scripts/generate-project-claude.sh \"$PWD\""
-          },
-          {
-            "type": "command",
-            "command": "bash ~/.claude/scripts/detect-project.sh \"$PWD\""
-          },
-          {
-            "type": "command",
-            "command": "bash ~/.claude/scripts/track-usage.sh --init"
+            "command": "bash ~/.claude/scripts/session-init.sh \"$PWD\""
           }
         ]
       }

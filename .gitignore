@@ -1,5 +1,12 @@
 # Sensitive - contains API tokens via env vars
-# settings.json
+settings.json
+settings.local.json
+
+# Backup files
+*.backup
+
+# Nested .claude directory (duplicate skills)
+.claude/
 
 /projects
 /backup
@@ -18,5 +25,15 @@
 /sessions
 history.jsonl
 stats-cache.json
+usage.json
+
 # Ralph Loop state files
-.claude/ralph-loop.local.md
+ralph-loop.local.md
+
+# Python
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+.env.*
