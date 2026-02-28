@@ -22,9 +22,42 @@ You are helping a developer implement a new feature. Follow a systematic approac
 
 **Goal**: Create a git worktree for isolated feature development
 
+### Branch Naming Convention (MANDATORY)
+
+Follow industry-standard git branch naming conventions:
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| **Feature** | `feature/<description>` | `feature/user-auth-oauth` |
+| **Feature + Issue** | `feature/<issue-id>-<description>` | `feature/JIRA-123-oauth` |
+| **Bugfix** | `bugfix/<description>` | `bugfix/login-timeout` |
+| **Hotfix** | `hotfix/<description>` | `hotfix/security-patch` |
+| **Release** | `release/v<version>` | `release/v2.1.0` |
+| **Docs** | `docs/<description>` | `docs/api-reference` |
+| **Refactor** | `refactor/<description>` | `refactor/auth-module` |
+| **Test** | `test/<description>` | `test/integration-coverage` |
+| **Chore** | `chore/<description>` | `chore/update-deps` |
+
+**Branch Naming Rules**:
+1. Use lowercase letters only
+2. Use hyphens `-` to separate words in description
+3. Use slashes `/` to separate type prefix
+4. Keep total length under 50 characters
+5. Never use spaces or special characters (`~ ^ : * ? [ ] @`)
+6. Include issue tracker ID when available (JIRA-XXX, GH-XXX)
+
 **Actions**:
-1. Generate a branch name from the feature description (use kebab-case, max 50 chars)
+1. **Generate branch name** following conventions above:
+   - Extract type from feature description (default: `feature`)
+   - Create kebab-case description (max 40 chars after prefix)
+   - Include issue ID if provided
+   - **Example transformations**:
+     - "Add user authentication with OAuth" → `feature/user-auth-oauth`
+     - "Fix JIRA-456: Login timeout on mobile" → `bugfix/JIRA-456-login-timeout`
+     - "Critical security patch for API" → `hotfix/api-security-patch`
+
 2. Ask user to confirm or modify the branch name
+
 3. **Create a git worktree** (isolated working directory):
    ```bash
    # Determine worktree path (sibling to current repo)
@@ -34,20 +67,33 @@ You are helping a developer implement a new feature. Follow a systematic approac
 
    # Create worktree with new branch
    git worktree add "$WORKTREE_PATH" -b $BRANCH_NAME
+
+   # Create session marker for worktree isolation
+   echo "{\"branch\":\"$BRANCH_NAME\",\"created\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"pid\":$$}" > "$WORKTREE_PATH/.worktree-session"
    ```
+
 4. **Store variables for later use**:
    - `$BRANCH_NAME` - for documentation naming
    - `$WORKTREE_PATH` - for worktree location
    - `$MAIN_REPO_PATH` - for returning to main repo ($REPO_ROOT)
+
 5. **Note the worktree location** for reference:
    - Worktree created at: `$WORKTREE_PATH`
+   - Session marker created: `.worktree-session`
    - Continue working in the current session (no session restart needed)
 
 **Example**:
 - Feature: "Add user authentication with OAuth"
-- Branch name: `add-user-auth-oauth`
-- Worktree path: `../myproject-add-user-auth-oauth`
+- Branch name: `feature/user-auth-oauth`
+- Worktree path: `../myproject-feature-user-auth-oauth`
 - Documentation directory: `.claude/docs/$BRANCH_NAME/`
+
+### Worktree Session Isolation
+
+The `.worktree-session` marker file ensures new Claude sessions detect active worktrees:
+- New sessions starting in main repo will see worktree status
+- New sessions will NOT interfere with active worktree work
+- User can start fresh work on main branch while worktree is active
 
 **Benefits of Worktrees**:
 - Isolated context window for this feature

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Worktree Helper Script for Claude Code
 # Manages git worktrees for parallel agent instances
+# Supports session isolation via .worktree-session marker
 
 set -e
 
@@ -12,17 +13,32 @@ usage() {
     echo ""
     echo "Commands:"
     echo "  create <branch-name>     Create a new worktree with branch"
-    echo "  list                     List all worktrees"
+    echo "  list                     List all worktrees with session status"
     echo "  remove <branch-name>     Remove a worktree and optionally delete branch"
     echo "  merge <branch-name>      Merge worktree branch to main and cleanup"
     echo "  prune                    Remove stale worktree references"
     echo "  status                   Show worktree status"
+    echo "  session <branch-name>    Show session info for a worktree"
+    echo "  abandon                  Abandon current worktree session (return to main)"
+    echo ""
+    echo "Branch Naming Convention (MANDATORY):"
+    echo "  feature/<description>        New feature (e.g., feature/user-auth)"
+    echo "  feature/<issue-id>-<desc>    Feature with issue (e.g., feature/JIRA-123-auth)"
+    echo "  bugfix/<description>         Bug fix (e.g., bugfix/login-timeout)"
+    echo "  bugfix/<issue-id>-<desc>     Bug fix with issue (e.g., bugfix/GH-789-crash)"
+    echo "  hotfix/<description>         Production hotfix (e.g., hotfix/security-patch)"
+    echo "  release/v<version>           Release branch (e.g., release/v2.1.0)"
+    echo "  docs/<description>           Documentation (e.g., docs/api-reference)"
+    echo "  refactor/<description>       Refactoring (e.g., refactor/auth-module)"
+    echo "  test/<description>           Testing (e.g., test/integration-coverage)"
+    echo "  chore/<description>          Maintenance (e.g., chore/update-deps)"
     echo ""
     echo "Examples:"
-    echo "  worktree-helper.sh create fix/login-bug"
-    echo "  worktree-helper.sh create feature/user-auth"
-    echo "  worktree-helper.sh merge fix/login-bug"
+    echo "  worktree-helper.sh create bugfix/login-bug"
+    echo "  worktree-helper.sh create feature/JIRA-123-user-auth"
+    echo "  worktree-helper.sh merge bugfix/login-bug"
     echo "  worktree-helper.sh list"
+    echo "  worktree-helper.sh session feature/user-auth"
 }
 
 get_worktree_path() {
@@ -37,6 +53,30 @@ cmd_create() {
         echo "Error: Branch name required"
         usage
         exit 1
+    fi
+
+    # Validate branch naming convention
+    if [[ ! "$branch_name" =~ ^(feature|bugfix|hotfix|release|docs|refactor|test|chore)/ ]]; then
+        echo "Warning: Branch name does not follow naming convention."
+        echo "Expected pattern: <type>/<description> where type is one of:"
+        echo "  feature, bugfix, hotfix, release, docs, refactor, test, chore"
+        echo ""
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+
+    # Check branch name length
+    if [ ${#branch_name} -gt 50 ]; then
+        echo "Warning: Branch name exceeds 50 characters (current: ${#branch_name})"
+        echo "Consider shortening the description."
+        read -p "Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 
     local worktree_path=$(get_worktree_path "$branch_name")
@@ -56,10 +96,17 @@ cmd_create() {
         git worktree add "$worktree_path" -b "$branch_name"
     fi
 
+    # Create session marker for worktree isolation
+    echo "{\"branch\":\"$branch_name\",\"created\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"pid\":$$}" > "$worktree_path/.worktree-session"
+
     echo ""
     echo "Worktree created successfully!"
     echo "  Branch: $branch_name"
     echo "  Path: $worktree_path"
+    echo "  Session marker: .worktree-session"
+    echo ""
+    echo "To start a Claude session in this worktree:"
+    echo "  cd $worktree_path && claude"
 }
 
 cmd_list() {
@@ -96,6 +143,13 @@ cmd_remove() {
         echo "Available worktrees:"
         git worktree list
         exit 1
+    fi
+
+    # Remove session marker first
+    local session_file="$worktree_path/.worktree-session"
+    if [ -f "$session_file" ]; then
+        rm "$session_file"
+        echo "Session marker removed"
     fi
 
     echo "Removing worktree at $worktree_path..."
@@ -190,6 +244,22 @@ cmd_status() {
 
     echo "Current branch: $(git branch --show-current)"
 
+    # Check for session markers
+    echo ""
+    echo "Active sessions:"
+    local found_session=false
+    for wt_path in $(git worktree list | tail -n +2 | awk '{print $1}'); do
+        if [ -f "$wt_path/.worktree-session" ]; then
+            local branch=$(cat "$wt_path/.worktree-session" 2>/dev/null | grep -o '"branch":"[^"]*"' | cut -d'"' -f4)
+            local created=$(cat "$wt_path/.worktree-session" 2>/dev/null | grep -o '"created":"[^"]*"' | cut -d'"' -f4)
+            echo "  $branch (created: $created)"
+            found_session=true
+        fi
+    done
+    if [ "$found_session" = false ]; then
+        echo "  No active sessions with markers"
+    fi
+
     # Check for modified worktrees
     echo ""
     echo "Uncommitted changes by worktree:"
@@ -200,6 +270,62 @@ cmd_status() {
             fi
         fi
     done
+}
+
+cmd_session() {
+    local branch_name="$1"
+    if [ -z "$branch_name" ]; then
+        echo "Error: Branch name required"
+        usage
+        exit 1
+    fi
+
+    local worktree_path=$(get_worktree_path "$branch_name")
+    local session_file="$worktree_path/.worktree-session"
+
+    if [ ! -f "$session_file" ]; then
+        echo "No session marker found for branch $branch_name"
+        echo "Worktree path: $worktree_path"
+        exit 1
+    fi
+
+    echo "Session info for $branch_name:"
+    echo "================================"
+    cat "$session_file" | python3 -m json.tool 2>/dev/null || cat "$session_file"
+    echo ""
+    echo "Worktree path: $worktree_path"
+}
+
+cmd_abandon() {
+    # Check if we're in a worktree
+    local current_worktree=$(git rev-parse --show-toplevel 2>/dev/null)
+    local main_worktree=$(git worktree list 2>/dev/null | head -1 | cut -f1)
+
+    if [ "$current_worktree" = "$main_worktree" ] || [ -z "$main_worktree" ]; then
+        echo "Not in a worktree - already in main repo"
+        exit 0
+    fi
+
+    local session_file="$current_worktree/.worktree-session"
+    local branch_name=$(git branch --show-current)
+
+    echo "Abandoning worktree session..."
+    echo "  Branch: $branch_name"
+    echo "  Path: $current_worktree"
+    echo ""
+
+    # Remove session marker
+    if [ -f "$session_file" ]; then
+        rm "$session_file"
+        echo "Session marker removed"
+    fi
+
+    echo ""
+    echo "To return to main repo:"
+    echo "  cd $main_worktree"
+    echo ""
+    echo "To clean up the worktree:"
+    echo "  worktree-helper.sh remove $branch_name"
 }
 
 # Main command dispatcher
@@ -221,6 +347,12 @@ case "${1:-}" in
         ;;
     status)
         cmd_status
+        ;;
+    session)
+        cmd_session "$2"
+        ;;
+    abandon)
+        cmd_abandon
         ;;
     -h|--help|help)
         usage

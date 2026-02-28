@@ -1,6 +1,6 @@
 #!/bin/bash
 # Consolidated Session Initialization
-# Combines: generate-project-claude, detect-project, track-usage --init
+# Combines: generate-project-claude, detect-project, track-usage --init, worktree detection
 # Reduces hook overhead from 3 scripts to 1
 
 set -euo pipefail
@@ -11,16 +11,55 @@ CACHE_DIR="$CLAUDE_DIR"
 CACHE_FILE="$CACHE_DIR/.cache_hash"
 
 # ============================================
-# 1. USAGE TRACKING INIT (minimal)
+# 1. USAGE TRACKING INIT (for local LLM)
 # ============================================
-USAGE_FILE="$HOME/.claude/usage.json"
-if [[ ! -f "$USAGE_FILE" ]]; then
-    mkdir -p "$(dirname "$USAGE_FILE")"
-    echo '{"plan_tier":"pro","prompts_per_window":600,"window_hours":5,"calls":[]}' > "$USAGE_FILE"
+# Initialize local LLM token tracking via dedicated script
+# This sets up session tracking for llama.cpp servers with --metrics
+bash "$HOME/.claude/scripts/local-llm-usage.sh" --init 2>/dev/null || true
+
+# ============================================
+# 2. WORKTREE DETECTION
+# ============================================
+# Check if we're in a git worktree and handle session isolation
+detect_worktree() {
+    local project_dir="$1"
+
+    # Check if we're in a git repository
+    if ! git -C "$project_dir" rev-parse --git-dir &>/dev/null; then
+        return 1
+    fi
+
+    # Get the main worktree path (first worktree in list)
+    local main_worktree=$(git -C "$project_dir" worktree list 2>/dev/null | head -1 | cut -f1)
+    local current_worktree=$(git -C "$project_dir" rev-parse --show-toplevel 2>/dev/null)
+
+    # If current path differs from main worktree, we're in a worktree
+    if [ -n "$main_worktree" ] && [ "$main_worktree" != "$current_worktree" ]; then
+        # Check for session marker
+        local session_marker="$project_dir/.worktree-session"
+        if [ -f "$session_marker" ]; then
+            local branch=$(cat "$session_marker" 2>/dev/null | grep -o '"branch":"[^"]*"' | cut -d'"' -f4)
+            local created=$(cat "$session_marker" 2>/dev/null | grep -o '"created":"[^"]*"' | cut -d'"' -f4)
+            echo "WORKTREE_DETECTED=1"
+            echo "WORKTREE_BRANCH=$branch"
+            echo "WORKTREE_CREATED=$created"
+            echo "MAIN_REPO=$main_worktree"
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# Store worktree info for Claude to use
+WORKTREE_INFO=$(detect_worktree "$PROJECT_DIR")
+if [ -n "$WORKTREE_INFO" ]; then
+    echo "$WORKTREE_INFO" > "$CLAUDE_DIR/.worktree-context"
+else
+    rm -f "$CLAUDE_DIR/.worktree-context" 2>/dev/null || true
 fi
 
 # ============================================
-# 2. PROJECT DETECTION (skip if not a project)
+# 3. PROJECT DETECTION (skip if not a project)
 # ============================================
 cd "$PROJECT_DIR" 2>/dev/null || exit 0
 
@@ -37,7 +76,7 @@ if [ "$IS_PROJECT" = false ]; then
 fi
 
 # ============================================
-# 3. COPY AUTONOMOUS DEVELOPMENT FLOW DOC
+# 4. COPY AUTONOMOUS DEVELOPMENT FLOW DOC
 # ============================================
 mkdir -p "$CLAUDE_DIR/docs"
 GLOBAL_DOCS="$HOME/.claude/docs"
@@ -46,7 +85,7 @@ if [ -f "$GLOBAL_DOCS/AUTONOMOUS-DEVELOPMENT-FLOW.md" ] && [ ! -f "$CLAUDE_DIR/d
 fi
 
 # ============================================
-# 4. GENERATE CLAUDE.md IF NEEDED
+# 5. GENERATE CLAUDE.md IF NEEDED
 # ============================================
 PROJECT_CLAUDE="$CLAUDE_DIR/CLAUDE.md"
 
@@ -56,7 +95,7 @@ if [ ! -f "$PROJECT_CLAUDE" ]; then
 fi
 
 # ============================================
-# 5. CACHE HASH FOR DETECTION
+# 6. CACHE HASH FOR DETECTION
 # ============================================
 calculate_hash() {
     local hash_input=""
