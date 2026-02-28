@@ -1,3 +1,6 @@
+# Sensitive - contains API tokens via env vars
+# settings.json
+
 /projects
 /backup
 /debug
