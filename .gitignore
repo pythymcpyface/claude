@@ -1,6 +1,6 @@
-# Sensitive - contains API tokens via env vars
-settings.json
+# Sensitive - contains actual tokens (copy from example)
 settings.local.json
+!.settings.example.json
 
 # Backup files
 *.backup
@@ -37,3 +37,4 @@ __pycache__/
 # Environment files
 .env
 .env.*
+!.env.example
