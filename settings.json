@@ -33,6 +33,16 @@
         ]
       }
     ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/user-prompt-tokens.sh"
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -54,6 +64,10 @@
           {
             "type": "command",
             "command": "bash ~/.claude/scripts/context-summary.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/local-llm-usage.sh --end"
           }
         ]
       }
@@ -64,6 +78,10 @@
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/ralph-stop-hook.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/post-response-tokens.sh --update"
           }
         ]
       }
