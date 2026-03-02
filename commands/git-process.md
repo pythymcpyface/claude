@@ -30,13 +30,28 @@ Run in parallel:
 
 ### 3. Branch Management
 
-If on main/master, create new branch:
-```
-feat/[scope]-[description]
-fix/[issue-number]-[description]
-docs/[description]
-refactor/[scope]-[description]
-```
+If on main/master, create new branch following industry-standard naming:
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| **Feature** | `feature/<description>` | `feature/user-auth-oauth` |
+| **Feature + Issue** | `feature/<issue-id>-<description>` | `feature/JIRA-123-oauth` |
+| **Bugfix** | `bugfix/<description>` | `bugfix/login-timeout` |
+| **Bugfix + Issue** | `bugfix/<issue-id>-<description>` | `bugfix/GH-789-login-crash` |
+| **Hotfix** | `hotfix/<description>` | `hotfix/security-patch` |
+| **Release** | `release/v<version>` | `release/v2.1.0` |
+| **Docs** | `docs/<description>` | `docs/api-reference` |
+| **Refactor** | `refactor/<description>` | `refactor/auth-module` |
+| **Test** | `test/<description>` | `test/integration-coverage` |
+| **Chore** | `chore/<description>` | `chore/update-deps` |
+
+**Branch Naming Rules**:
+1. Use lowercase letters only
+2. Use hyphens `-` to separate words in description
+3. Use slashes `/` to separate type prefix
+4. Keep total length under 50 characters
+5. Never use spaces or special characters (`~ ^ : * ? [ ] @`)
+6. Include issue tracker ID when available (JIRA-XXX, GH-XXX)
 
 ### 4. Confirm with User
 

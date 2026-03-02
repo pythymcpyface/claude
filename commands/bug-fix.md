@@ -23,11 +23,39 @@ You are helping a developer resolve a bug. Follow a systematic approach: underst
 
 **Goal**: Create a git worktree for isolated bug fix development
 
+### Branch Naming Convention (MANDATORY)
+
+Follow industry-standard git branch naming conventions:
+
+| Type | Pattern | Example |
+|------|---------|---------|
+| **Bugfix** | `bugfix/<description>` | `bugfix/login-timeout` |
+| **Bugfix + Issue** | `bugfix/<issue-id>-<description>` | `bugfix/GH-789-login-crash` |
+| **Hotfix** | `hotfix/<description>` | `hotfix/security-patch` |
+| **Hotfix + Issue** | `hotfix/<issue-id>-<description>` | `hotfix/JIRA-123-critical-fix` |
+
+**Branch Naming Rules**:
+1. Use lowercase letters only
+2. Use hyphens `-` to separate words in description
+3. Use slashes `/` to separate type prefix
+4. Keep total length under 50 characters
+5. Never use spaces or special characters (`~ ^ : * ? [ ] @`)
+6. Include issue tracker ID when available (JIRA-XXX, GH-XXX)
+7. Use `bugfix/` for non-critical bugs, `hotfix/` for production-critical
+
 **Actions**:
-1. Generate a branch name from the bug description (use kebab-case, max 50 chars)
-2. Prefix with `fix/` (e.g., `fix/login-null-pointer`, `fix/payment-validation-failure`)
-3. Ask user to confirm or modify the branch name
-4. **Create a git worktree** (isolated working directory):
+1. **Generate branch name** following conventions above:
+   - Determine severity: `bugfix/` (normal) or `hotfix/` (critical/production)
+   - Create kebab-case description (max 40 chars after prefix)
+   - Include issue ID if provided
+   - **Example transformations**:
+     - "Login crashes when email is null" → `bugfix/login-null-email`
+     - "Fix GH-789: Payment timeout on mobile" → `bugfix/GH-789-payment-timeout`
+     - "Critical: Security vulnerability in API" → `hotfix/api-security-vuln`
+
+2. Ask user to confirm or modify the branch name
+
+3. **Create a git worktree** (isolated working directory):
    ```bash
    # Determine worktree path (sibling to current repo)
    REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -36,19 +64,32 @@ You are helping a developer resolve a bug. Follow a systematic approach: underst
 
    # Create worktree with new branch
    git worktree add "$WORKTREE_PATH" -b $BRANCH_NAME
+
+   # Create session marker for worktree isolation
+   echo "{\"branch\":\"$BRANCH_NAME\",\"created\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"pid\":$$}" > "$WORKTREE_PATH/.worktree-session"
    ```
-5. **Store variables for later use**:
+
+4. **Store variables for later use**:
    - `$BRANCH_NAME` - for documentation naming
    - `$WORKTREE_PATH` - for worktree location
-6. **Note the worktree location** for reference:
+
+5. **Note the worktree location** for reference:
    - Worktree created at: `$WORKTREE_PATH`
+   - Session marker created: `.worktree-session`
    - Continue working in the current session (no session restart needed)
 
 **Example**:
 - Bug: "Login crashes when email is null"
-- Branch name: `fix/login-null-pointer`
-- Worktree path: `../myproject-fix-login-null-pointer`
+- Branch name: `bugfix/login-null-email`
+- Worktree path: `../myproject-bugfix-login-null-email`
 - Documentation directory: `.claude/docs/$BRANCH_NAME/`
+
+### Worktree Session Isolation
+
+The `.worktree-session` marker file ensures new Claude sessions detect active worktrees:
+- New sessions starting in main repo will see worktree status
+- New sessions will NOT interfere with active worktree work
+- User can start fresh work on main branch while worktree is active
 
 **Benefits of Worktrees**:
 - Isolated context window for this bug fix
