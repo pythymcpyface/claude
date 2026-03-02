@@ -159,7 +159,54 @@ Invoke this skill when:
 
 ---
 
-## Integration Points
+## Integration with /start-project
+
+This skill is **Phase 0** of the project initialization flow:
+
+```
+/spec-workflow → (approve specs) → /start-project → (approve plan) → /ralph-loop
+```
+
+### Output Contract
+
+When `/start-project` runs, it expects these files in `.claude/docs/$BRANCH/`:
+
+| File | Required | Purpose |
+|------|----------|---------|
+| `USER-JOURNEYS.md` | Yes | Roles, goals, entry points, paths |
+| `REQUIREMENTS.md` | Yes | EARS-formatted atomic requirements |
+| `TDD-STRATEGY.md` | Yes | Gherkin scenarios with test IDs |
+| `TRACEABILITY-MATRIX.md` | Yes | Coverage verification |
+
+### How /start-project Uses These Files
+
+1. **REQUIREMENTS.md** → Synthesized into SPECIFICATIONS.md
+   - EARS patterns converted to user stories
+   - Requirement IDs mapped to SPEC-XXX IDs
+
+2. **TDD-STRATEGY.md** → Merged into TDD-MASTER-DOCUMENT.md
+   - Gherkin scenarios preserved
+   - Extended with performance/security tests
+
+3. **USER-JOURNEYS.md** → Context for PROJECT-PLAN.md
+   - Roles and goals inform system context
+   - Entry points inform API design
+
+4. **TRACEABILITY-MATRIX.md** → Verification checkpoint
+   - Ensures no orphaned artifacts
+   - Validates coverage before implementation
+
+### Auto-Run Behavior
+
+If `/start-project` is run without existing specs:
+1. It auto-runs this spec-workflow
+2. Presents specs for user approval
+3. Waits for confirmation
+4. Continues with project documentation
+
+---
+
+## Integration Points (Legacy)
 
 ### With /feature-dev
 Add after Phase 3 (Clarifying Questions):

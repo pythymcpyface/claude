@@ -249,15 +249,34 @@ After all phases complete, present:
 
 ---
 
-## STOP - User Approval Required
+## STOP - User Approve Specs Before Continuing
 
-Review the generated specifications before proceeding.
+Review the generated specifications above.
 
-**Next Steps**:
-1. Review `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
-2. Review `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
-3. Verify traceability in `TRACEABILITY-MATRIX.md`
-4. Request implementation when ready
+**Next Step**: Run `/start-project` to:
+- Synthesize these specs into project documentation
+- Generate implementation roadmap with checkpoints
+- Create dependency graph and parallel execution groups
+- Prepare for `/ralph-loop` implementation
+
+---
+
+## Integration with /start-project
+
+This command is **Phase 0** of the project initialization flow:
+
+```
+/spec-workflow → (approve specs) → /start-project → (approve plan) → /ralph-loop
+```
+
+When you run `/start-project`, it will:
+1. Detect these generated specs
+2. Synthesize them into SPECIFICATIONS.md
+3. Merge TDD-STRATEGY.md into TDD-MASTER-DOCUMENT.md
+4. Generate PROJECT-PLAN.md with full context
+5. Create IMPLEMENTATION-ROADMAP.md with checkpoints
+
+**You can also run `/start-project` directly** - it will auto-run this spec-workflow if no specs exist.
 ```
 
 ---

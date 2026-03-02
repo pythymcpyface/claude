@@ -1,18 +1,15 @@
 ---
 description: "Cancel active Ralph Loop"
-allowed-tools: ["Bash(test -f ${CLAUDE_BASE_DIR}/.claude/ralph-loop.local.md:*)", "Bash(rm ${CLAUDE_BASE_DIR}/.claude/ralph-loop.local.md)", "Read(${CLAUDE_BASE_DIR}/.claude/ralph-loop.local.md)"]
+allowed-tools: ["Bash(bash $HOME/.claude/scripts/cancel-ralph-loop.sh:*)"]
 hide-from-slash-command-tool: "true"
 ---
 
 # Cancel Ralph
 
-To cancel the Ralph loop:
+To cancel the Ralph loop for the current project:
 
-1. Check if `ralph-loop.local.md` exists using Bash: `test -f "${CLAUDE_BASE_DIR}/.claude/ralph-loop.local.md" && echo "EXISTS" || echo "NOT_FOUND"`
+```!
+bash "$HOME/.claude/scripts/cancel-ralph-loop.sh"
+```
 
-2. **If NOT_FOUND**: Say "No active Ralph loop found."
-
-3. **If EXISTS**:
-   - Read `ralph-loop.local.md` to get the current iteration number from the `iteration:` field
-   - Remove the file using Bash: `rm "${CLAUDE_BASE_DIR}/.claude/ralph-loop.local.md"`
-   - Report: "Cancelled Ralph loop (was at iteration N)" where N is the iteration value
+This will remove the project-specific ralph-loop state file and report the iteration that was cancelled.

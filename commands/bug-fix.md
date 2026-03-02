@@ -23,6 +23,33 @@ You are helping a developer resolve a bug. Follow a systematic approach: underst
 
 **Goal**: Create a git worktree for isolated bug fix development
 
+### Pre-Flight: Orphaned Worktree Cleanup
+
+**Before creating a new worktree**, check for and clean up any orphaned worktrees from previous incomplete sessions:
+
+```bash
+# List all worktrees and check for orphans
+git worktree list
+
+# Check for worktrees that no longer exist on disk or are stale
+git worktree prune -v
+
+# For any remaining worktrees, check if they're orphaned
+for wt_path in $(git worktree list | tail -n +2 | awk '{print $1}'); do
+  if [ ! -d "$wt_path" ]; then
+    echo "Orphaned worktree reference: $wt_path"
+    git worktree remove "$wt_path" --force 2>/dev/null || true
+  fi
+done
+```
+
+**If orphaned worktrees are found**, present them to the user with options:
+1. Clean up all orphaned worktrees
+2. Review each one individually
+3. Skip cleanup (not recommended)
+
+**Actions**:
+
 ### Branch Naming Convention (MANDATORY)
 
 Follow industry-standard git branch naming conventions:
@@ -58,6 +85,7 @@ Follow industry-standard git branch naming conventions:
 3. **Create a git worktree** (isolated working directory):
    ```bash
    # Determine worktree path (sibling to current repo)
+   # Note: Sanitize slashes to avoid nested directories
    REPO_ROOT=$(git rev-parse --show-toplevel)
    REPO_NAME=$(basename "$REPO_ROOT")
    WORKTREE_PATH="../${REPO_NAME}-$(echo $BRANCH_NAME | sed 's/\//-/g')"

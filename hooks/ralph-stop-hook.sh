@@ -12,8 +12,11 @@ BASE_DIR="${CLAUDE_BASE_DIR:-${HOME}/.claude}"
 # Read hook input from stdin (advanced stop hook API)
 HOOK_INPUT=$(cat)
 
-# Check if ralph-loop is active
-RALPH_STATE_FILE="${BASE_DIR}/.claude/ralph-loop.local.md"
+# Project-specific state file (isolates ralph-loop per project)
+# Use PWD from environment or fall back to current directory
+PROJECT_DIR="${PWD:-$(pwd)}"
+PROJECT_HASH=$(echo "$PROJECT_DIR" | shasum | cut -d' ' -f1)
+RALPH_STATE_FILE="${BASE_DIR}/.claude/ralph-loop.${PROJECT_HASH}.md"
 
 if [[ ! -f "$RALPH_STATE_FILE" ]]; then
   # No active loop - allow exit

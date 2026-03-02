@@ -1,19 +1,21 @@
 ---
 description: Generate planning documentation ONLY. Reads research/feasibility docs, outputs .claude/docs/*.md files. Does NOT write code or create implementation plans.
-argument-hint: Project context (optional - reads existing research/feasibility docs)
+argument-hint: Project context (optional - reads existing research/feasibility docs or auto-runs /spec-workflow)
 ---
 
 # Start Project - DOCUMENTATION GENERATION ONLY
 
 ## ⛔ THIS COMMAND DOES NOT WRITE CODE ⛔
 
-**PURPOSE**: Generate planning documentation from existing research/feasibility documents.
-**OUTPUT**: `.claude/docs/` directory with markdown files only.
+**PURPOSE**: Generate planning documentation from specifications and research documents.
+**OUTPUT**: `.claude/docs/$BRANCH/` directory with markdown files only.
 **STOPPING POINT**: After documentation generation is complete.
 
 **WHAT THIS COMMAND DOES:**
-- ✅ Read existing research/feasibility documents
-- ✅ Generate `.claude/docs/*.md` planning documents
+- ✅ Auto-run `/spec-workflow` if no specs exist (Phase 0)
+- ✅ Read existing spec-workflow outputs or research/feasibility documents
+- ✅ Synthesize specs into project documentation
+- ✅ Generate `.claude/docs/$BRANCH/*.md` planning documents
 - ✅ Generate `.claude/scripts/*.sh` helper scripts (not executed)
 
 **WHAT THIS COMMAND DOES NOT DO:**
@@ -26,18 +28,124 @@ argument-hint: Project context (optional - reads existing research/feasibility d
 
 ---
 
-## Workflow
+## Workflow Overview
 
-1. Read existing research/feasibility documents
-2. Generate all planning documentation
-3. Validate documentation completeness
-4. Present summary and **STOP**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    PROJECT INITIALIZATION FLOW                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Step 0: Check for Existing Specifications                      │
+│      │                                                           │
+│      ├─► Specs exist? ─► Read & Synthesize ─┐                   │
+│      │                                       │                   │
+│      └─► No specs? ─► Auto-run /spec-workflow │                  │
+│                           │                   │                   │
+│                           ▼                   │                   │
+│                  ⛔ HARD STOP: Approve Specs   │                   │
+│                           │                   │                   │
+│                           └───────────────────┘                   │
+│                                  │                               │
+│                                  ▼                               │
+│  Step 1-5: Generate Project Documentation                       │
+│                                  │                               │
+│                                  ▼                               │
+│                    ⛔ HARD STOP: Approve Plan                    │
+│                                  │                               │
+│                                  ▼                               │
+│                         /ralph-loop                             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Step 1: Read Existing Research Documents
+## Step 0: Check for Existing Specifications
 
-First, discover and read any existing project documentation:
+### 0.1 Detect Branch and Spec Directory
+
+```bash
+# Get current branch name (sanitized for directory use)
+BRANCH=$(git branch --show-current 2>/dev/null | sed 's/[^a-zA-Z0-9]/-/g' || echo "main")
+DOCS_DIR=".claude/docs/$BRANCH"
+
+# Check for existing spec-workflow outputs
+ls "$DOCS_DIR/REQUIREMENTS.md" 2>/dev/null
+```
+
+### 0.2 Decision Point
+
+**If specs exist** (`$DOCS_DIR/REQUIREMENTS.md` found):
+- Read existing spec-workflow outputs
+- Skip to Step 1 for synthesis
+
+**If no specs exist**:
+- Proceed to 0.3 to auto-run spec-workflow
+
+### 0.3 Auto-Run spec-workflow (If No Specs)
+
+If no specifications exist, run the spec-workflow to generate them:
+
+1. **Determine context source**:
+   - Use argument provided to `/start-project` if available
+   - Otherwise, search for research/feasibility documents
+   - If neither, prompt user for feature description
+
+2. **Run spec-workflow**:
+   ```
+   Execute the full 4-phase spec-workflow:
+   - Phase 1: User Journey Analysis
+   - Phase 2: Requirements Extraction (EARS)
+   - Phase 3: TDD Strategy Generation (Gherkin)
+   - Phase 4: Traceability Verification
+   ```
+
+3. **Present specs for approval**:
+   ```markdown
+   ## Specification Workflow Complete
+
+   ### Documents Generated:
+   - ✅ USER-JOURNEYS.md
+   - ✅ REQUIREMENTS.md
+   - ✅ TDD-STRATEGY.md
+   - ✅ TRACEABILITY-MATRIX.md
+
+   ---
+
+   ## ⛔ STOP - User Approve Specs Before Continuing
+
+   Review the generated specifications above.
+
+   **Type "continue" or "approve" to proceed with project documentation generation.**
+   ```
+
+4. **Wait for user confirmation** before continuing to Step 1.
+
+---
+
+## Step 1: Read Input Sources
+
+### 1.1 Read spec-workflow Outputs (Preferred)
+
+If specs exist from Step 0 or were just generated:
+
+```bash
+# Read spec-workflow outputs
+Read "$DOCS_DIR/USER-JOURNEYS.md"
+Read "$DOCS_DIR/REQUIREMENTS.md"
+Read "$DOCS_DIR/TDD-STRATEGY.md"
+Read "$DOCS_DIR/TRACEABILITY-MATRIX.md"
+```
+
+Extract from these files:
+- **USER-JOURNEYS.md** → Roles, goals, entry points, paths
+- **REQUIREMENTS.md** → EARS-formatted atomic requirements
+- **TDD-STRATEGY.md** → Gherkin scenarios and test IDs
+- **TRACEABILITY-MATRIX.md** → Coverage verification
+
+### 1.2 Fall Back to Research Documents (If No Specs)
+
+If running spec-workflow was skipped and no specs exist:
 
 ```bash
 # Find research/feasibility documents
@@ -45,7 +153,7 @@ Glob -pattern "*.md" -path .
 Grep -pattern "research|feasibility|requirements" -glob "*.md" -i
 ```
 
-Read any discovered research, feasibility, or requirements documents to understand the project context.
+Read any discovered research, feasibility, or requirements documents.
 
 ---
 

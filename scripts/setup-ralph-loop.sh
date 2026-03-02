@@ -8,6 +8,10 @@ set -euo pipefail
 # Base directory for Claude config
 BASE_DIR="${CLAUDE_BASE_DIR:-${HOME}/.claude}"
 
+# Project-specific state file (isolates ralph-loop per project)
+PROJECT_HASH=$(echo "$PWD" | shasum | cut -d' ' -f1)
+RALPH_STATE_FILE="${BASE_DIR}/.claude/ralph-loop.${PROJECT_HASH}.md"
+
 # Parse arguments
 PROMPT_PARTS=()
 MAX_ITERATIONS=0
@@ -119,7 +123,7 @@ else
   COMPLETION_PROMISE_YAML="null"
 fi
 
-cat > "${BASE_DIR}/.claude/ralph-loop.local.md" <<EOF
+cat > "$RALPH_STATE_FILE" <<EOF
 ---
 active: true
 iteration: 1
@@ -143,7 +147,7 @@ The stop hook is now active. When you try to exit, the SAME PROMPT will be
 fed back to you. You'll see your previous work in files, creating a
 self-referential loop where you iteratively improve on the same task.
 
-To monitor: head -10 "${BASE_DIR}/.claude/ralph-loop.local.md"
+To monitor: head -10 "$RALPH_STATE_FILE"
 
 WARNING: This loop cannot be stopped manually! It will run infinitely
     unless you set --max-iterations or --completion-promise.
