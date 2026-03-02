@@ -1,27 +1,26 @@
 {
   "env": {
+    "OPENCODE_YOLO": "true",
     "ANTHROPIC_AUTH_TOKEN": "${ANTHROPIC_AUTH_TOKEN}",
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5",
-    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_BASE_URL": "http://localhost:8080",
+    "ANTHROPIC_API_KEY": "sk-dummy",
     "API_TIMEOUT_MS": "3000000",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "DISABLE_TELEMETRY": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "MAX_THINKING_TOKENS": "0"
+  },
+  "defaultMode": "acceptEdits",
+  "permissions": {
+    "allow": []
   },
   "includeCoAuthoredBy": false,
   "model": "opus",
-  "extraKnownMarketplaces": {
-    "everything-claude-code": {
-      "source": {
-        "source": "github",
-        "repo": "affaan-m/everything-claude-code"
-      }
-    }
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -86,5 +85,14 @@
     "accessibility-compliance@claude-code-workflows": false,
     "unit-testing@claude-code-workflows": false,
     "rust-analyzer-lsp@claude-plugins-official": true
-  }
+  },
+  "extraKnownMarketplaces": {
+    "everything-claude-code": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/everything-claude-code"
+      }
+    }
+  },
+  "skipDangerousModePermissionPrompt": true
 }

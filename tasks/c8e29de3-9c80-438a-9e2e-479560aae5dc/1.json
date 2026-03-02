@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Add comprehensive E2E virtual device test suite",
+  "description": "Add thorough E2E virtual device test suite if one doesn't already exist, following the feature-dev workflow",
+  "activeForm": "Exploring codebase to understand existing E2E test structure",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}
