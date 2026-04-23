@@ -343,6 +343,155 @@ grep -r "Cache-Control|max-age|stale-while-revalidate" --include="*.ts" --includ
 grep -r "resources:\|requests:\|limits:" --include="*.yaml" 2>/dev/null | head -15
 ```
 
+#### 11. File Exclusion & Cleanup Analysis
+
+| Check | Pattern | Status |
+|-------|---------|--------|
+| .dockerignore configured | Excludes build artifacts | Required |
+| .gitignore optimized | No tracking unnecessary files | Required |
+| No test files in image | Tests excluded from production | Required |
+| No docs in image | README, markdown excluded | Required |
+| No IDE configs in image | .vscode, idea excluded | Required |
+| No secrets in repo | .env, credentials excluded | Required |
+| Cron jobs reviewed | Remove unused scheduled tasks | Required |
+| Long running tasks optimized | Background jobs efficient | Required |
+| Caching strategy | Invalidation rules defined | Required |
+| Test suite optimized | Only essential tests in CI | Recommended |
+
+**Search Patterns:**
+```bash
+# Check for .dockerignore
+cat .dockerignore 2>/dev/null | head -30
+
+# Check for .gitignore
+cat .gitignore 2>/dev/null | head -30
+
+# Check for test files in repository
+find . -name "*.test.*" -o -name "*.spec.*" 2>/dev/null | wc -l
+
+# Check for cron jobs
+crontab -l 2>/dev/null || echo "No crontab"
+grep -r "cron\|schedule\|setInterval\|setTimeout" --include="*.ts" --include="*.js" 2>/dev/null | head -15
+
+# Check for background jobs
+grep -r "worker\|queue\|bull\|celery\|sidekiq" --include="*.ts" --include="*.js" --include="*.py" 2>/dev/null | head -15
+
+# Check for cache files being created
+grep -r "cache\|tmp\|temp" --include="*.ts" --include="*.js" 2>/dev/null | grep -i "write\|create" | head -10
+
+# Check for unnecessary files in build
+find dist build .next -type f \( -name "*.md" -o -name "*.test.*" -o -name "*.spec.*" -o -name "*.map" \) 2>/dev/null | head -20
+
+# Check for large untracked files
+git ls-files --others --exclude-standard | xargs du -sh 2>/dev/null | sort -rh | head -15
+grep -r "TODO\|FIXME\|HACK" --include="*.ts" --include="*.js" 2>/dev/null | wc -l
+```
+
+**File Exclusion Checklist:**
+
+| File Type | Should Be in .dockerignore | Should Be in .gitignore |
+|----------|---------------------------|--------------------------|
+| node_modules | YES | NO |
+| .git | YES | NO |
+| .gitignore | NO | YES (if local only) |
+| dist/build | YES | NO |
+| *.log | YES | NO |
+| .env/.env.* | YES | YES (except .env.example) |
+| README.md | NO | NO |
+| coverage | YES | NO |
+| .vscode/.idea | YES | YES |
+| __tests__ | YES | NO |
+| *.test.ts | YES | NO |
+| *.spec.ts | YES | NO |
+| .dockerignore | NO | NO |
+| Dockerfile | NO | YES (if templates) |
+| docker-compose* | NO | Conditional |
+
+**Cron Job & Scheduled Task Analysis:**
+
+| Check | Status |
+|-------|--------|
+| All cron jobs documented | Required |
+| No orphaned scheduled tasks | Required |
+| Job failures monitored | Required |
+| Job runtime limited | Recommended |
+| Backoff on failure | Recommended |
+| No duplicate jobs | Required |
+
+**Test Optimization:**
+
+| Check | Status |
+|-------|--------|
+| Unit tests fast | Required (<1 min) |
+| Integration tests filtered | Recommended |
+| E2E tests separate | Required |
+| Test skipping for small changes | Recommended |
+| Only affected tests in PR | Recommended |
+| Tests excluded from Docker | Required |
+| No test dependencies in production | Required |
+
+**Test Exclusion Patterns:**
+
+```bash
+# Check if test files are in Docker build
+find dist -name "*.test.*" -o -name "*.spec.*" 2>/dev/null
+
+# Check test dependencies
+grep -E "jest|vitest|mocha|playwright|cypress" package.json | grep -v "devDependencies"
+
+# Check for test code in production bundle
+grep -r "describe\|it\('\|test(" dist/ 2>/dev/null | head -5
+```
+
+**CI Test Optimization:**
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'src/**'
+            tests:
+              - 'tests/**'
+              - '**/*.test.*'
+              - '**/*.spec.*'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests (always fast)
+        run: npm run test:unit
+
+      - name: Run tests (only if source changed)
+        if: steps.filter.outputs.src == 'true'
+        run: npm run test
+
+      - name: Run integration tests (only if needed)
+        if: steps.filter.outputs.src == 'true'
+        run: npm run test:integration
+
+      - name: Cache test results
+        uses: actions/cache@v4
+        with:
+          path: |
+            coverage/
+            .turbo/
+          key: test-${{ hashFiles('package-lock.json') }}
+```
+
 ---
 
 ### Phase 3: Runtime Analysis Commands
@@ -654,16 +803,17 @@ Monthly Cost Savings:
 
 | Category | Weight |
 |----------|--------|
-| Dependency Analysis | 10% |
-| Runtime Memory & RAM | 20% |
-| Application Code Efficiency | 15% |
-| Bundle Size | 10% |
-| Docker Image | 15% |
+| Dependency Analysis | 8% |
+| Runtime Memory & RAM | 15% |
+| Application Code Efficiency | 12% |
+| Bundle Size | 8% |
+| Docker Image | 12% |
 | Build Performance | 5% |
 | Dependency Size | 5% |
 | Serverless/Cold Start | 5% |
 | Background Workers | 5% |
 | Deployment Cost | 10% |
+| File Exclusion & Cleanup | 15% |
 
 ---
 
@@ -961,6 +1111,120 @@ jobs:
           tags: app:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+```
+
+### Optimal .gitignore for Efficiency
+
+```
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.nuxt/
+.turbo/
+
+# Test & Coverage
+coverage/
+.nyc_output/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+*.log
+npm-debug.log*
+
+# Cloud/state
+.firebase/
+.firebaserc
+.netlify/
+.vercel/
+now.json
+
+# CMS/Database
+*.db
+*.sqlite
+*.sql.gz
+```
+
+### Cron Job & Scheduled Task Optimization
+
+```typescript
+// background/cron.ts
+import { CronJob } from 'cron';
+
+const job = new CronJob('0 * * * *', async () => {
+  const start = Date.now();
+
+  try {
+    // Limit runtime to avoid long-running tasks
+    await runWithTimeout(cleanupOldRecords(), 5 * 60 * 1000);
+  } catch (error) {
+    console.error('Cron job failed:', error);
+    // Send to monitoring
+  } finally {
+    const duration = Date.now() - start;
+    console.log(`Job completed in ${duration}ms`);
+  }
+}, null, true, 'UTC');
+
+async function runWithTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('Job timeout')), ms)
+    ),
+  ]);
+}
+```
+
+### Redis Cache Invalidation
+
+```typescript
+// cache/invalidation.ts
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL);
+
+interface CacheRule {
+  pattern: string;
+  ttl: number;
+  invalidation: 'auto' | 'manual' | 'on-update';
+}
+
+const CACHE_RULES: CacheRule[] = [
+  { pattern: 'users:*', ttl: 300, invalidation: 'auto' },
+  { pattern: 'posts:*', ttl: 60, invalidation: 'on-update' },
+  { pattern: 'stats:*', ttl: 3600, invalidation: 'manual' },
+];
+
+async function invalidateCache(pattern: string) {
+  const keys = await redis.keys(pattern);
+  if (keys.length > 0) {
+    await redis.del(...keys);
+  }
+}
 ```
 
 ---
