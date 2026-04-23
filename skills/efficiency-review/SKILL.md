@@ -1,22 +1,24 @@
 ---
 name: efficiency-review
-description: Production readiness review for deployment efficiency. Analyzes package sizes, dependencies, Docker images, build times, and provides optimization recommendations to reduce deployment costs and times. Use PROACTIVELY before production releases, when optimizing infrastructure costs, or when build/deploy times are too long.
+description: Production readiness review for deployment efficiency. Analyzes package sizes, dependencies, Docker images, build times, runtime RAM usage, application code efficiency, and provides optimization recommendations to reduce deployment costs and times. Use PROACTIVELY before production releases, when optimizing infrastructure costs, or when build/deploy times are too long.
 tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 
 # Efficiency Review Skill
 
-Production readiness code review focused on Deployment Efficiency. Analyzes package sizes, dependencies, Docker images, build times, and provides optimization recommendations to reduce deployment costs and times.
+Production readiness code review focused on Deployment Efficiency. Analyzes package sizes, dependencies, Docker images, build times, runtime RAM usage, application code efficiency, and provides optimization recommendations to reduce deployment costs and times.
 
 ## When to Trigger (Proactive)
 
 Automatically suggest this review when:
-- PR/commit message contains: "optimize", "efficiency", "deploy", "bundle", "reduce", "cost", "size"
+- PR/commit message contains: "optimize", "efficiency", "deploy", "bundle", "reduce", "cost", "size", "memory", "ram"
 - Dockerfile or build configuration changes
 - package.json, requirements.txt, go.mod, Cargo.toml changes
 - New dependencies added
 - Deployment times exceed targets (>5 min for typical services)
 - Infrastructure cost concerns raised
+- Runtime memory issues or high costs
+- Production scaling problems
 
 ---
 
@@ -29,7 +31,7 @@ Detect the project's technology stack and build tooling:
 ```bash
 # Detect package manager and build tools
 ls package.json pnpm-lock.yaml yarn.lock bun.lockb 2>/dev/null
-ls requirements.txt pyproject.toml setup.py 2>/dev/null
+ls requirements.txt pyproject.toml setup.py Pipfile 2>/dev/null
 ls go.mod go.sum Cargo.toml Cargo.lock 2>/dev/null
 
 # Detect bundlers and build tools
@@ -40,6 +42,12 @@ ls Dockerfile docker-compose.yml docker-compose.yaml 2>/dev/null
 
 # Detect monorepo
 ls pnpm-workspace.yaml lerna.json turbo.json nx.json 2>/dev/null
+
+# Detect serverless/lambda
+ls serverless.yml sam.yaml template.yaml handler.js 2>/dev/null
+
+# Detect background workers
+lsProcfile worker.ts cron.yaml celeryconfig.py rq-scheduler 2>/dev/null
 
 # Check for CI configuration
 ls .github/workflows/*.yml .gitlab-ci.yml Jenkinsfile circleci/config.yml 2>/dev/null
@@ -57,6 +65,7 @@ ls .github/workflows/*.yml .gitlab-ci.yml Jenkinsfile circleci/config.yml 2>/dev
 | No security vulnerabilities | npm audit, snyk, dependabot | Required |
 | Lock file present | package-lock.json, yarn.lock, etc | Required |
 | Optional dependencies used | Native modules as optional | Recommended |
+| No bundled deps in node_modules | Check package bundles | Recommended |
 
 **Search Patterns:**
 ```bash
@@ -72,12 +81,77 @@ ls node_modules/*/node_modules 2>/dev/null | head -20
 
 # Check for heavy dependencies
 grep -E "\"lodash|\"moment|\"rxjs|\"graphql|\"prisma|\"typeorm" package.json 2>/dev/null
+grep -E "\"clsx|\"classnames|\"tiny-invariant" package.json 2>/dev/null
 
 # Check for security vulnerabilities
 npm audit --json 2>/dev/null | head -50 || echo "No audit results"
+
+# Check for bundled dependencies in node_modules
+du -sh node_modules/@google-cloud/datastore/node_modules 2>/dev/null || echo "No nested deps"
 ```
 
-#### 2. Bundle Size Analysis
+#### 2. Runtime Memory & RAM Analysis
+
+| Check | Pattern | Status |
+|-------|---------|--------|
+| Memory limits configured | Container/pod memory limits | Required |
+| No memory leaks | Proper cleanup on unmount | Required |
+| Streaming responses | No full file buffering | Required |
+| Pagination implemented | Batch processing for large data | Required |
+| WeakRefs used where appropriate | For caches and large objects | Recommended |
+| Streaming parsing | JSON parsing incrementally | Recommended |
+| Event listener cleanup | Proper cleanup on component unmount | Required |
+
+**Search Patterns:**
+```bash
+# Check for memory limits in Kubernetes/config
+grep -ri "memory:" --include="*.yaml" 2>/dev/null | head -20
+grep -ri "MAX_old_SPACE|--max-old-space-size" --include="*.yaml" --include="*.json" 2>/dev/null | head -10
+
+# Check for memory leak patterns
+grep -r "addEventListener" --include="*.ts" --include="*.tsx" -l 2>/dev/null | head -10
+grep -r "useEffect" --include="*.tsx" -l 2>/dev/null | head -10
+
+# Check for streaming responses
+grep -r "Stream\|createReadableStream\|pipe" --include="*.ts" --include="*.js" 2>/dev/null | head -10
+grep -r "JSON\.parse\|JSON\.stringify" --include="*.ts" --include="*.js" 2>/dev/null | head -10
+
+# Check for large data handling
+grep -r "fs\.readFileSync\|readFile" --include="*.ts" --include="*.js" 2>/dev/null | head -10
+grep -r "large\|chunk\|batch\|limit" --include="*.ts" --include="*.js" -i 2>/dev/null | head -15
+```
+
+#### 3. Application Code Efficiency
+
+| Check | Pattern | Status |
+|-------|---------|--------|
+| No blocking operations | Async/await for I/O | Required |
+| Efficient data structures | Maps vs Objects, Sets vs Arrays | Required |
+| No N+1 queries | Eager loading or batching | Required |
+| Query pagination | Limit/offset or cursor | Required |
+| Connection pooling configured | Database pool limits | Required |
+| Caching implemented | Redis/memory cache | Required |
+| Batch operations | Bulk inserts/updates | Recommended |
+
+**Search Patterns:**
+```bash
+# Check for blocking operations in async context
+grep -r "\.then\|\.catch\|Promise" --include="*.ts" --include="*.js" 2>/dev/null | head -20
+grep -r "await.*await\|sync\|readFileSync" --include="*.ts" --include="*.js" 2>/dev/null | head -15
+
+# Check for inefficient data structures
+grep -r "Object\.keys\|\.values\|\.entries\|\.forEach" --include="*.ts" --include="*.js" 2>/dev/null | head -15
+grep -r "\.find\|\.filter\|\.map.*find" --include="*.ts" --include="*.js" 2>/dev/null | head -15
+
+# Check for N+1 patterns
+grep -r "for.*of\|for.*const.*of" --include="*.ts" --include="*.js" --include="*.py" 2>/dev/null | head -15
+
+# Check for query optimization
+grep -r "include\|\ preload\|\ eager\|_with_" --include="*.ts" --include="*.py" 2>/dev/null | head -15
+grep -r "limit\|offset\|paginate\|cursor" --include="*.ts" --include="*.py" 2>/dev/null | head -15
+```
+
+#### 4. Bundle Size Analysis
 
 | Check | Pattern | Status |
 |-------|---------|--------|
@@ -106,7 +180,7 @@ find dist build -name "*.map" 2>/dev/null | head -5
 grep -r "import\(" --include="*.js" --include="*.ts" --include="*.tsx" -l 2>/dev/null | head -10
 ```
 
-#### 3. Docker Image Optimization
+#### 5. Docker Image Optimization
 
 | Check | Pattern | Status |
 |-------|---------|--------|
@@ -117,7 +191,9 @@ grep -r "import\(" --include="*.js" --include="*.ts" --include="*.tsx" -l 2>/dev
 | Layers optimized | Order for cache efficiency | Required |
 | .dockerignore configured | Exclude build artifacts | Required |
 | Image size tracked | <200MB for typical services | Required |
-| No root user | Security best practice | Recommended |
+| No root user | Security best practice | Required |
+| Distroless image | For minimal attack surface | Recommended |
+| Just runtime deps | No build tools in final image | Required |
 
 **Search Patterns:**
 ```bash
@@ -128,16 +204,22 @@ grep -E "FROM.*AS|AS build|AS production" Dockerfile 2>/dev/null
 grep "^FROM" Dockerfile 2>/dev/null
 
 # Check for npm ci --production
-grep -E "npm ci|npm install" Dockerfile 2>/dev/null
+grep -E "npm ci|npm install|npm run" Dockerfile 2>/dev/null
 
 # Check for .dockerignore
 cat .dockerignore 2>/dev/null | head -20
 
 # Measure Docker image size (if built)
 docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}" | grep -E "$(basename $(pwd))|app" | head -5
+
+# Check for distroless or scratch
+grep -E "gcr.io/distroless|gcr.io/google-containers/base-alpine|scratch" Dockerfile 2>/dev/null
+
+# Check user is non-root
+grep -E "USER |adduser |addgroup " Dockerfile 2>/dev/null
 ```
 
-#### 4. Build Performance
+#### 6. Build Performance
 
 | Check | Pattern | Status |
 |-------|---------|--------|
@@ -162,7 +244,7 @@ time npm run build 2>&1 | tail -10
 grep -E "parallel|workers|jobs" package.json vite.config.* webpack.config.* 2>/dev/null
 ```
 
-#### 5. Dependency Size Analysis
+#### 7. Dependency Size Analysis
 
 | Check | Pattern | Status |
 |-------|---------|--------|
@@ -188,7 +270,54 @@ grep -r "from 'lodash'" --include="*.ts" --include="*.js" 2>/dev/null | head -10
 grep -A5 "browserslist" package.json 2>/dev/null
 ```
 
-#### 6. Deployment Cost Optimization
+#### 8. Serverless & Cold Start Optimization
+
+| Check | Pattern | Status |
+|-------|---------|--------|
+| Minimal handler size | <5MB package size | Required |
+| No heavy imports in handler | Lazy load heavy deps | Required |
+| Warm-up configured | Scheduled warm-up | Recommended |
+| Provisioned concurrency | For latency-sensitive | Recommended |
+| Outside handler code | Modules loaded at cold start | Required |
+
+**Search Patterns:**
+```bash
+# Check handler file size
+ls -lh handler.js handler.ts index.js 2>/dev/null
+
+# Check for heavy imports at module level
+head -20 handler.js handler.ts 2>/dev/null
+
+# Check serverless config
+grep -r "provider:|functions:" serverless.yml 2>/dev/null | head -10
+grep -r "provisionedConcurrency|reservedConcurrency" serverless.yml 2>/dev/null | head -5
+
+# Check for webpack layering
+grep -r "layer|webpack" serverless.yml 2>/dev/null | head -5
+```
+
+#### 9. Background Worker Optimization
+
+| Check | Pattern | Status |
+|-------|---------|--------|
+| Worker concurrency configured | Limit concurrent jobs | Required |
+| Memory per worker | Sized correctly | Required |
+| Job chunking | Process in batches | Required |
+| Graceful shutdown | Signal handling | Required |
+
+**Search Patterns:**
+```bash
+# Check for worker configuration
+grep -r "concurrency|workers|maxJobs" --include="*.js" --include="*.ts" --include="*.yaml" 2>/dev/null | head -10
+
+# Check for cron/schedule
+grep -r "cron|schedule|interval" --include="*.js" --include="*.ts" --include="*.yaml" 2>/dev/null | head -10
+
+# Check Procfile
+cat Procfile 2>/dev/null
+```
+
+#### 10. Deployment Cost Optimization
 
 | Check | Pattern | Status |
 |-------|---------|--------|
@@ -216,18 +345,53 @@ grep -r "resources:\|requests:\|limits:" --include="*.yaml" 2>/dev/null | head -
 
 ---
 
-### Phase 3: Analysis & Recommendations
+### Phase 3: Runtime Analysis Commands
+
+Additional commands specifically for runtime efficiency:
+
+```bash
+# Analyze runtime memory consumption
+node --inspect --expose-gc -e "
+const before = process.memoryUsage();
+console.log('Heap Used:', Math.round(before.heapUsed / 1024 / 1024), 'MB');
+console.log('Heap Total:', Math.round(before.heapTotal / 1024 / 1024), 'MB');
+console.log('RSS:', Math.round(before.rss / 1024 / 1024), 'MB');
+"
+
+# Check for memory leaks in running process
+node --inspect -e "
+setInterval(() => {
+  const mem = process.memoryUsage();
+  console.log(Date.now(), mem.heapUsed / 1024 / 1024);
+}, 5000);
+" 2>&1 | head -20
+
+# Analyze event loop blocking
+node -e "
+const { EventEmitter } = require('events');
+const emitter = new EventEmitter();
+let listeners = emitter.listenerCount('event');
+console.log('Event emitter slots:', listeners);
+"
+
+# Check database connection pool health
+grep -r "pool\|max\|connection" --include="*.ts" --include="*.js" --include="*.py" 2>/dev/null | grep -i "db\|database\|redis" | head -10
+```
+
+---
+
+### Phase 4: Analysis & Recommendations
 
 For each area, provide:
 
 1. **Current state**: What's currently configured
 2. **Gap**: What's missing or suboptimal
-3. **Impact**: Effect on deploy time/cost
+3. **Impact**: Effect on runtime memory, deploy time, and costs
 4. **Recommendation**: Specific fix with code examples
 
 ---
 
-### Phase 4: Output Report
+### Phase 5: Output Report
 
 Generate a comprehensive efficiency report:
 
@@ -250,6 +414,18 @@ DEPENDENCY ANALYSIS
   [FAIL] 3 unused dependencies detected
   [PASS] No duplicate dependencies
   [WARN] No security audit automation
+
+RUNTIME MEMORY & RAM
+  [FAIL] No memory limits configured in container
+  [WARN] Potential memory leak in user service (listeners not cleaned)
+  [PASS] Streaming responses enabled for large files
+  [PASS] Pagination implemented for database queries
+
+APPLICATION CODE EFFICIENCY
+  [FAIL] N+1 queries in user service
+  [PASS] Using Maps for lookups
+  [WARN] Blocking I/O in async handler
+  [PASS] Connection pooling configured (10 connections)
 
 BUNDLE SIZE
   [PASS] Production bundle: 245KB (gzipped)
@@ -274,17 +450,27 @@ DEPENDENCY SIZE
   [PASS] Using date-fns instead of moment
   [PASS] Proper named imports used
 
+SERVERLESS & COLD START
+  [PASS] Handler size: 2.5MB
+  [WARN] Heavy module imports at handler level
+  [FAIL] No provisioned concurrency
+
+BACKGROUND WORKERS
+  [PASS] Worker concurrency limited to 5
+  [PASS] Graceful shutdown implemented
+
 DEPLOYMENT COST
   [PASS] CDN configured for static assets
   [PASS] Gzip compression enabled
   [PASS] Cache headers properly set
+  [WARN] Using on-demand instances (not spot)
 
 ──────────────────────────────────────────────────────────────
                      OPTIMIZATION RECOMMENDATIONS
 ──────────────────────────────────────────────────────────────
 
 [CRITICAL] Large Docker Image (920MB)
-  Impact: Slower deployments, higher storage costs
+  Impact: Slower deployments, higher ECR storage costs
   Fix: Use node:18-alpine as base image
   File: Dockerfile
 
@@ -295,6 +481,25 @@ DEPLOYMENT COST
   FROM node:18-alpine AS builder
   FROM node:18-alpine AS runner
 
+[CRITICAL] No Container Memory Limits
+  Impact: Container can consume all node memory, OOM kills
+  Fix: Set memory limit to 1.5x typical usage
+  File: kubernetes/deployment.yaml
+
+  resources:
+    limits:
+      memory: "512Mi"
+    requests:
+      memory: "256Mi"
+
+[CRITICAL] No Memory Limits in Node.js
+  Impact: V8 can exceed container limits causing OOM
+  Fix: Set --max-old-space-size
+  File: Dockerfile
+
+  # Set to 80% of container limit
+  ENV NODE_OPTIONS="--max-old-space-size=400"
+
 [HIGH] 3 Unused Dependencies
   Impact: Longer install times, larger deployments
   Fix: Remove unused packages
@@ -303,8 +508,24 @@ DEPLOYMENT COST
   Remove: ["unused-package-1", "unused-package-2", "unused-package-3"]
   Run: npm audit && npm prune
 
+[HIGH] N+1 Queries in User Service
+  Impact: Database overload, slow responses, high DB costs
+  Fix: Use eager loading
+  File: src/services/user.service.ts
+
+  // Before:
+  const users = await prisma.user.findMany();
+  for (const user of users) {
+    user.posts = await prisma.post.findMany({ where: { userId: user.id } });
+  }
+
+  // After:
+  const users = await prisma.user.findMany({
+    include: { posts: true },
+  });
+
 [HIGH] No Code Splitting
-  Impact: Larger initial bundle, slower TTI
+  Impact: Larger initial bundle, slower TTI, more RAM
   Fix: Implement route-based code splitting
   File: src/App.tsx
 
@@ -325,6 +546,29 @@ DEPLOYMENT COST
       adduser -S nodejs -u 1001
   USER nodejs
 
+[HIGH] Memory Leak - Event Listeners
+  Impact: Memory grows over time, requires restarts
+  Fix: Cleanup in useEffect return
+  File: src/components/UserList.tsx
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+[HIGH] Blocking I/O in Async Handler
+  Impact: Event loop blocked, slow responses
+  Fix: Use async I/O operations
+  File: src/api/handler.ts
+
+  // Before:
+  const data = fs.readFileSync(path);
+  const result = await processData(data);
+
+  // After:
+  const data = await fs.promises.readFile(path);
+  const result = await processData(data);
+
 [MEDIUM] Full Lodash Import
   Impact: 70KB extra bundle size
   Fix: Use lodash-es or individual imports
@@ -343,27 +587,53 @@ DEPLOYMENT COST
   File: vite.config.ts
 
   build: {
-    sourcemap: false, // or 'hidden' for error tracking only
+    sourcemap: false,
   }
+
+[MEDIUM] Heavy Imports in Handler
+  Impact: Slow cold starts, billed duration increase
+  Fix: Lazy load heavy modules
+  File: handler.js
+
+  // Before (slow cold start):
+  const { heavyLib } = require('heavy-lib');
+  exports.handler = async (event) => { ... };
+
+  // After (lazy load):
+  exports.handler = async (event) => {
+    const { heavyLib } = await import('heavy-lib');
+    return await heavyLib.process(event);
+  };
+
+[MEDIUM] No Spot Instances
+  Impact: 60-80% higher compute costs
+  Fix: Use spot/preemptible instances
+  File: kubernetes/deployment.yaml
+
+  spec:
+    template:
+      spec:
+        tolerations:
+          - key: "spot"
+            operator: "Equal"
+            value: "true"
+            effect: "NoSchedule"
 
 ──────────────────────────────────────────────────────────────
                      COST IMPACT ESTIMATE
 ──────────────────────────────────────────────────────────────
 
-Current State:
-  - Docker image: 920MB
-  - Bundle size: 245KB (gzipped)
-  - Deploy time: ~3 minutes
-
-After Optimizations:
-  - Docker image: 180MB (80% reduction)
-  - Bundle size: 175KB (28% reduction)
-  - Deploy time: ~1.5 minutes (50% faster)
+Runtime Memory Impact:
+  - Current baseline: 450MB heap, 800MB container
+  - After optimization: 280MB heap, 400MB container
+  - Potential reduction: 50% less RAM per instance
 
 Monthly Cost Savings:
-  - ECR storage: $X.XX/month
-  - Build minutes: $X.XX/month
-  - Bandwidth: $X.XX/month
+  - Container memory: 512MB -> 400MB = XX% reduction
+  - ECR storage: $X.XX/month (after image optimization)
+  - Compute (spot): $X.XX/month (60% savings)
+  - Database queries: $X.XX/month (after fixing N+1)
+  - Bandwidth: $X.XX/month (after CDN optimization)
   - Total estimated: $X.XX/month
 
 ══════════════════════════════════════════════════════════════
@@ -384,44 +654,56 @@ Monthly Cost Savings:
 
 | Category | Weight |
 |----------|--------|
-| Dependency Analysis | 20% |
-| Bundle Size | 20% |
-| Docker Image | 25% |
-| Build Performance | 15% |
-| Dependency Size | 10% |
+| Dependency Analysis | 10% |
+| Runtime Memory & RAM | 20% |
+| Application Code Efficiency | 15% |
+| Bundle Size | 10% |
+| Docker Image | 15% |
+| Build Performance | 5% |
+| Dependency Size | 5% |
+| Serverless/Cold Start | 5% |
+| Background Workers | 5% |
 | Deployment Cost | 10% |
 
 ---
 
 ## Quick Reference: Optimization Patterns
 
-### Docker Multi-Stage Build
+### Docker Multi-Stage Build with Memory Limits
 
 ```dockerfile
 # Dockerfile
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-
+# Stage 1: Dependencies
 FROM node:18-alpine AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --only=production
 
+# Stage 2: Builder
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:18-alpine AS runner
+# Stage 3: Runner (minimal)
+FROM node:18-alpine-slim AS runner
 WORKDIR /app
+
+# Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
+
+# Set Node memory limit (80% of container limit)
+ENV NODE_OPTIONS="--max-old-space-size=384"
+
+# Copy only what's needed
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+
 USER nodejs
+EXPOSE 3000
 CMD ["node", "dist/index.js"]
 ```
 
@@ -444,90 +726,208 @@ build
 *.md
 README*
 .env*
+.env.*
 docker-compose*
-
-# IDEs
-.idea
 .vscode
+.idea
 *.swp
 
-# OS
+#OS
 .DS_Store
 Thumbs.db
+
+# CI
+.github
+.gitlab-ci.yml
+
+# Tests
+__tests__
+*.test.ts
+*.spec.ts
+coverage
 ```
 
-### Vite Bundle Optimization
+### Memory Limit Configuration
+
+```yaml
+# kubernetes/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: api
+          image: api:latest
+          env:
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=384"
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+```
+
+### V8 Heap Memory Optimization
+
+```javascript
+// Set at entry point
+const v8 = require('v8');
+console.log('Heap statistics:', v8.getHeapStatistics());
+```
+
+### Lazy Loading Heavy Modules
 
 ```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+// handler.ts
+import type { APIGatewayProxyHandler } from 'aws-lambda';
 
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    target: 'esnext',
-    minify: 'esbuild',
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          utils: ['lodash-es', 'date-fns'],
-        },
-      },
-    },
-  },
-  optimizeDeps: {
-    include: ['react', 'react-dom'],
+export const handler: APIGatewayProxyHandler = async (event) => {
+  // Only import heavy modules when needed
+  const { processLargeFile } = await import('./heavy-processor');
+  const { validation } = await import('./validators');
+  const { analytics } = await import('./analytics');
+
+  // ... handler logic
+};
+```
+
+### Event Listener Cleanup
+
+```typescript
+// React component
+useEffect(() => {
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('scroll', handleScroll);
+
+  // Cleanup function
+  return () => {
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('scroll', handleScroll);
+  };
+}, [deps]);
+
+// Cleanup on unmount
+useEffect(() => {
+  return () => {
+    // Cleanup subscriptions, intervals, timeouts
+    subscription.unsubscribe();
+    clearInterval(intervalId);
+    clearTimeout(timeoutId);
+  };
+}, []);
+```
+
+### Database Query Optimization
+
+```typescript
+// N+1 query fix with Prisma
+const usersWithPosts = await prisma.user.findMany({
+  include: {
+    posts: true,
+    profile: true,
   },
 });
+
+// Pagination for large queries
+const pageSize = 100;
+let cursor: string | null = undefined;
+
+do {
+  const { data, nextCursor } = await prisma.post.findMany({
+    take: pageSize,
+    cursor: cursor ? { id: cursor } : undefined,
+    skip: cursor ? 1 : 0,
+  });
+  cursor = nextCursor;
+  // Process batch
+} while (cursor);
 ```
 
-### Code Splitting Example
+### Connection Pool Configuration (PostgreSQL)
 
 ```typescript
-// src/App.tsx
-import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
-import LoadingSpinner from './components/LoadingSpinner';
+import { Pool } from 'pg';
 
-const Home = lazy(() => import('./pages/Home'));
-const About = lazy(() => import('./pages/About'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+const pool = new Pool({
+  max: 20,                    // Max connections
+  idleTimeoutMillis: 30000,    // Close idle after 30s
+  connectionTimeoutMillis: 2000,  // Connection timeout
+});
 
-function App() {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </Suspense>
-  );
+export const query = async (text: string, params: any[]) => {
+  const start = Date.now();
+  const result = await pool.query(text, params);
+  return result.rows;
+};
+```
+
+### Redis Caching for Expensive Queries
+
+```typescript
+import Redis from 'ioredis';
+
+const redis = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: 3,
+  lazyConnect: true,
+});
+
+async function getCachedUsers() {
+  const cached = await redis.get('users:all');
+  if (cached) return JSON.parse(cached);
+
+  const users = await db.users.findMany();
+  await redis.setex('users:all', 300, JSON.stringify(users)); // 5 min TTL
+  return users;
 }
-
-export default App;
 ```
 
-### Named Imports (Tree Shaking)
+### Background Worker Chunking
 
 ```typescript
-// Bad - imports entire library
-import _ from 'lodash';
-import { format, parseISO } from 'date-fns';
+async function processQueue() {
+  const batchSize = 100;
 
-// Good - named imports enable tree shaking
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
-import { format, parseISO } from 'date-fns';
+  while (true) {
+    const items = await redis.lpopCount('queue', batchSize);
+    if (!items.length) break;
 
-// Better - use ESM alternatives
-import { debounce, throttle } from 'lodash-es';
+    // Process batch
+    await Promise.all(items.map(processItem));
+
+    // Brief pause to allow other workers
+    await new Promise(r => setTimeout(r, 10));
+  }
+}
 ```
 
-### CI Cache Configuration
+### Serverless Warm-Up
+
+```yaml
+# serverless.yml
+functions:
+  warmUp:
+    handler: handler.warmUp
+    events:
+      - schedule: rate(5 minutes)
+
+  main:
+    handler: handler.main
+    events:
+      - http:
+          path: /api
+          method: any
+    # Enable provisioned concurrency
+    provisionedConcurrency: 1
+```
+
+### CI Cache Configuration with GitHub Actions
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -572,3 +972,4 @@ This skill complements:
 - `/dependency-security-scan` - For vulnerability scanning
 - `/devops-review` - For deployment and CI/CD
 - `/docker-review` - For container security and best practices
+- `/database-review` - For query optimization and indexing
