@@ -2,9 +2,9 @@
   "env": {
     "OPENCODE_YOLO": "true",
     "ANTHROPIC_AUTH_TOKEN": "${ANTHROPIC_AUTH_TOKEN}",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5",
-    "ANTHROPIC_BASE_URL": "http://localhost:8080",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.1",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.1",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
     "ANTHROPIC_API_KEY": "sk-dummy",
     "API_TIMEOUT_MS": "3000000",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
@@ -12,7 +12,6 @@
     "DISABLE_TELEMETRY": "1",
     "DISABLE_ERROR_REPORTING": "1",
     "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
-    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "64000",
     "MAX_THINKING_TOKENS": "0"
   },
   "defaultMode": "acceptEdits",
@@ -21,6 +20,25 @@
   },
   "includeCoAuthoredBy": false,
   "model": "opus",
+  "mcpServers": {
+    "code-graph-rag": {
+      "command": "code-graph-rag",
+      "args": ["mcp-server"],
+      "env": {
+        "TARGET_REPO_PATH": "/Users/andrewgibson/Projects/personal",
+        "ORCHESTRATOR_PROVIDER": "openai",
+        "ORCHESTRATOR_MODEL": "glm-5.1",
+        "ORCHESTRATOR_ENDPOINT": "https://api.z.ai/api/anthropic",
+        "ORCHESTRATOR_API_KEY": "${ANTHROPIC_AUTH_TOKEN}",
+        "CYPHER_PROVIDER": "openai",
+        "CYPHER_MODEL": "glm-5.1",
+        "CYPHER_ENDPOINT": "https://api.z.ai/api/anthropic",
+        "CYPHER_API_KEY": "${ANTHROPIC_AUTH_TOKEN}",
+        "MEMGRAPH_HOST": "127.0.0.1",
+        "MEMGRAPH_PORT": "7687"
+      }
+    }
+  },
   "hooks": {
     "SessionStart": [
       {
@@ -87,7 +105,7 @@
     ]
   },
   "enabledPlugins": {
-    "claude-mem@thedotmack": true,
+    "claude-mem@thedotmack": false,
     "everything-claude-code@everything-claude-code": true,
     "context-management@claude-code-workflows": false,
     "tdd-workflows@claude-code-workflows": false,
