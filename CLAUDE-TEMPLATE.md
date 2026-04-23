@@ -1,66 +1,56 @@
-# Developer Constitution Template
+# Project CLAUDE.md - Minimal Template
+
+This file is auto-generated when starting a new project. Edit to add project-specific details.
 
 ## Critical Constraints
-- **NEVER include AI attribution** (no Co-Authored-By, no watermarks, no robot emojis in git commits)
-- NEVER output real API keys (use `<YOUR_KEY>` or environment variables)
-- Warn before destructive actions (`rm -rf`, `DROP TABLE`, force push)
-- Git commits must appear indistinguishable from senior human engineer work
+- **NEVER include AI attribution** (no Co-Authored-By, no watermarks)
+- **NEVER output real API keys** (use `<YOUR_KEY>` or env vars)
+- **Warn before destructive actions** (`rm -rf`, `DROP TABLE`, force push)
+- **Git commits must appear as senior human engineer work**
+
+## MCP Tool Priority
+
+Use these MCP tools BEFORE falling back to grep/read:
+
+| Task | MCP Tool |
+|------|----------|
+| Code relationships (calls, deps) | `code-graph-rag_query_code_graph` |
+| Cross-session context | `memory_search_nodes` |
+| Document search | `knowledge_query_documents` |
+
+**Note**: Run `code-graph-rag_index_repository` once per project to enable code graph queries.
 
 ## Token Optimization
 
-### Delegation Strategy
-Delegate operations >1000 tokens to Gemini via ultra-mcp:
+- Target: <50k tokens per session
+- Grep first, then read specific sections
+- Skip: node_modules, dist, build, __pycache__
+- Truncate long outputs: `git log --oneline | head -20`
 
-| Claude (expensive) | Gemini (cheap) |
-|-------------------|----------------|
-| Code generation | Test execution |
-| Architecture decisions | Build processes |
-| Complex reasoning | Large file analysis |
-| User interaction | Git log/diff processing |
+## Memory System
 
-### Delegation Tools
-- Tests/builds: `mcp__ultra-mcp__debug-issue`
-- Large files/logs: `mcp__ultra-mcp__analyze-code`
-- Code review: `mcp__ultra-mcp__review-code`
-- Security audit: `mcp__ultra-mcp__secaudit`
-
-### Context Budget
-- Target: <50k tokens per session for optimal performance
-- Use `/compact` when responses slow down
-- Use `/clear` when switching projects
-
-### Tool Result Truncation
-Always limit output from expensive commands:
-```bash
-git log --oneline | head -20      # Not full history
-npm test 2>&1 | tail -50          # Only recent output
-find . -name "*.ts" | head -30    # Limit file lists
+Store decisions and milestones:
+```python
+memory_create_entities(entities=[{
+  "name": "project:feature-decision",
+  "entityType": "decision",
+  "observations": ["chose approach X because Y", "files: src/auth/"]
+}])
 ```
 
-## Cross-Session Memory (claude-mem)
-
-### Before Complex Tasks
-Search memory for prior work:
+Search context:
+```python
+memory_search_nodes(query="previous implementation of feature")
 ```
-/mem-search "previous implementation of [feature]"
-/mem-search "decision about [architecture choice]"
-```
-
-### Memory Commands
-- `mem-search` - Search past sessions
-- `get_recent_context` - Load recent work
-- `timeline` - View session history
-
-## Dynamic Context Loading
-
-Extended skills load on keyword detection:
-- Database (prisma, migration, schema) -> `skills/extended/database-integrity.md`
-- Algorithms (consolidate, validation) -> `skills/extended/algorithm-validation.md`
-- Error handling (retry, circuit breaker) -> `skills/extended/error-classification-recovery.md`
-- E2E testing (playwright, cypress) -> `commands/extended/generate-e2e-tests.md`
 
 ## Available Commands
-- `/quality-check` - Lint, types, tests, coverage validation
-- `/git-process` - Safe commit workflow with secret detection
-- `/migrate-schema` - Database schema migrations
-- `/mem-search` - Search cross-session memory
+- `/quality-check` - Lint, types, tests, coverage
+- `/git-process` - Safe commit with secret detection
+- `/production-readiness-review` - Full production review
+
+## Project Documentation
+- `.claude/docs/AUTONOMOUS-DEVELOPMENT-FLOW.md` - Development workflow
+
+---
+
+*Edit this file to add project-specific patterns, key files, or team conventions.*

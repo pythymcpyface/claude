@@ -11,12 +11,66 @@ Senior Engineer directing junior developers. **Stakes are extreme** - bugs mean 
 - Testing must be comprehensive
 - When in doubt, ask rather than assume
 
+## MCP Tool Priority (CRITICAL - READ THIS)
+
+You have three MCP tool groups configured. Use them BEFORE falling back to grep/glob/read.
+
+### Decision Tree
+
+```
+Task received
+  ├─ "How does X connect to Y?" / "Who calls this?" / "Show dependencies"
+  │   → code-graph-rag FIRST, then grep/glob for specifics
+  │
+  ├─ "What did we decide about X?" / "Previous work on Y?" / Cross-session context
+  │   → memory_search_nodes FIRST
+  │
+  ├─ "Find documentation about X" / "Search ingested docs for Y"
+  │   → knowledge_query_documents FIRST
+  │
+  └─ "Show me file X" / "Find files matching Y" / "What's in directory Z?"
+      → read/glob/grep (direct file access)
+```
+
+### code-graph-rag (Code Relationships)
+- **When**: Any question about function calls, class hierarchies, dependency chains, impact analysis
+- **First action**: `code-graph-rag_index_repository` if not yet indexed for this project
+- **Query**: `code-graph-rag_query_code_graph` for natural language code questions
+- **Snippet**: `code-graph-rag_get_code_snippet` to retrieve source by qualified name
+- **Edit**: `code-graph-rag_surgical_replace_code` for precise targeted edits
+- **Fallback**: Only fall back to grep/glob if code-graph-rag returns no results
+- **Note**: The knowledge graph must be indexed before use. Run `code-graph-rag_index_repository` on first session or when project structure changes significantly.
+
+### memory (Cross-Session State)
+- **When**: Starting a session, looking for prior decisions, milestones, architecture choices
+- **Session start**: `memory_search_nodes` with project/topic keywords
+- **After milestones**: `memory_create_entities` with decisions, trade-offs, files modified
+- **Entity naming**: Use `{project}:{topic}` pattern (e.g., `slapenir:auth-architecture`)
+- **Entity types**: `decision`, `milestone`, `blocker`, `architecture`, `convention`
+- **Read**: `memory_open_nodes` to retrieve specific entities
+
+### knowledge (Document Search)
+- **When**: Searching ingested docs, project documentation, research notes
+- **Query**: `knowledge_query_documents` with specific terms + context
+- **Ingest**: `knowledge_ingest_file` for new docs, `knowledge_ingest_data` for web/text content
+- **Status**: `knowledge_list_files` to see what's indexed
+
+### Priority Rules
+1. For **code relationship** questions: `code-graph-rag` > grep > read
+2. For **cross-session** questions: `memory` > re-reading files
+3. For **document** questions: `knowledge` > glob+read
+4. For **file content** questions: read > code-graph-rag
+5. For **file search** by name: glob (fastest, no MCP overhead)
+6. **Combine tools**: Use memory + code-graph-rag together for complex tasks
+
 ## Workflow
-1. **Contextualize**: Read relevant files first
-2. **Plan**: Output `<plan>` block with files and verification strategy
-3. **Execute**: Generate code changes
-4. **Verify**: Run tests/linter
-5. **Refine**: Retry up to 3 times before asking user
+1. **Recall**: `memory_search_nodes` for prior context on this project/topic
+2. **Contextualize**: Read relevant files, `code-graph-rag_query_code_graph` for relationships
+3. **Plan**: Output `<plan>` block with files and verification strategy
+4. **Execute**: Generate code changes
+5. **Verify**: Run tests/linter
+6. **Remember**: `memory_create_entities` for decisions, blockers, milestones
+7. **Refine**: Retry up to 3 times before asking user
 
 ## Quality Gates
 - Strict typing (no `any`). Lint-free code.
@@ -74,20 +128,32 @@ find . -name "*.ts" | head -30
 
 ## Cross-Session Memory
 
-Before complex tasks: `/mem-search "previous implementation"`
-After milestones: Store decisions, trade-offs, files modified, blockers
+Before complex tasks: `memory_search_nodes` with project/topic keywords
+After milestones: `memory_create_entities` with decisions, trade-offs, files modified, blockers
 
 ---
 
 ## Dynamic Context Loading
 
 Extended skills load on keyword detection:
-- Database (prisma, migration, schema) -> `skills/extended/database-integrity.md`
-- Algorithms (consolidate, validation) -> `skills/extended/algorithm-validation.md`
-- Error handling (retry, circuit breaker) -> `skills/extended/error-classification-recovery.md`
-- E2E testing (playwright, cypress) -> `commands/extended/generate-e2e-tests.md`
+- Database (prisma, migration, schema) -> `.claude/skills/extended/database-integrity.md`
+- Algorithms (consolidate, validation) -> `.claude/skills/extended/algorithm-validation.md`
+- Error handling (retry, circuit breaker) -> `.claude/skills/extended/error-classification-recovery.md`
+- E2E testing (playwright, cypress) -> `.claude/skills/extended/generate-e2e-tests.md`
+- Railway (deploy, database, domain) -> `.claude/skills/railway-{topic}/SKILL.md`
+
+### Session Initialization
+
+On session start, `session-init.sh` runs automatically:
+1. Detects project stack (Node.js, Rust, Go, Python)
+2. Copies autonomous development flow docs
+3. Generates project-specific `.claude/CLAUDE.md` if missing
+
+The project CLAUDE.md is built from templates in `.claude/templates/traits/`.
 
 ---
 
 ## Commands
-`/quality-check` `/git-process` `/migrate-schema` `/mem-search` `/production-readiness-review`
+- `/quality-check` - Lint, types, tests, coverage validation
+- `/git-process` - Safe commit workflow with secret detection
+- `/production-readiness-review` - Run all 21 production readiness reviews
