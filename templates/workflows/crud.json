@@ -1,0 +1,80 @@
+{
+  "name": "crud",
+  "description": "Quick CRUD feature template for standard create/read/update/delete operations",
+  "complexity": "low",
+  "estimated_time": "1-2 hours",
+  "phases": {
+    "phase_0_spec_workflow": {
+      "enabled": true,
+      "lightweight": true,
+      "focus": ["basic_user_journeys", "standard_requirements", "crud_test_cases"]
+    },
+    "phase_1_discovery": {
+      "enabled": true,
+      "duration": "5min",
+      "questions": [
+        "What entity are we creating CRUD operations for?",
+        "What fields does this entity have?",
+        "Any special validation rules?",
+        "Who can perform these operations (permissions)?"
+      ]
+    },
+    "phase_2_exploration": {
+      "enabled": false,
+      "skip_reason": "Reuse existing CRUD patterns from codebase"
+    },
+    "phase_3_architecture": {
+      "enabled": true,
+      "lightweight": true,
+      "duration": "10min",
+      "focus": ["copy_similar_crud_feature", "adjust_for_new_entity"],
+      "patterns_to_reuse": [
+        "REST API endpoints (GET, POST, PUT, DELETE)",
+        "Database model with migrations",
+        "Input validation schemas",
+        "Authorization middleware",
+        "Standard error responses"
+      ]
+    },
+    "phase_4_specs": {
+      "enabled": true,
+      "template_based": true,
+      "duration": "10min",
+      "use_template": "CRUD-SPEC-TEMPLATE.md"
+    },
+    "phase_5_implementation": {
+      "enabled": true,
+      "tdd": true,
+      "duration": "45-60min",
+      "checklist": [
+        "Create database model and migration",
+        "Write validation schemas",
+        "Implement API endpoints (TDD)",
+        "Add authorization checks",
+        "Write integration tests",
+        "Update API documentation"
+      ]
+    }
+  },
+  "quality_gates": {
+    "test_coverage": "85%",
+    "required_tests": [
+      "Unit tests for validation",
+      "Integration tests for all CRUD endpoints",
+      "Authorization tests (positive and negative)"
+    ],
+    "security_checks": [
+      "Input validation on all fields",
+      "Authorization on all endpoints",
+      "SQL injection prevention (parameterized queries)"
+    ]
+  },
+  "documentation": {
+    "required": [
+      "API endpoint documentation",
+      "Database schema documentation",
+      "Permission requirements"
+    ]
+  },
+  "example_usage": "/feature-dev --template=crud \"Add blog posts management\""
+}

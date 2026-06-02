@@ -1,0 +1,141 @@
+{
+  "name": "api-integration",
+  "description": "API integration template for connecting to external services with resilience patterns",
+  "complexity": "medium",
+  "estimated_time": "3-4 hours",
+  "phases": {
+    "phase_0_spec_workflow": {
+      "enabled": true,
+      "lightweight": false,
+      "focus": [
+        "api_user_journeys",
+        "error_scenarios",
+        "retry_requirements",
+        "fallback_behavior"
+      ]
+    },
+    "phase_1_discovery": {
+      "enabled": true,
+      "duration": "10min",
+      "questions": [
+        "Which external API are we integrating?",
+        "What endpoints/operations do we need?",
+        "What's the authentication method (API key, OAuth, etc)?",
+        "What are the rate limits?",
+        "What's the expected response time?",
+        "What happens if the API is down?",
+        "Do we need caching?"
+      ]
+    },
+    "phase_2_exploration": {
+      "enabled": true,
+      "duration": "15min",
+      "focus": [
+        "review_api_documentation",
+        "check_existing_integrations",
+        "identify_error_handling_patterns",
+        "review_retry_logic"
+      ]
+    },
+    "phase_3_architecture": {
+      "enabled": true,
+      "duration": "20min",
+      "focus": [
+        "api_client_design",
+        "error_handling_strategy",
+        "retry_and_circuit_breaker",
+        "caching_strategy",
+        "monitoring_and_logging"
+      ],
+      "patterns_to_implement": [
+        "API client wrapper with typed responses",
+        "Exponential backoff retry logic",
+        "Circuit breaker for fault tolerance",
+        "Response caching (if applicable)",
+        "Request/response logging",
+        "Timeout configuration",
+        "Rate limiting compliance"
+      ]
+    },
+    "phase_4_specs": {
+      "enabled": true,
+      "template_based": false,
+      "duration": "20min",
+      "comprehensive": true,
+      "include": [
+        "Happy path scenarios",
+        "Error scenarios (4xx, 5xx)",
+        "Timeout scenarios",
+        "Rate limit scenarios",
+        "Circuit breaker scenarios",
+        "Fallback behavior"
+      ]
+    },
+    "phase_5_implementation": {
+      "enabled": true,
+      "tdd": true,
+      "duration": "2-2.5 hours",
+      "checklist": [
+        "Create API client class/module",
+        "Implement authentication",
+        "Add request/response types",
+        "Implement retry logic with exponential backoff",
+        "Add circuit breaker",
+        "Implement caching (if needed)",
+        "Add comprehensive error handling",
+        "Write unit tests (mocked API)",
+        "Write integration tests (real API or test environment)",
+        "Add monitoring/logging",
+        "Document API usage and error codes"
+      ]
+    }
+  },
+  "quality_gates": {
+    "test_coverage": "90%",
+    "required_tests": [
+      "Unit tests with mocked API responses",
+      "Integration tests with test API",
+      "Error scenario tests (timeouts, 4xx, 5xx)",
+      "Retry logic tests",
+      "Circuit breaker tests",
+      "Rate limiting tests"
+    ],
+    "security_checks": [
+      "API keys stored in environment variables",
+      "No secrets in logs",
+      "HTTPS only",
+      "Input validation before API calls",
+      "Response validation"
+    ],
+    "resilience_checks": [
+      "Timeout configured (default: 30s)",
+      "Retry with exponential backoff",
+      "Circuit breaker implemented",
+      "Graceful degradation on failure"
+    ]
+  },
+  "documentation": {
+    "required": [
+      "API client usage examples",
+      "Error handling guide",
+      "Rate limit documentation",
+      "Monitoring/alerting setup",
+      "Fallback behavior documentation"
+    ]
+  },
+  "monitoring": {
+    "metrics": [
+      "API request count",
+      "API response time (p50, p95, p99)",
+      "API error rate",
+      "Circuit breaker state",
+      "Cache hit rate (if applicable)"
+    ],
+    "alerts": [
+      "API error rate > 5%",
+      "API response time > 5s",
+      "Circuit breaker open"
+    ]
+  },
+  "example_usage": "/feature-dev --template=api-integration \"Connect to Stripe payment API\""
+}

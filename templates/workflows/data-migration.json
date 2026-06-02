@@ -1,0 +1,206 @@
+{
+  "name": "data-migration",
+  "description": "Data migration template with zero-downtime strategy and rollback plan",
+  "complexity": "high",
+  "estimated_time": "8-12 hours",
+  "risk": "critical",
+  "phases": {
+    "phase_0_spec_workflow": {
+      "enabled": true,
+      "comprehensive": true,
+      "focus": [
+        "migration_user_journeys",
+        "data_integrity_requirements",
+        "rollback_requirements",
+        "performance_requirements"
+      ]
+    },
+    "phase_1_discovery": {
+      "enabled": true,
+      "duration": "20min",
+      "questions": [
+        "What data are we migrating?",
+        "What's the source and target schema?",
+        "What's the data volume?",
+        "What's the acceptable downtime (if any)?",
+        "What's the rollback strategy?",
+        "What's the data validation strategy?",
+        "What are the performance requirements?",
+        "What's the cutover plan?"
+      ]
+    },
+    "phase_2_exploration": {
+      "enabled": true,
+      "extended": true,
+      "duration": "45min",
+      "focus": [
+        "analyze_current_schema",
+        "analyze_target_schema",
+        "identify_data_dependencies",
+        "review_previous_migrations",
+        "assess_data_quality"
+      ]
+    },
+    "phase_3_architecture": {
+      "enabled": true,
+      "comprehensive": true,
+      "duration": "1 hour",
+      "focus": [
+        "migration_strategy",
+        "zero_downtime_approach",
+        "rollback_plan",
+        "data_validation_strategy",
+        "performance_optimization"
+      ],
+      "patterns_to_implement": [
+        "Dual-write pattern (write to both old and new)",
+        "Shadow mode (validate new without switching)",
+        "Gradual cutover (percentage-based)",
+        "Data validation checkpoints",
+        "Automated rollback triggers",
+        "Performance monitoring",
+        "Data reconciliation"
+      ],
+      "migration_phases": [
+        "Phase 1: Schema migration (DDL)",
+        "Phase 2: Dual-write setup",
+        "Phase 3: Backfill historical data",
+        "Phase 4: Data validation",
+        "Phase 5: Shadow mode testing",
+        "Phase 6: Gradual cutover",
+        "Phase 7: Cleanup old schema"
+      ]
+    },
+    "phase_4_specs": {
+      "enabled": true,
+      "comprehensive": true,
+      "duration": "1 hour",
+      "include": [
+        "Migration requirements",
+        "Data integrity requirements",
+        "Performance requirements (RPO/RTO)",
+        "Rollback procedures",
+        "Validation procedures",
+        "Cutover procedures",
+        "Monitoring requirements"
+      ]
+    },
+    "phase_5_implementation": {
+      "enabled": true,
+      "tdd": true,
+      "duration": "4-6 hours",
+      "checklist": [
+        "Create target schema (DDL scripts)",
+        "Implement dual-write logic",
+        "Create backfill script with batching",
+        "Implement data validation",
+        "Create rollback scripts",
+        "Add migration monitoring",
+        "Write migration tests",
+        "Test rollback procedures",
+        "Create cutover runbook",
+        "Set up alerting"
+      ]
+    },
+    "phase_6_validation": {
+      "enabled": true,
+      "duration": "2 hours",
+      "activities": [
+        "Test migration on staging data",
+        "Validate data integrity",
+        "Test rollback procedures",
+        "Performance testing",
+        "Load testing",
+        "Dry-run cutover",
+        "Review monitoring/alerting"
+      ]
+    }
+  },
+  "quality_gates": {
+    "test_coverage": "95%",
+    "required_tests": [
+      "Schema migration tests",
+      "Dual-write tests",
+      "Backfill tests",
+      "Data validation tests",
+      "Rollback tests",
+      "Performance tests",
+      "Load tests"
+    ],
+    "data_integrity_checks": [
+      "Row count validation",
+      "Data type validation",
+      "Constraint validation",
+      "Foreign key validation",
+      "Data reconciliation",
+      "Checksum validation"
+    ],
+    "performance_checks": [
+      "Migration speed (rows/second)",
+      "Application performance during migration",
+      "Database load during migration",
+      "Rollback speed"
+    ]
+  },
+  "documentation": {
+    "required": [
+      "Migration architecture document",
+      "Schema comparison (before/after)",
+      "Migration runbook",
+      "Rollback runbook",
+      "Data validation report",
+      "Performance test results",
+      "Cutover checklist",
+      "Post-migration verification"
+    ]
+  },
+  "monitoring": {
+    "metrics": [
+      "Migration progress (rows migrated)",
+      "Migration speed (rows/second)",
+      "Error rate",
+      "Data validation failures",
+      "Application performance",
+      "Database load"
+    ],
+    "alerts": [
+      "Migration stalled",
+      "High error rate",
+      "Data validation failures",
+      "Performance degradation",
+      "Database load critical"
+    ]
+  },
+  "rollback": {
+    "required": true,
+    "automated_triggers": [
+      "Data validation failure rate > 1%",
+      "Application error rate > 5%",
+      "Performance degradation > 50%"
+    ],
+    "manual_triggers": [
+      "Business decision",
+      "Unexpected issues",
+      "Data quality concerns"
+    ],
+    "procedures": [
+      "Stop dual-write",
+      "Revert application to old schema",
+      "Drop new schema (if safe)",
+      "Verify old system operational",
+      "Document rollback reason"
+    ]
+  },
+  "cutover": {
+    "strategy": "gradual",
+    "phases": [
+      "10% traffic to new schema",
+      "25% traffic to new schema",
+      "50% traffic to new schema",
+      "100% traffic to new schema"
+    ],
+    "validation_between_phases": true,
+    "rollback_window": "24 hours per phase"
+  },
+  "example_usage": "/feature-dev --template=data-migration \"Migrate from MySQL to PostgreSQL\""
+}

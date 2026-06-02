@@ -1,0 +1,202 @@
+{
+  "name": "security-critical",
+  "description": "Security-critical feature template with comprehensive threat modeling and compliance checks",
+  "complexity": "high",
+  "estimated_time": "6-8 hours",
+  "phases": {
+    "phase_0_spec_workflow": {
+      "enabled": true,
+      "lightweight": false,
+      "comprehensive": true,
+      "focus": [
+        "security_user_journeys",
+        "threat_scenarios",
+        "compliance_requirements",
+        "audit_trail_requirements"
+      ]
+    },
+    "phase_1_discovery": {
+      "enabled": true,
+      "duration": "15min",
+      "questions": [
+        "What security-critical operation are we implementing?",
+        "What data is being protected?",
+        "What are the compliance requirements (GDPR, PCI-DSS, HIPAA, etc)?",
+        "Who should have access?",
+        "What's the threat model?",
+        "What audit logging is required?",
+        "What's the incident response plan?"
+      ]
+    },
+    "phase_2_exploration": {
+      "enabled": true,
+      "extended": true,
+      "duration": "30min",
+      "focus": [
+        "review_existing_security_patterns",
+        "identify_similar_security_features",
+        "review_security_incidents",
+        "check_compliance_requirements"
+      ],
+      "security_review": {
+        "enabled": true,
+        "checklist": [
+          "Authentication mechanisms",
+          "Authorization patterns",
+          "Encryption at rest and in transit",
+          "Secret management",
+          "Audit logging",
+          "Rate limiting",
+          "Input validation"
+        ]
+      }
+    },
+    "phase_3_architecture": {
+      "enabled": true,
+      "comprehensive": true,
+      "duration": "45min",
+      "includes_threat_modeling": true,
+      "focus": [
+        "defense_in_depth_design",
+        "threat_modeling",
+        "security_controls",
+        "audit_logging_design",
+        "incident_response_plan"
+      ],
+      "patterns_to_implement": [
+        "Multi-factor authentication",
+        "Role-based access control (RBAC)",
+        "Encryption (AES-256 or better)",
+        "Secure session management",
+        "Comprehensive audit logging",
+        "Rate limiting and throttling",
+        "Input validation and sanitization",
+        "Output encoding",
+        "CSRF protection",
+        "Security headers"
+      ],
+      "threat_modeling": {
+        "stride_analysis": true,
+        "attack_surface_mapping": true,
+        "risk_assessment": true
+      }
+    },
+    "phase_4_specs": {
+      "enabled": true,
+      "template_based": false,
+      "duration": "45min",
+      "comprehensive": true,
+      "include": [
+        "Security requirements (EARS format)",
+        "Threat scenarios and mitigations",
+        "Compliance requirements",
+        "Audit logging requirements",
+        "Incident response procedures",
+        "Security test cases"
+      ]
+    },
+    "phase_5_implementation": {
+      "enabled": true,
+      "tdd": true,
+      "security_first": true,
+      "duration": "3-4 hours",
+      "checklist": [
+        "Implement authentication mechanism",
+        "Implement authorization checks",
+        "Add encryption for sensitive data",
+        "Implement secure session management",
+        "Add comprehensive audit logging",
+        "Implement rate limiting",
+        "Add input validation and sanitization",
+        "Add output encoding",
+        "Implement CSRF protection",
+        "Add security headers",
+        "Write security unit tests",
+        "Write security integration tests",
+        "Perform security code review",
+        "Run OWASP security scan",
+        "Document security controls",
+        "Create incident response runbook"
+      ]
+    },
+    "phase_6_security_validation": {
+      "enabled": true,
+      "duration": "1 hour",
+      "activities": [
+        "Run security-gate.sh",
+        "Perform penetration testing",
+        "Review audit logs",
+        "Validate compliance requirements",
+        "Security code review by second engineer",
+        "Test incident response procedures"
+      ]
+    }
+  },
+  "quality_gates": {
+    "test_coverage": "95%",
+    "required_tests": [
+      "Unit tests for all security controls",
+      "Integration tests for authentication/authorization",
+      "Security tests (injection, XSS, CSRF)",
+      "Audit logging tests",
+      "Rate limiting tests",
+      "Incident response tests"
+    ],
+    "security_checks": [
+      "No hardcoded secrets",
+      "All inputs validated",
+      "All outputs encoded",
+      "Encryption for sensitive data",
+      "Secure session management",
+      "Comprehensive audit logging",
+      "Rate limiting on all endpoints",
+      "CSRF protection",
+      "Security headers configured",
+      "OWASP Top 10 validated"
+    ],
+    "compliance_checks": [
+      "GDPR compliance (if applicable)",
+      "PCI-DSS compliance (if handling payments)",
+      "HIPAA compliance (if handling health data)",
+      "SOC 2 requirements (if applicable)"
+    ]
+  },
+  "documentation": {
+    "required": [
+      "Security architecture document",
+      "Threat model",
+      "Security controls documentation",
+      "Audit logging specification",
+      "Incident response runbook",
+      "Compliance documentation",
+      "Security testing report"
+    ]
+  },
+  "monitoring": {
+    "metrics": [
+      "Authentication attempts (success/failure)",
+      "Authorization failures",
+      "Rate limit violations",
+      "Security events",
+      "Audit log volume"
+    ],
+    "alerts": [
+      "Multiple failed authentication attempts",
+      "Authorization failures spike",
+      "Rate limit violations",
+      "Security event detected",
+      "Audit log gaps"
+    ]
+  },
+  "incident_response": {
+    "required": true,
+    "includes": [
+      "Detection procedures",
+      "Escalation path",
+      "Containment steps",
+      "Recovery procedures",
+      "Post-incident review"
+    ]
+  },
+  "example_usage": "/feature-dev --template=security-critical \"Add two-factor authentication\""
+}
