@@ -4,6 +4,7 @@ settings.local.json
 
 # Backup files
 *.backup
+/backups/
 
 # Nested .claude directory (duplicate skills)
 .claude/
