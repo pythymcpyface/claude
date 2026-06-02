@@ -109,16 +109,7 @@ else
 fi
 echo ""
 
-# 6. Spec completeness (if in Ralph Loop)
-echo "📋 Specification Tracking:"
-if [ -f ".claude/docs/RALPH-STATE.md" ]; then
-  echo -e "   ${GREEN}✓ RALPH-STATE.md exists${NC}"
-else
-  echo -e "   ${YELLOW}⚠ Not in Ralph Loop (no RALPH-STATE.md)${NC}"
-fi
-echo ""
-
-# 7. Performance checks
+# 6. Performance checks
 echo "⚡ Performance Checks:"
 
 # Check for bundle size budget

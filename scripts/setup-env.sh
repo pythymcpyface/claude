@@ -1,6 +1,6 @@
 #!/bin/bash
 # Environment Setup Script
-# Run before starting Ralph Loop implementation
+# Run before starting project implementation
 # Usage: bash .claude/scripts/setup-env.sh [project_directory]
 
 set -euo pipefail

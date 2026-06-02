@@ -1,13 +1,55 @@
 ---
 name: tdd-breakdown
-description: Iterative requirement breakdown for TDD workflow. Breaks down features into atomic requirements, generates specifications, and creates TDD test strategy documents.
+description: DEPRECATED - Use spec-workflow skill instead. This skill is superseded by the comprehensive spec-workflow (4-phase) approach.
+deprecated: true
+replacement: spec-workflow
 ---
 
-# TDD Breakdown Skill
+# ⚠️ DEPRECATED: Use spec-workflow Instead
 
-Supporting skill for iterative requirement breakdown in the feature development workflow. This skill is called by `/feature-dev` during Phase 3.5 (Requirements Breakdown) and Phase 4.5 (TDD Strategy Generation).
+**This skill has been deprecated and should no longer be used.**
+
+## Replacement
+
+Use the comprehensive `spec-workflow` skill instead, which includes all functionality of this skill plus:
+
+- **Phase 1**: User journey analysis (exhaustive path mapping)
+- **Phase 2**: EARS-formatted requirements extraction (atomic decomposition)
+- **Phase 3**: TDD strategy with Gherkin scenarios
+- **Phase 4**: Traceability verification (100% coverage)
+
+## Migration Guide
+
+### Old Approach (tdd-breakdown)
+```
+/feature-dev → Phase 3.5: Requirements Breakdown (tdd-breakdown)
+            → Phase 4.5: TDD Strategy (tdd-breakdown)
+```
+
+### New Approach (spec-workflow)
+```
+/feature-dev → Phase 3.5: Complete Specification Workflow (spec-workflow)
+            → Includes: User Journeys + EARS Requirements + TDD Strategy + Traceability
+```
+
+## Why Deprecated?
+
+1. **Incomplete**: tdd-breakdown only covered requirements and TDD, missing user journeys and traceability
+2. **No EARS**: Lacked industry-standard EARS requirement formatting
+3. **No Gherkin**: Missing BDD/Gherkin scenario generation
+4. **Redundant**: spec-workflow already mandatory in start-project, feature-dev, bug-fix
+5. **Maintenance**: Consolidating to single comprehensive workflow reduces complexity
+
+## See Also
+
+- `skills/spec-workflow/skill.md` - Full 4-phase specification workflow
+- `commands/start-project.md` - Uses spec-workflow as Phase 0
+- `commands/feature-dev.md` - Uses spec-workflow in Phase 3.5
+- `commands/bug-fix.md` - Uses spec-workflow in Phase 4.5
 
 ---
+
+# Original Documentation (For Reference Only)
 
 ## Phase 3.5: Requirements Breakdown
 
@@ -97,77 +139,4 @@ Each test case must include:
 
 ---
 
-## Document Generation Order
-
-**CRITICAL**: Complete ALL documents before any implementation
-
-1. Generate complete `REQUIREMENTS.md` (all requirements broken down atomically)
-2. Generate complete `SPECIFICATIONS.md` (all specs from requirements)
-3. Generate complete `TDD-STRATEGY.md` (all test cases mapped)
-4. **THEN** begin implementation following TDD loop
-
----
-
-## TDD Loop (For Phase 5 Implementation)
-
-For each SPEC-XXX in dependency order:
-
-1. **Read test cases** from TDD-STRATEGY.md for this spec
-2. **Write failing test** (RED) - create test file with test case
-3. **Run test**, confirm it fails
-4. **Write minimal implementation** to make test pass
-5. **Run test**, confirm it passes (GREEN)
-6. **Refactor** if needed (REFACTOR)
-7. **Run `quality-gate.sh`**
-8. **Commit** if gate passes
-
----
-
-## Quick Reference
-
-### Requirements Template Location
-`.claude/docs/templates/REQUIREMENTS-TEMPLATE.md`
-
-### TDD Strategy Template Location
-`.claude/docs/templates/TDD-STRATEGY-TEMPLATE.md`
-
-### Spec Template Location
-`.claude/docs/templates/SPEC-TEMPLATE.md`
-
-### Output Files
-- `.claude/docs/REQUIREMENTS.md`
-- `.claude/docs/SPECIFICATIONS.md`
-- `.claude/docs/TDD-STRATEGY.md`
-
----
-
-## Critical Rules
-
-**ALWAYS:**
-- Break down requirements to atomic units (single function, single decision point)
-- Generate ALL documents before implementation starts
-- Include happy path, sad path, and edge cases for each requirement
-- Map test cases to acceptance criteria
-
-**NEVER:**
-- Start implementation before all three documents are complete
-- Skip the iterative breakdown loop
-- Create requirements that depend on multiple other requirements
-
----
-
-## Verification Checklist
-
-Before proceeding to Phase 5 (Implementation):
-- [ ] `REQUIREMENTS.md` exists with all requirements numbered
-- [ ] Each requirement has user story format
-- [ ] Each requirement has binary acceptance criteria
-- [ ] Each requirement is atomic (single function)
-- [ ] `SPECIFICATIONS.md` exists with SPEC-XXX for each REQ-XXX
-- [ ] `TDD-STRATEGY.md` exists with TEST-XXX-XXX for each acceptance criterion
-- [ ] Dependencies between requirements are documented
-- [ ] Implementation order based on dependencies is defined
-
----
-
-*End of TDD-BREAKDOWN skill*
+*End of DEPRECATED TDD-BREAKDOWN skill - Use spec-workflow instead*
