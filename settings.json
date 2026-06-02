@@ -35,7 +35,7 @@
         "CYPHER_ENDPOINT": "https://api.z.ai/api/anthropic",
         "CYPHER_API_KEY": "${ANTHROPIC_AUTH_TOKEN}",
         "MEMGRAPH_HOST": "127.0.0.1",
-        "MEMGRAPH_PORT": "7687"
+        "MEMGRAPH_PORT": "7689"
       }
     }
   },

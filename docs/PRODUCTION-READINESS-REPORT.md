@@ -197,7 +197,7 @@ PHASE 5: POLISH (Weight: 5%)
 | track-usage.sh | 85/100 | Good example |
 | docker-helpers.sh | 80/100 | Good example |
 | ralph-stop-hook.sh | 80/100 | Good example |
-| setup-ralph-loop.sh | 75/100 | Minor issues |
+
 | quality-gate.sh | 70/100 | Missing trap |
 | security-gate.sh | 70/100 | Missing trap |
 | worktree-helper.sh | 55/100 | Missing pipefail, u |

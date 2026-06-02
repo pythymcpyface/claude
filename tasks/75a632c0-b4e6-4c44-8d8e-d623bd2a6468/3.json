@@ -1,0 +1,9 @@
+{
+  "id": "3",
+  "subject": "Generate Production Readiness Report",
+  "description": "Aggregate all review results, calculate weighted scores, generate comprehensive report with blockers and recommendations.",
+  "activeForm": "Generating production readiness report",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

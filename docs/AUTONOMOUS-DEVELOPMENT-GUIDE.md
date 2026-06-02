@@ -118,7 +118,7 @@ Execute Phase 8: Create TDD Master Document
 Once all planning is complete:
 
 ```
-/ralph-loop "
+Begin implementation following the roadmap
 You are implementing a notes API using strict TDD.
 
 # MANDATORY READING
@@ -148,7 +148,7 @@ Output <promise>NOTES_API_COMPLETE</promise> when all specs implemented and test
 
 | Command | Purpose |
 |---------|---------|
-| `/ralph-loop "PROMPT" --max-iterations N` | Start autonomous loop |
+
 | `/cancel-ralph` | Cancel active loop |
 | `/review-pr` | Comprehensive PR review |
 | `/commit` | Create commit with auto-generated message |
@@ -165,7 +165,7 @@ While Ralph Loop runs, monitor in separate terminals:
 watch -n 2 cat .claude/docs/PROGRESS.md
 
 # Check iteration count
-head -10 .claude/ralph-loop.local.md
+
 
 # Watch git history
 watch -n 2 "git log --oneline -5"
@@ -241,7 +241,7 @@ Not a setting in a file - it's a command-line flag.
 
 Check iteration count:
 ```bash
-grep '^iteration:' .claude/ralph-loop.local.md
+
 ```
 
 Check max_iterations wasn't reached.

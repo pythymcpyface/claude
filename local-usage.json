@@ -1,0 +1,107 @@
+{
+  "sessions": [
+    {
+      "session_id": "1772480574",
+      "start_time": "2026-03-02T19:42:54Z",
+      "end_time": "2026-03-02T20:58:42Z",
+      "prompt_tokens": 969,
+      "completion_tokens": 2060,
+      "total_tokens": 3029,
+      "messages": 7
+    },
+    {
+      "session_id": "1772485123",
+      "start_time": "2026-03-02T20:58:43Z",
+      "end_time": "2026-03-02T21:39:41Z",
+      "prompt_tokens": 515,
+      "completion_tokens": 461,
+      "total_tokens": 976,
+      "messages": 3
+    },
+    {
+      "session_id": "1772487582",
+      "start_time": "2026-03-02T21:39:42Z",
+      "end_time": "2026-03-02T22:21:08Z",
+      "prompt_tokens": 27,
+      "completion_tokens": 3704,
+      "total_tokens": 3731,
+      "messages": 4
+    },
+    {
+      "session_id": "1772490069",
+      "start_time": "2026-03-02T22:21:09Z",
+      "end_time": "2026-03-02T22:48:48Z",
+      "prompt_tokens": 121,
+      "completion_tokens": 334,
+      "total_tokens": 455,
+      "messages": 1
+    },
+    {
+      "session_id": "1772491728",
+      "start_time": "2026-03-02T22:48:48Z",
+      "end_time": "2026-03-02T22:49:50Z",
+      "prompt_tokens": 0,
+      "completion_tokens": 183,
+      "total_tokens": 183,
+      "messages": 1
+    },
+    {
+      "session_id": "1772522829",
+      "start_time": "2026-03-03T07:27:09Z",
+      "end_time": "2026-03-03T08:39:39Z",
+      "prompt_tokens": 282,
+      "completion_tokens": 530,
+      "total_tokens": 812,
+      "messages": 3
+    },
+    {
+      "session_id": "1772532485",
+      "start_time": "2026-03-03T10:08:05Z",
+      "end_time": "2026-03-03T10:24:56Z",
+      "prompt_tokens": 0,
+      "completion_tokens": 388,
+      "total_tokens": 388,
+      "messages": 1
+    },
+    {
+      "session_id": "1772535563",
+      "start_time": "2026-03-03T10:59:23Z",
+      "end_time": "2026-03-03T10:59:40Z",
+      "prompt_tokens": 1,
+      "completion_tokens": 25,
+      "total_tokens": 26,
+      "messages": 1
+    },
+    {
+      "session_id": "1772536896",
+      "start_time": "2026-03-03T11:21:36Z",
+      "end_time": "2026-03-03T11:59:31Z",
+      "prompt_tokens": 80,
+      "completion_tokens": 267,
+      "total_tokens": 347,
+      "messages": 1
+    },
+    {
+      "session_id": "1772545950",
+      "start_time": "2026-03-03T13:52:30Z",
+      "end_time": "2026-03-03T14:18:41Z",
+      "prompt_tokens": 24,
+      "completion_tokens": 322,
+      "total_tokens": 346,
+      "messages": 2
+    },
+    {
+      "session_id": "1772547615",
+      "start_time": "2026-03-03T14:20:15Z",
+      "end_time": "2026-03-03T21:56:03Z",
+      "prompt_tokens": 180,
+      "completion_tokens": 2521,
+      "total_tokens": 2701,
+      "messages": 9
+    }
+  ],
+  "total_prompt_tokens": 0,
+  "total_completion_tokens": 0,
+  "total_tokens": 0,
+  "total_messages": 0
+}

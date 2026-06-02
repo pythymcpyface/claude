@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Execute Phase 3 - Operational Reviews",
+  "description": "Run all 4 operational reviews: devops, observability, disaster-recovery, feature-flag. Infrastructure and deployment readiness.",
+  "activeForm": "Executing Phase 3 operational reviews",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Execute Phase 1 - Foundation Reviews",
+  "description": "Run all 5 foundation reviews: code-quality, security, dependency-security, secrets-management, git-hygiene. These are blocking issues that must pass before production.",
+  "activeForm": "Executing Phase 1 foundation reviews",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

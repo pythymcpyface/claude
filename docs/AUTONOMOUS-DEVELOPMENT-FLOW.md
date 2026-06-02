@@ -50,7 +50,7 @@ When `/start-project` is invoked, follow these steps:
 - DO NOT run build commands (npm run build, tsc, etc.)
 - DO NOT run test commands (npm test, jest, etc.)
 - DO NOT run setup-env.sh - USER must do this manually
-- DO NOT start /ralph-loop - USER must do this manually
+- DO NOT start implementation automatically - USER must do this manually
 - PRESENT SUMMARY AND STOP - WAIT for user to proceed
 
 **The ONLY files created during this flow are:**
@@ -124,7 +124,7 @@ Before any code is written, the following phases must be completed **using Opus*
 │   - Run setup-env.sh to initialize project structure           │
 │   - Install dependencies, create directories                    │
 ├─────────────────────────────────────────────────────────────────┤
-│ Phase 9: Ralph Loop Implementation (Manual: /ralph-loop)     │
+│ Phase 9: Implementation (Manual: Begin following roadmap)       │
 │   - Execute with CHECKPOINTS for user review                   │
 │   - Generate PROGRESS.md with live status                       │
 │   - Resume capability via --resume-from flag                    │
@@ -1753,7 +1753,7 @@ Create `.claude/docs/RALPH-STATE.md` (template):
 
 ## Resume Command
 \`\`\`bash
-/ralph-loop "--resume-from=SPEC-[XXX+1]"
+Resume implementation from SPEC-[XXX+1] following the roadmap
 \`\`\`
 
 ## Notes
@@ -1921,7 +1921,7 @@ None yet.
 All specifications.
 
 ---
-Environment ready. Run `/ralph-loop` to begin implementation.
+Environment ready. Begin implementation following the generated roadmap.
 EOF
 fi
 
@@ -1930,7 +1930,7 @@ echo ""
 echo "Next steps:"
 echo "  1. Review generated configuration files"
 echo "  2. Run tests: npm test"
-echo "  3. Start Ralph Loop: /ralph-loop"
+echo "  3. Begin implementation following the roadmap"
 ```
 
 ### 0.2 Run Setup Script
@@ -1961,7 +1961,7 @@ npx tsc --noEmit
 Once all planning documents are complete and verified, start Ralph Loop:
 
 ```bash
-/ralph-loop "
+Begin implementation following the roadmap
 You are implementing a software system from detailed specifications.
 
 # MANDATORY READING (Read in order)

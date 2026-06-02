@@ -1,0 +1,9 @@
+{
+  "id": "6",
+  "subject": "Reproduce Bug",
+  "description": "Attempt to reproduce the bug by examining the container setup and slash command configuration",
+  "activeForm": "Reproducing bug",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

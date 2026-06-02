@@ -1,0 +1,9 @@
+{
+  "id": "1",
+  "subject": "Plan Fix",
+  "description": "Design minimal fix to make slash commands available in container",
+  "activeForm": "Planning fix",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

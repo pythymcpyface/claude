@@ -19,6 +19,13 @@ macOS disk space recovery with analysis-first approach. Use when disk is >75% fu
 | `~/.claude/skills/` | Custom skills |
 | `~/.claude/commands/` | Custom commands |
 | Any path containing `claude-mem` | Cross-session memory system |
+| `~/.colima/` | Colima VM (active running VMs) |
+| `~/.bob/` | Bob CLI tool configuration |
+| `~/Documents/` | User documents |
+| `~/Library/Application Support/Code/User/` | VSCode user data/extensions |
+| `~/Library/Application Support/OnVUE/` | OnVUE exam software |
+| `~/Library/Application Support/IBM Bob/` | IBM Bob configuration |
+| `~/.ollama/` | Ollama AI models |
 
 ---
 
@@ -120,7 +127,7 @@ du -sh ~/Library/Caches/ms-playwright 2>/dev/null || echo "0B"
 # Google Chrome
 du -sh ~/Library/Caches/Google 2>/dev/null || echo "0B"
 
-# VSCode
+# VSCode ShipIt
 du -sh ~/Library/Caches/com.microsoft.VSCode.ShipIt 2>/dev/null || echo "0B"
 
 # Python
@@ -144,8 +151,26 @@ du -sh ~/Library/Caches/pip 2>/dev/null || echo "0B"
 # Gradle cache
 du -sh ~/.gradle/caches 2>/dev/null || echo "0B"
 
+# uv cache
+du -sh ~/.cache/uv 2>/dev/null || echo "0B"
+
+# Trivy vulnerability scanner cache
+du -sh ~/.cache/trivy 2>/dev/null || echo "0B"
+
+# Puppeteer cache
+du -sh ~/.cache/puppeteer 2>/dev/null || echo "0B"
+
+# Rustup toolchains
+du -sh ~/.rustup 2>/dev/null || echo "0B"
+
 # Maven cache
 du -sh ~/.m2/repository 2>/dev/null || echo "0B"
+
+# Slack cache
+du -sh ~/Library/Application\ Support/Slack 2>/dev/null || echo "0B"
+
+# Brave cache
+du -sh ~/Library/Application\ Support/BraveSoftware 2>/dev/null || echo "0B"
 
 # CocoaPods cache
 du -sh ~/Library/Caches/CocoaPods 2>/dev/null || echo "0B"
@@ -329,6 +354,42 @@ rm -rf ~/.claude/projects/-Users-<username>-path-to-inactive-project/
 ```bash
 # Only if user confirmed - this is NOT regenerated
 rm -rf ~/.claude/file-history/*
+```
+
+#### Gradle Cache
+```bash
+rm -rf ~/.gradle/caches
+```
+
+#### uv Cache
+```bash
+rm -rf ~/.cache/uv
+```
+
+#### Trivy Cache
+```bash
+rm -rf ~/.cache/trivy
+```
+
+#### Puppeteer Cache
+```bash
+rm -rf ~/.cache/puppeteer
+```
+
+#### Rustup Toolchains
+```bash
+rm -rf ~/.rustup
+```
+
+#### Slack Cache
+```bash
+rm -rf ~/Library/Application\ Support/Slack/*
+```
+
+#### Brave Cache
+```bash
+rm -rf ~/Library/Application\ Support/BraveSoftware/Brave-Global-Default/Cache/*
+rm -rf ~/Library/Application\ Support/BraveSoftware/Brave-Global-Default/CodeCache/*
 ```
 
 ---

@@ -200,7 +200,7 @@ None yet.
 All specifications.
 
 ---
-Environment ready. Run `/ralph-loop` to begin implementation.
+Environment ready. Begin implementation following the generated roadmap.
 EOF
   echo "   ✓ PROGRESS.md created"
 else
@@ -260,5 +260,5 @@ echo ""
 echo "🚀 Next steps:"
 echo "   1. Review generated configuration files"
 echo "   2. Run tests: npm test"
-echo "   3. Start Ralph Loop: /ralph-loop"
+echo "   3. Begin implementation following the roadmap"
 echo ""

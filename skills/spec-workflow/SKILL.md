@@ -164,7 +164,7 @@ Invoke this skill when:
 This skill is **Phase 0** of the project initialization flow:
 
 ```
-/spec-workflow → (approve specs) → /start-project → (approve plan) → /ralph-loop
+/spec-workflow → (approve specs) → /start-project → (approve plan) → begin implementation
 ```
 
 ### Output Contract

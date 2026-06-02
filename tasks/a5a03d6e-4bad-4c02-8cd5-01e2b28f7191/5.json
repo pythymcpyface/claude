@@ -1,0 +1,9 @@
+{
+  "id": "5",
+  "subject": "Create Bug Report",
+  "description": "Document the bug comprehensively with expected behavior, actual behavior, reproduction steps, severity, and environment details",
+  "activeForm": "Creating bug report",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,5 +1,5 @@
 ---
-description: Comprehensive specification workflow with user journey analysis, EARS requirements extraction, Gherkin/BDD generation, and bidirectional traceability verification
+description: Comprehensive specification workflow (Phase 0 of /start-project). Generates exhaustive specifications with user journey analysis, EARS requirements extraction, Gherkin/BDD generation, and bidirectional traceability verification. Can be run standalone or automatically as part of /start-project.
 argument-hint: Feature description for specification
 ---
 
@@ -254,10 +254,10 @@ After all phases complete, present:
 Review the generated specifications above.
 
 **Next Step**: Run `/start-project` to:
-- Synthesize these specs into project documentation
+- Synthesize these specs into comprehensive project documentation
 - Generate implementation roadmap with checkpoints
 - Create dependency graph and parallel execution groups
-- Prepare for `/ralph-loop` implementation
+- Generate all supporting documentation for implementation
 
 ---
 
@@ -266,7 +266,7 @@ Review the generated specifications above.
 This command is **Phase 0** of the project initialization flow:
 
 ```
-/spec-workflow → (approve specs) → /start-project → (approve plan) → /ralph-loop
+/spec-workflow → (approve specs) → /start-project → (approve plan) → begin implementation
 ```
 
 When you run `/start-project`, it will:
@@ -275,6 +275,7 @@ When you run `/start-project`, it will:
 3. Merge TDD-STRATEGY.md into TDD-MASTER-DOCUMENT.md
 4. Generate PROJECT-PLAN.md with full context
 5. Create IMPLEMENTATION-ROADMAP.md with checkpoints
+6. Generate all supporting documentation
 
 **You can also run `/start-project` directly** - it will auto-run this spec-workflow if no specs exist.
 ```

@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Verify and Merge",
+  "description": "Verify fix works, merge to main, and clean up worktree",
+  "activeForm": "Verifying and merging",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}

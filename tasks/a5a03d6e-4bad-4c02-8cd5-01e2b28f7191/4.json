@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Analyze Root Cause",
+  "description": "Investigate why global host machine slash commands aren't available in the container",
+  "activeForm": "Analyzing root cause",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": []
+}

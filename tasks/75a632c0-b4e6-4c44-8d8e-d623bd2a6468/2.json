@@ -1,0 +1,9 @@
+{
+  "id": "2",
+  "subject": "Execute Phase 2 - Functional Reviews",
+  "description": "Run all 5 functional reviews: testing, api-readiness, database, performance, error-resilience. Focus on core feature readiness.",
+  "activeForm": "Executing Phase 2 functional reviews",
+  "status": "in_progress",
+  "blocks": [],
+  "blockedBy": []
+}

@@ -1,0 +1,9 @@
+{
+  "id": "4",
+  "subject": "Execute Phase 4 - Compliance Reviews",
+  "description": "Run all 4 compliance reviews: compliance, accessibility, i18n-l10n, browser-compatibility. Regulatory and standards compliance.",
+  "activeForm": "Executing Phase 4 compliance reviews",
+  "status": "pending",
+  "blocks": [],
+  "blockedBy": []
+}
