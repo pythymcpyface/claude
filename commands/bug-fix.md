@@ -281,60 +281,118 @@ describe('BUG-001: Login crashes when email is null', () => {
 
 ---
 
-## Phase 4.5: Bug Specification Generation
+## Phase 4.5: Specification Workflow (MANDATORY)
 
-**Goal**: Create EARS-formatted bug specification with regression tests
+**Goal**: Generate comprehensive bug fix specifications using /spec-workflow
 
-**CRITICAL**: Document bug in specification format for traceability
+**CRITICAL**: This phase is MANDATORY - always run complete spec-workflow for every bug fix
 
-**Actions**:
+### Execute Complete Specification Workflow
 
-1. **Create BUG-SPECIFICATION.md** using EARS syntax:
+**ALWAYS run all 4 phases of /spec-workflow**:
 
-   ```markdown
-   ### Normal Behavior (Expected)
+1. **Phase 1: User Journey Analysis**
+   - Map the journey where the bug occurs
+   - Document expected vs actual behavior
+   - Identify all affected paths and edge cases
+   - Generate Mermaid diagrams showing bug manifestation
 
-   **Pattern**: [Event-Driven|State-Driven|etc.]
+2. **Phase 2: Requirements Extraction (EARS)**
+   - Convert bug fix into EARS-formatted requirements
+   - Use "Unwanted" pattern for buggy behavior
+   - Use appropriate pattern for correct behavior
+   - Atomic decomposition (3-5 iterations)
+   - Build dependency graph
 
-   **Specification**:
-   > When [condition], the system shall [expected behavior]
-
-   ### Buggy Behavior (Actual)
-
-   **Pattern**: Unwanted
-
-   **Specification**:
-   > The system shall not [buggy behavior]
-   ```
-
-2. **Generate regression test Gherkin scenarios**:
+3. **Phase 3: TDD Strategy Generation (Gherkin)**
+   - Create regression test scenarios
    - Tag with `@regression @BUG-XXX`
-   - Cover the specific bug condition
-   - Cover related edge cases
-   - Map to original journey if applicable
+   - Generate scenarios (reproduction, edge cases, related bugs)
+   - Map step definitions
+   - Define test fixtures
 
-3. **Create `features/bug-XXX-[description].feature`**:
-   ```gherkin
-   @regression @BUG-001 @security
-   Feature: [Bug Name] Fix
-     As a [role]
-     I want [correct behavior]
-     So that [benefit]
+4. **Phase 4: Traceability Verification**
+   - Ensure bidirectional traceability
+   - Link bug to affected journeys/requirements
+   - Verify 100% regression test coverage
+   - Generate verification report
 
-     # REG-001-001
-     Scenario: [Bug condition handled correctly]
-       Given [precondition]
-       When [trigger that caused bug]
-       Then [expected behavior, not crash/error]
-   ```
+### Documents Generated
 
-4. **Update traceability**:
-   - Link BUG-XXX to related journey (if exists)
-   - Link BUG-XXX to related requirement (if exists)
-   - Add to VERIFICATION-REPORT.md
+The spec-workflow will generate in `.claude/docs/$BRANCH_NAME/`:
+- ✅ `USER-JOURNEYS.md` - Journey analysis showing bug manifestation
+- ✅ `REQUIREMENTS.md` - EARS-formatted fix requirements (with Unwanted patterns)
+- ✅ `TDD-STRATEGY.md` - Gherkin regression test specifications
+- ✅ `TRACEABILITY-MATRIX.md` - Bidirectional traceability
+- ✅ `VERIFICATION-REPORT.md` - Quality assurance
+- ✅ `features/bug-*.feature` - Executable regression test files
 
-**Template**: `.claude/docs/templates/BUG-SPECIFICATION-TEMPLATE.md`
-**Output**: `.claude/docs/$BRANCH_NAME/BUG-SPECIFICATION.md`
+### Additional Bug Fix Documentation
+
+After spec-workflow completes, generate bug-specific supporting documents:
+
+1. **`.claude/docs/$BRANCH_NAME/BUG-SPECIFICATION.md`**
+   - Transform REQUIREMENTS.md into detailed bug specifications
+   - Document expected vs actual behavior using EARS
+   - Include root cause analysis from Phase 3
+   - Map to affected code locations
+
+2. **`.claude/docs/$BRANCH_NAME/REGRESSION-TESTS.md`**
+   - Extract from TDD-STRATEGY.md
+   - Comprehensive regression test suite
+   - Tests for the specific bug condition
+   - Tests for related edge cases
+   - Tests to prevent similar bugs
+
+3. **`.claude/docs/$BRANCH_NAME/TEST-FIXTURES.md`**
+   - Test data that triggers the bug
+   - Valid data for regression tests
+   - Edge case data
+   - Reusable fixtures for all test scenarios
+
+4. **`.claude/docs/$BRANCH_NAME/FIX-IMPLEMENTATION-GUIDE.md`**
+   - Step-by-step fix implementation guide
+   - Minimal change approach
+   - Verification checkpoints
+   - Rollback plan
+
+**Note**: Project-level documents (PROJECT-PLAN.md, GIT-STRATEGY.md, DEPENDENCY-GRAPH.md, PARALLEL-GROUPS.md, CRITICAL-PATH.md) are NOT generated for individual bug fixes - these are only created by /start-project for new projects.
+
+### Present Specification Summary
+
+After spec-workflow and supporting docs are complete:
+
+```markdown
+## Bug Fix Specification Complete
+
+### Documents Generated:
+- ✅ USER-JOURNEYS.md (showing bug manifestation)
+- ✅ REQUIREMENTS.md ([N] fix requirements with Unwanted patterns)
+- ✅ TDD-STRATEGY.md ([N] regression test scenarios)
+- ✅ features/bug-*.feature ([N] regression test files)
+- ✅ TRACEABILITY-MATRIX.md (100% coverage)
+- ✅ VERIFICATION-REPORT.md
+- ✅ BUG-SPECIFICATION.md (detailed bug analysis)
+- ✅ REGRESSION-TESTS.md (comprehensive test suite)
+- ✅ TEST-FIXTURES.md (test data)
+- ✅ FIX-IMPLEMENTATION-GUIDE.md (step-by-step guide)
+
+### Statistics:
+- Affected Journeys: [N]
+- Fix Requirements: [N]
+- Regression Tests: [N]
+- Coverage: 100%
+
+---
+
+## ⛔ STOP - User Approve Specs Before Implementation
+
+Review the generated specifications above.
+
+**Type "continue" or "approve" to proceed to Phase 5 (Implementation).**
+```
+
+**WAIT for user confirmation** before continuing to Phase 5
 
 ---
 

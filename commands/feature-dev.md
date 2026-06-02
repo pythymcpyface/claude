@@ -184,58 +184,112 @@ If the user says "whatever you think is best", provide your recommendation and g
 
 ---
 
-## Phase 3.5: Requirements Breakdown
+## Phase 3.5: Specification Workflow (MANDATORY)
 
-**Goal**: Generate complete REQUIREMENTS.md with atomic requirements
+**Goal**: Generate comprehensive feature specifications using /spec-workflow
 
-**CRITICAL**: Complete all requirements work before any specifications
+**CRITICAL**: This phase is MANDATORY - always run complete spec-workflow for every feature
 
-**Workflow Options**:
+### Execute Complete Specification Workflow
 
-### Option A: Comprehensive Specification Workflow (Recommended for complex features)
+**ALWAYS run all 4 phases of /spec-workflow**:
 
-Use `/spec-workflow` for exhaustive specification:
-1. **Invoke spec-workflow**:
-   ```
-   /spec-workflow [feature description]
-   ```
-2. **This generates**:
-   - `USER-JOURNEYS.md` - Exhaustive journey analysis
-   - `REQUIREMENTS.md` - EARS-formatted requirements
-   - `TDD-STRATEGY.md` - Gherkin/BDD specifications
-   - `TRACEABILITY-MATRIX.md` - Bidirectional traceability
-   - `features/*.feature` - Executable Gherkin files
-3. **Skip to Phase 4** after spec-workflow completes
+1. **Phase 1: User Journey Analysis**
+   - Map ALL paths for this feature
+   - Identify all roles, goals, entry points
+   - Document all edge cases and error states
+   - Generate Mermaid diagrams
 
-### Option B: Standard Requirements Breakdown
+2. **Phase 2: Requirements Extraction (EARS)**
+   - Convert journeys to EARS-formatted requirements
+   - Atomic decomposition (3-5 iterations)
+   - Build dependency graph
+   - Assign priorities and test IDs
 
-**Actions**:
-1. **Generate initial requirements** from user input and clarifying questions
-2. **Iterative breakdown loop (3-5 passes)**:
-   - For each requirement, ask: "Can this be split into smaller, independently testable units?"
-   - Break down until atomic (single function, single decision point, single file)
-   - Stop when requirements seem "ridiculously small"
-3. **Generate `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`** with:
-   - Numbered REQ-001, REQ-002, etc.
-   - User story format for each
-   - Acceptance criteria (binary, measurable)
-   - Dependencies between requirements
-   - Priority (Must-have / Should-have / Nice-to-have)
+3. **Phase 3: TDD Strategy Generation (Gherkin)**
+   - Create executable Gherkin specifications
+   - Generate scenarios (happy, sad, edge, security)
+   - Map step definitions
+   - Define test fixtures
 
-**Atomic Requirement Indicators**:
-- Can be implemented in a single function or small set of functions
-- Has clear, binary acceptance criteria (pass/fail)
-- Independent of other requirements (minimal dependencies)
-- Testable in isolation
+4. **Phase 4: Traceability Verification**
+   - Ensure bidirectional traceability
+   - Verify 100% coverage
+   - Generate verification report
 
-**Template**: Use `.claude/docs/templates/REQUIREMENTS-TEMPLATE.md`
-**Output**: `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
+### Documents Generated
 
-**Recommendation**: Use Option A (spec-workflow) for:
-- Complex features with multiple user roles
-- Features requiring exhaustive test coverage
-- Projects with compliance requirements
-- Features with security implications
+The spec-workflow will generate in `.claude/docs/$BRANCH_NAME/`:
+- ✅ `USER-JOURNEYS.md` - Exhaustive journey analysis for this feature
+- ✅ `REQUIREMENTS.md` - EARS-formatted atomic requirements
+- ✅ `TDD-STRATEGY.md` - Gherkin/BDD specifications
+- ✅ `TRACEABILITY-MATRIX.md` - Bidirectional traceability
+- ✅ `VERIFICATION-REPORT.md` - Quality assurance
+- ✅ `features/*.feature` - Executable Gherkin files
+
+### Additional Feature Documentation
+
+After spec-workflow completes, generate feature-specific supporting documents:
+
+1. **`.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`**
+   - Transform REQUIREMENTS.md into detailed specifications
+   - Iterate 3-5 times until atomic
+   - Include: User Story, Acceptance Criteria, Functional Spec, Performance, Security, Testing, Dependencies
+
+2. **`.claude/docs/$BRANCH_NAME/TEST-FIXTURES.md`**
+   - Extract from TDD-STRATEGY.md
+   - Valid and invalid test data
+   - Reusable fixtures for all test scenarios
+
+3. **`.claude/docs/$BRANCH_NAME/INTEGRATION-TESTS.md`**
+   - Tests spanning multiple specifications
+   - Critical workflows from USER-JOURNEYS.md
+   - End-to-end scenarios
+
+4. **`.claude/docs/$BRANCH_NAME/IMPLEMENTATION-ROADMAP.md`**
+   - Step-by-step implementation guide for this feature
+   - Checkpoints and verification steps
+   - Dependencies and order
+
+**Note**: Project-level documents (PROJECT-PLAN.md, GIT-STRATEGY.md, DEPENDENCY-GRAPH.md, PARALLEL-GROUPS.md, CRITICAL-PATH.md) are NOT generated for individual features - these are only created by /start-project for new projects.
+
+### Present Specification Summary
+
+After spec-workflow and supporting docs are complete:
+
+```markdown
+## Feature Specification Complete
+
+### Documents Generated:
+- ✅ USER-JOURNEYS.md ([N] journeys, [N] steps)
+- ✅ REQUIREMENTS.md ([N] atomic requirements)
+- ✅ TDD-STRATEGY.md ([N] test scenarios)
+- ✅ features/*.feature ([N] feature files)
+- ✅ TRACEABILITY-MATRIX.md (100% coverage)
+- ✅ VERIFICATION-REPORT.md
+- ✅ SPECIFICATIONS.md ([N] atomic specs)
+- ✅ TEST-FIXTURES.md
+- ✅ INTEGRATION-TESTS.md
+- ✅ IMPLEMENTATION-ROADMAP.md
+
+### Statistics:
+- Roles: [N]
+- Journeys: [N]
+- Requirements: [N] (Must-have: [N], Should-have: [N])
+- Specifications: [N]
+- Test Scenarios: [N]
+- Coverage: 100%
+
+---
+
+## ⛔ STOP - User Approve Specs Before Architecture Design
+
+Review the generated specifications above.
+
+**Type "continue" or "approve" to proceed to Phase 4 (Architecture Design).**
+```
+
+**WAIT for user confirmation** before continuing to Phase 4
 
 ---
 
@@ -284,55 +338,57 @@ Use `/spec-workflow` for exhaustive specification:
 
 ---
 
-## Phase 4.6: TDD Strategy Generation
+## Phase 4.6: Verify Documentation Complete
 
-**Goal**: Generate complete SPECIFICATIONS.md and TDD-STRATEGY.md
+**Goal**: Confirm all specification documents are ready for implementation
 
-**CRITICAL**: Complete all specs and test planning before implementation
+**CRITICAL**: All documentation was generated in Phase 3.5 - just verify completeness
 
 **Actions**:
-1. **For each REQ-XXX**, generate SPEC-XXX using the existing template
-2. **Generate `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`** containing all specs
-3. **Generate `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`** with:
-   - Test case for every acceptance criterion
-   - Happy path tests
-   - Sad path/edge case tests
-   - Integration tests
-   - Test fixtures needed
+1. **Verify all documents exist** in `.claude/docs/$BRANCH_NAME/`:
+   - [ ] USER-JOURNEYS.md
+   - [ ] REQUIREMENTS.md
+   - [ ] TDD-STRATEGY.md
+   - [ ] TRACEABILITY-MATRIX.md
+   - [ ] VERIFICATION-REPORT.md
+   - [ ] features/*.feature
+   - [ ] SPECIFICATIONS.md
+   - [ ] TEST-FIXTURES.md
+   - [ ] INTEGRATION-TESTS.md
+   - [ ] IMPLEMENTATION-ROADMAP.md
 
-**Coverage Targets**:
-- **Unit tests**: Each acceptance criterion gets at least one test
-- **Edge cases**: Minimum 2-3 per requirement
-- **Integration tests**: For requirement dependencies
-- **Coverage goal**: >80% on business logic
+2. **Present final documentation summary**:
 
-**Templates**:
-- Specifications: `.claude/docs/templates/SPEC-TEMPLATE.md`
-- TDD Strategy: `.claude/docs/templates/TDD-STRATEGY-TEMPLATE.md`
-**Outputs**:
-- `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`
-- `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
+```markdown
+## Feature Documentation Complete
 
-**Document Generation Order**:
-1. Complete `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md` (all requirements broken down)
-2. Complete `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md` (all specs from requirements)
-3. Complete `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md` (all test cases mapped)
-4. **THEN** stop and present documentation summary
+### All Documents Verified:
+- ✅ USER-JOURNEYS.md - Exhaustive journey analysis
+- ✅ REQUIREMENTS.md - EARS-formatted atomic requirements
+- ✅ TDD-STRATEGY.md - Gherkin/BDD specifications
+- ✅ TRACEABILITY-MATRIX.md - 100% coverage verification
+- ✅ VERIFICATION-REPORT.md - Quality assurance
+- ✅ features/*.feature - Executable Gherkin files
+- ✅ SPECIFICATIONS.md - Atomic specifications (iterated 3-5 times)
+- ✅ TEST-FIXTURES.md - Test data fixtures
+- ✅ INTEGRATION-TESTS.md - Cross-specification tests
+- ✅ IMPLEMENTATION-ROADMAP.md - Step-by-step guide
+
+### Ready for Implementation
+All planning and specification work is complete.
 
 ---
 
-# ⛔ DOCUMENTATION COMPLETE - STOP POINT ⛔
+## ⛔ DOCUMENTATION COMPLETE - STOP POINT ⛔
 
-**Planning Phase Complete.** All documentation has been generated:
-- `.claude/docs/$BRANCH_NAME/REQUIREMENTS.md`
-- `.claude/docs/$BRANCH_NAME/SPECIFICATIONS.md`
-- `.claude/docs/$BRANCH_NAME/TDD-STRATEGY.md`
+**Planning Phase Complete.** All documentation has been generated and verified.
 
 **DO NOT proceed to implementation automatically.**
 
 Present the documentation summary to the user and **WAIT** for explicit approval before continuing to Phase 5.
 
 The user must explicitly request implementation to proceed.
+```
 
 ---
 
