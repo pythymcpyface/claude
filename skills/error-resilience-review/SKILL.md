@@ -12,6 +12,7 @@ paths:
   - "**/clients/**"
   - "**/integrations/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Error Resilience Review Skill

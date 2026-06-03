@@ -22,6 +22,7 @@ paths:
   - "**/composer.json"
   - "**/composer.lock"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Dependency Security Scan Skill

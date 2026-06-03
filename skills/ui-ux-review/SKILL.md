@@ -11,6 +11,7 @@ paths:
   - "**/design-system/**"
   - "**/ui/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # UI/UX Review Skill

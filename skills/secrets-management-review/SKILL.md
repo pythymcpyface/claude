@@ -11,6 +11,7 @@ paths:
   - "**/config/**"
   - "**/*.config.{ts,js,py}"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Secrets Management Review Skill

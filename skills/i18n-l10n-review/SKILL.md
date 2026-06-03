@@ -11,6 +11,7 @@ paths:
   - "**/messages/**"
   - "**/*.{json,yaml,yml}"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # i18n/l10n Review Skill

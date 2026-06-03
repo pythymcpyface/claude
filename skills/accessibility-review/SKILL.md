@@ -11,6 +11,7 @@ paths:
   - "**/views/**"
   - "**/*.{css,scss,sass}"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Accessibility Review Skill

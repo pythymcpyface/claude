@@ -17,6 +17,7 @@ paths:
   - "**/vite.config.*"
   - "**/rollup.config.*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Efficiency Review Skill

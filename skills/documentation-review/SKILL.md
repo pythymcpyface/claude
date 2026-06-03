@@ -11,6 +11,7 @@ paths:
   - "**/architecture/**"
   - "**/adr/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Documentation Review Skill

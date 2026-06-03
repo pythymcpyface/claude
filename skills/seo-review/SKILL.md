@@ -13,6 +13,7 @@ paths:
   - "**/seo/**"
   - "**/meta*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # SEO Review Skill

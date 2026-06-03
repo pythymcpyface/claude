@@ -12,6 +12,7 @@ paths:
   - "**/users/**"
   - "**/profile/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Compliance Review Skill

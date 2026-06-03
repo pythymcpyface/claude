@@ -11,6 +11,7 @@ paths:
   - "**/terraform/**"
   - "**/k8s/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Disaster Recovery Review Skill

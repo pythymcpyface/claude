@@ -16,6 +16,7 @@ paths:
   - "**/buildkite/**"
   - "**/helm/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # DevOps Review Skill

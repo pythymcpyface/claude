@@ -15,6 +15,7 @@ paths:
   - "**/pytest.ini"
   - "**/conftest.py"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Testing Review Skill

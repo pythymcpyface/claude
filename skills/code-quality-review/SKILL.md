@@ -10,6 +10,7 @@ paths:
   - "**/.rubocop.yml"
   - "**/biome.json"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Code Quality Review Skill

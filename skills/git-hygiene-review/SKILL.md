@@ -10,6 +10,7 @@ paths:
   - "**/.husky/**"
   - "**/.pre-commit-config.yaml"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Git Hygiene Review Skill

@@ -10,6 +10,7 @@ paths:
   - "**/*flag*.{ts,js,py,rb,go}"
   - "**/experiments/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Feature Flag Review Skill

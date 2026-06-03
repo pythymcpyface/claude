@@ -12,6 +12,7 @@ paths:
   - "**/graphql/**"
   - "**/*.graphql"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # API Readiness Review Skill

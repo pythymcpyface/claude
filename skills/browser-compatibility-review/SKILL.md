@@ -11,6 +11,7 @@ paths:
   - "**/babel.config.*"
   - "**/.babelrc*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Browser Compatibility Review Skill

@@ -15,6 +15,7 @@ paths:
   - "**/crypto*"
   - "**/password*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Security Review Skill

@@ -15,6 +15,7 @@ paths:
   - "**/opentelemetry*"
   - "**/otel*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Observability Review Skill

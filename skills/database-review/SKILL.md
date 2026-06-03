@@ -12,6 +12,7 @@ paths:
   - "**/seeders/**"
   - "**/alembic/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Database Review Skill

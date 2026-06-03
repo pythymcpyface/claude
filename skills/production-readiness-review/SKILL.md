@@ -2,6 +2,7 @@
 name: production-readiness-review
 description: Comprehensive production readiness orchestration. Runs all 21 review skills sequentially across 5 phases to provide a complete pre-production assessment. Use PROACTIVELY before production releases, major deployments, or quarterly audits.
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Production Readiness Review - Orchestration Skill

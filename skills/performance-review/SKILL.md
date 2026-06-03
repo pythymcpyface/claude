@@ -11,6 +11,7 @@ paths:
   - "**/cache/**"
   - "**/queries/**"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
+context: fork
 ---
 
 # Performance Review Skill
