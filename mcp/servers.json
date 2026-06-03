@@ -51,7 +51,7 @@
     "kdb-remote": {
       "description": "Remote KDB vector store (IBM Cloud Redis + watsonx embeddings)",
       "command": [
-        "$HOME/Projects/cic/bob_backup_20260528_202358/kdb/start-mcp-server.sh"
+        "$HOME/Projects/cic/kdb/start-mcp-server.sh"
       ],
       "env": {
         "NODE_ENV": "production"

@@ -34,7 +34,7 @@ done
 CGR_BIN="$HOME/.local/share/uv/tools/code-graph-rag/bin/cgr"
 MCP_MEMORY_BIN="$HOME/.local/share/fnm/node-versions/v24.14.0/installation/bin/mcp-server-memory"
 MCP_LOCAL_RAG_BIN="$HOME/.local/share/fnm/node-versions/v24.14.0/installation/bin/mcp-local-rag"
-KDB_REMOTE_DIR="$HOME/.local/share/kdb-remote"
+KDB_REMOTE_DIR="$HOME/Projects/cic/kdb"
 
 for bin in "$CGR_BIN" "$MCP_MEMORY_BIN" "$MCP_LOCAL_RAG_BIN"; do
   if [[ ! -x "$bin" ]]; then
