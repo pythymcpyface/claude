@@ -22,7 +22,7 @@ Skill takes precedence per Anthropic. These commands are dead weight.
 
 - [x] Delete `commands/feature-dev.md` (573 lines) — verified byte-identical to skill body
 - [x] Delete `commands/bug-fix.md` (561 lines) — verified byte-identical to skill body
-- [s] Delete `commands/start-project.md` (1236 lines) — DEFERRED: `skills/start-project/` is empty; cannot delete until Step 3 migrates content
+- [x] Delete `commands/start-project.md` (1236 lines) — DONE in Step 3 (skill now populated)
 
 Done in commit `d4783ec`.
 
@@ -38,12 +38,12 @@ Pattern (already used by 22 review skills):
 
 Backup before each: `cp -r skills/<name> backups/<name>-pre-split-$(date +%s)/`
 
-- [ ] `skills/feature-dev/` (575 lines)
-- [ ] `skills/bug-fix/` (563 lines)
-- [ ] `skills/storage-cleanup/` (438 lines)
-- [ ] `skills/observability-review/` (391 lines)
-- [ ] `skills/spec-workflow/` (271 lines) — borderline; defer if shape is already coherent
-- [ ] `skills/memory-cleanup/` (252 lines) — borderline; defer
+- [x] `skills/feature-dev/` (575 → 86 lines, references/phases.md 440 lines) — commit `2187da0`
+- [x] `skills/bug-fix/` (563 → 102 lines, references/phases.md 368 lines) — commit `2187da0`
+- [x] `skills/observability-review/` (391 → 84 lines, references/{checklists.md 262, patterns.md 90}) — commit `ca3762e`
+- [x] `skills/storage-cleanup/` (438 → 98 lines, references/{analysis.md 196, cleanup.md 154}) — commit `ca3762e`
+- [s] `skills/spec-workflow/` (271 lines) — borderline; deferred per plan
+- [s] `skills/memory-cleanup/` (252 lines) — borderline; deferred per plan
 
 **Verify after each:** SKILL.md ≤ ~200 lines, references files reachable, frontmatter intact.
 
@@ -53,10 +53,12 @@ Backup before each: `cp -r skills/<name> backups/<name>-pre-split-$(date +%s)/`
 
 ## Step 3 — Migrate `start-project` properly
 
-If Step 1 deleted `commands/start-project.md`, the skill at `skills/start-project/SKILL.md` is the only copy. Verify:
-
-- [ ] `skills/start-project/SKILL.md` content is current (matches command, no regression)
-- [ ] If oversized, split into router + `references/{stacks,scaffolds,checklists}.md`
+- [x] `skills/start-project/SKILL.md` (114-line router)
+- [x] `skills/start-project/references/phases.md` (330 lines — Phase 0–7 actions, stop-points, validation)
+- [x] `skills/start-project/references/templates.md` (618 lines — all 11 doc templates)
+- [x] `skills/start-project/references/scripts.md` (189 lines — quality-gate, validate-planning, setup-env)
+- [x] Verified all 17 docs + 3 scripts referenced in skill (parity with original command)
+- [x] Deleted `commands/start-project.md`
 
 ---
 
@@ -74,37 +76,33 @@ If Step 1 deleted `commands/start-project.md`, the skill at `skills/start-projec
 
 ## Step 5 — Agent improvements
 
-`agents/code-architect.md` and `agents/code-reviewer.md`:
-- [ ] Add `memory: project` to frontmatter for cross-session learning
+- [x] `agents/code-architect.md`: added `memory: project`
+- [x] `agents/code-reviewer.md`: added `memory: project`
+- [x] `agents/code-simplifier.md`: added `disallowedTools: Bash`
 
-`agents/code-simplifier.md` modifies code (inherited Edit/Write):
-- [ ] Add `disallowedTools: Bash` OR `permissionMode: acceptEdits` to frontmatter
-
-**Commit:** `feat(agents): add memory and guardrails`
+Commit `567023a`.
 
 ---
 
 ## Step 6 — Script audit
 
-Scripts in `scripts/` that are NOT referenced by any hook in `settings.json`:
+Audit results (commit `567023a`):
 
-- [ ] `auto-heal.sh` — wire-or-delete
-- [ ] `quality-gate.sh` — wire-or-delete (or invoked from a skill?)
-- [ ] `security-gate.sh` — wire-or-delete
-- [ ] `tdd-gate.sh` — wire-or-delete
-- [ ] `integration-gate.sh` — wire-or-delete
-- [ ] `setup-auth.sh` — keep if manual onboarding script; document in CLAUDE.md
-- [ ] `setup-env.sh` — same
-- [ ] `local-llm-usage.sh` — delete if no local LLM running
-
-**Commit:** `chore(scripts): remove orphaned gate/setup scripts` (or wire into hooks)
+- [x] `auto-heal.sh` — DELETED (476 lines, no references in hooks/skills/commands)
+- [s] `quality-gate.sh` — KEEP (referenced by `feature-dev`, `bug-fix` skills, docs)
+- [s] `security-gate.sh` — KEEP (referenced by `feature-dev`, `bug-fix` skills)
+- [s] `tdd-gate.sh` — KEEP (referenced by `feature-dev` skill)
+- [s] `integration-gate.sh` — KEEP (referenced by `INTEGRATION-TEST-TEMPLATE.md`)
+- [s] `setup-auth.sh` — KEEP (manual onboarding helper, 43 lines)
+- [s] `setup-env.sh` — KEEP (referenced by `start-project`, `continue-planning`)
+- [s] `local-llm-usage.sh` — KEEP (wired in `settings.json` and `post-response-tokens.sh`)
 
 ---
 
 ## Step 7 — Final cleanup
 
-- [ ] Verify `skills/learned/` is gone
-- [ ] Decide `commands/_aliases.md`: wire-or-delete
+- [x] `skills/learned/` confirmed gone
+- [x] `commands/_aliases.md`: removed stale `/e2e` entry, kept `/qa` and `/git`
 - [ ] Run a final audit: `find skills -name SKILL.md | xargs wc -l | sort -rn | head -10`
 
 ---
@@ -134,3 +132,7 @@ When all P1/P2 items done:
 
 - 2026-06-03 08:30 — Plan created on branch `cleanup/2026-06-03-followup`.
 - 2026-06-03 09:10 — Step 1 done. Verified `feature-dev`/`bug-fix` skill bodies byte-identical to commands; deleted both. `start-project` deferred (skill dir empty). Commit `d4783ec`.
+- 2026-06-03 09:35 — Step 2 partial: split `feature-dev` (86-line router + 440-line references) and `bug-fix` (102-line router + 368-line references). Backups in `backups/cleanup-2026-06-03/`. Commit `2187da0`.
+- 2026-06-03 10:05 — Step 2 continues: split `observability-review` (84-line router + checklists 262 + patterns 90) and `storage-cleanup` (98-line router + analysis 196 + cleanup 154). Commit `ca3762e`.
+- 2026-06-03 (later) — Steps 5, 6, 7 (small): agent frontmatter (memory + disallowedTools), `_aliases.md` cleanup, deleted orphaned `auto-heal.sh`. Commit `567023a`.
+- 2026-06-03 (later) — Step 3 done: migrated `commands/start-project.md` (1236 lines) → `skills/start-project/{SKILL.md, references/{phases,templates,scripts}.md}` (114 + 330 + 618 + 189 = 1251 lines). Verified parity: all 17 docs + 3 scripts referenced. Deleted command. Pending commit.
