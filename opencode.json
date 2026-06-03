@@ -59,10 +59,10 @@
     "kdb-remote": {
       "type": "local",
       "command": [
-        "/Users/andrewgibson/.local/share/kdb-remote/start-mcp-server.sh"
+        "/Users/andrewgibson/Projects/cic/kdb/start-mcp-server.sh"
       ],
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "production"
       },
       "enabled": true,
       "timeout": 3600000
