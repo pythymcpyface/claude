@@ -1,6 +1,26 @@
 ---
 name: dependency-security-scan
 description: Production readiness review for dependency security. Scans for known vulnerabilities (CVEs) in npm, pip, go mod, and cargo dependencies. 84% of breaches originate from vulnerable dependencies. Use PROACTIVELY before production releases.
+paths:
+  - "**/package.json"
+  - "**/package-lock.json"
+  - "**/yarn.lock"
+  - "**/pnpm-lock.yaml"
+  - "**/requirements.txt"
+  - "**/requirements*.txt"
+  - "**/Pipfile"
+  - "**/Pipfile.lock"
+  - "**/pyproject.toml"
+  - "**/poetry.lock"
+  - "**/uv.lock"
+  - "**/go.mod"
+  - "**/go.sum"
+  - "**/Cargo.toml"
+  - "**/Cargo.lock"
+  - "**/Gemfile"
+  - "**/Gemfile.lock"
+  - "**/composer.json"
+  - "**/composer.lock"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: auto-prettify
 description: Automatically format rich text output (markdown, JSON, code, tables) using prettifier MCP tools. Use when output benefits from structured rendering.
+tools: mcp__prettifier__format_markdown, mcp__prettifier__format_json, mcp__prettifier__format_code, mcp__prettifier__format_yaml, mcp__prettifier__format_table, mcp__prettifier__format_raw
 ---
 
 # Auto-Prettify Output

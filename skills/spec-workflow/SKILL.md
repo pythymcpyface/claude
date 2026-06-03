@@ -1,6 +1,7 @@
 ---
 name: spec-workflow
 description: Comprehensive specification workflow with user journey analysis, EARS requirements extraction, Gherkin/BDD generation, and bidirectional traceability verification.
+tools: Read, Write, Edit, Glob, Grep, Bash, TodoWrite, Task, AskUserQuestion
 ---
 
 # Specification Workflow Skill
