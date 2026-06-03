@@ -20,13 +20,11 @@ We will work through this list in order, marking items DONE as we go. Update thi
 
 Skill takes precedence per Anthropic. These commands are dead weight.
 
-- [ ] Delete `commands/feature-dev.md` (573 lines) — `skills/feature-dev/SKILL.md` exists
-- [ ] Delete `commands/bug-fix.md` (561 lines) — `skills/bug-fix/SKILL.md` exists
-- [ ] Delete `commands/start-project.md` (1236 lines) — `skills/start-project/SKILL.md` exists
+- [x] Delete `commands/feature-dev.md` (573 lines) — verified byte-identical to skill body
+- [x] Delete `commands/bug-fix.md` (561 lines) — verified byte-identical to skill body
+- [s] Delete `commands/start-project.md` (1236 lines) — DEFERRED: `skills/start-project/` is empty; cannot delete until Step 3 migrates content
 
-**Verify before deleting:** confirm each skill's `SKILL.md` covers the command's content, or absorb missing pieces into the skill first.
-
-**Commit message:** `chore: remove commands shadowed by skills`
+Done in commit `d4783ec`.
 
 ---
 
@@ -135,3 +133,4 @@ When all P1/P2 items done:
 (Append entries here as work proceeds.)
 
 - 2026-06-03 08:30 — Plan created on branch `cleanup/2026-06-03-followup`.
+- 2026-06-03 09:10 — Step 1 done. Verified `feature-dev`/`bug-fix` skill bodies byte-identical to commands; deleted both. `start-project` deferred (skill dir empty). Commit `d4783ec`.
