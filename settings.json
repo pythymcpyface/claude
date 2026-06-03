@@ -1,18 +1,12 @@
 {
   "env": {
-    "OPENCODE_YOLO": "true",
     "ANTHROPIC_AUTH_TOKEN": "${ANTHROPIC_AUTH_TOKEN}",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.1",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.1",
-    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
-    "ANTHROPIC_API_KEY": "sk-dummy",
     "API_TIMEOUT_MS": "3000000",
     "DISABLE_NON_ESSENTIAL_MODEL_CALLS": "1",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "DISABLE_TELEMETRY": "1",
     "DISABLE_ERROR_REPORTING": "1",
-    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
-    "MAX_THINKING_TOKENS": "0"
+    "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1"
   },
   "defaultMode": "default",
   "permissions": {

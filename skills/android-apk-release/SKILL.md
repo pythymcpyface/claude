@@ -1,3 +1,10 @@
+---
+name: android-apk-release
+description: Build Android APK from Capacitor project, test on emulator, and create GitHub release. Use when user asks to "build APK", "release to Android", "deploy to phone", or create a GitHub release with the APK artifact.
+tools: Bash, Read, AskUserQuestion
+disable-model-invocation: true
+---
+
 # Android APK Build & GitHub Release
 
 Build Android APK from Capacitor project, test on emulator, and create GitHub release.

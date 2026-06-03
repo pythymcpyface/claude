@@ -2,6 +2,7 @@
 name: memory-cleanup
 description: macOS memory and CPU cleanup. Analyzes processes consuming high memory or CPU, identifies safe targets for cleanup, and terminates resource-intensive tasks. Use when system is slow or memory is exhausted.
 tools: Bash, AskUserQuestion
+disable-model-invocation: true
 ---
 
 # Memory & CPU Cleanup Skill
