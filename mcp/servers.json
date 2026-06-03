@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "_comment": "Canonical MCP server definitions. No secrets — those live in secrets.env (gitignored). Run mcp-ensure.sh to apply to all clients.",
+
+  "servers": {
+    "memory": {
+      "description": "Cross-session knowledge graph (MCP Memory)",
+      "command": ["mcp-server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "$HOME/.local/share/mcp-memory/memory.jsonl"
+      },
+      "timeout": 3600000
+    },
+
+    "cgr-local": {
+      "description": "Code-graph-RAG: structural code queries via Memgraph",
+      "command": [
+        "$HOME/.local/share/uv/tools/code-graph-rag/bin/cgr",
+        "mcp-server"
+      ],
+      "env": {
+        "MEMGRAPH_HOST": "localhost",
+        "MEMGRAPH_PORT": "7689",
+        "ORCHESTRATOR_PROVIDER": "openai",
+        "ORCHESTRATOR_MODEL": "claude-sonnet-4-6",
+        "ORCHESTRATOR_ENDPOINT": "$ICA_ENDPOINT",
+        "ORCHESTRATOR_API_KEY": "$ICA_API_KEY",
+        "CYPHER_PROVIDER": "openai",
+        "CYPHER_MODEL": "claude-sonnet-4-6",
+        "CYPHER_ENDPOINT": "$ICA_ENDPOINT",
+        "CYPHER_API_KEY": "$ICA_API_KEY"
+      },
+      "timeout": 600000,
+      "requires": ["memgraph"]
+    },
+
+    "kdb-local": {
+      "description": "Local vector RAG over ingested documents (Xenova embeddings)",
+      "command": [
+        "$HOME/.local/share/fnm/node-versions/v24.14.0/installation/bin/mcp-local-rag"
+      ],
+      "env": {
+        "DB_PATH": "$HOME/.local/share/mcp-knowledge",
+        "MODEL_NAME": "Xenova/all-MiniLM-L6-v2",
+        "CACHE_DIR": "$HOME/.cache/huggingface",
+        "HF_HUB_OFFLINE": "0"
+      },
+      "timeout": 3600000
+    },
+
+    "kdb-remote": {
+      "description": "Remote KDB vector store (IBM Cloud Redis + watsonx embeddings)",
+      "command": [
+        "$HOME/Projects/cic/bob_backup_20260528_202358/kdb/start-mcp-server.sh"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "timeout": 3600000
+    }
+  },
+
+  "infrastructure": {
+    "memgraph": {
+      "description": "Memgraph graph database for cgr-local",
+      "docker": {
+        "image": "memgraph/memgraph",
+        "container_name": "memgraph-codegraph",
+        "ports": ["7689:7687"],
+        "restart": "unless-stopped"
+      }
+    }
+  }
+}

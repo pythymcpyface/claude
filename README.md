@@ -1,64 +1,107 @@
-# Claude Code Global Configuration
+# Claude Global Configuration
 
-A highly optimized, token-efficient global configuration for Claude Code. This setup transforms Claude into a senior engineer that automatically adapts to your project's tech stack and lazy-loads specialized skills only when needed.
+Shared configuration for Claude Code, OpenCode, and Bob. Acts as the single source of truth for AI assistant behaviour, MCP server setup, skills, and automation scripts. Transfer between machines or team members by cloning this repo and running one setup script.
 
-## Key Features
+## New Machine Setup
 
-- **Auto-Bootstrapping**: When entering a directory, detects the stack (Rust, Node, Python) and generates a project-specific CLAUDE.md
-- **Lazy Loading Skills**: Specialized knowledge (Database, E2E Testing, Railway) is loaded only when relevant keywords are detected
-- **MCP Tool Priority**: Uses knowledge graph and memory MCP tools before falling back to grep/read
-- **Safety Rails**: Pre-configured hooks prevent forbidden directory access
+```bash
+git clone <this-repo> ~/.claude
+cp ~/.claude/mcp/secrets.env.example ~/.claude/mcp/secrets.env
+# Edit secrets.env and fill in real values (see comments inside)
+bash ~/.claude/mcp/mcp-ensure.sh
+```
+
+That's it. The script configures all MCP servers for OpenCode, Claude Code, and Bob, and ensures the Memgraph container is running with the correct restart policy.
+
+## MCP Servers
+
+Four servers run across all three clients. Config is managed centrally in `mcp/`.
+
+| Server | Purpose | Requires |
+|--------|---------|---------|
+| `memory` | Cross-session knowledge graph | — |
+| `cgr-local` | Code structure queries via Memgraph (code-graph-rag) | Memgraph container |
+| `kdb-local` | Local vector RAG over ingested documents | — |
+| `kdb-remote` | Remote KDB vector store (IBM Cloud Redis + watsonx) | IBM Cloud credentials |
+
+### Infrastructure
+
+`cgr-local` requires a Memgraph container. `mcp-ensure.sh` creates it if missing and sets `restart=unless-stopped` so it survives reboots.
+
+Manual start if needed:
+```bash
+docker run -d --name memgraph-codegraph --restart=unless-stopped -p 7689:7687 memgraph/memgraph
+```
+
+### Files
+
+```
+~/.claude/mcp/
+├── mcp-ensure.sh        # Run this to apply config to all clients (idempotent)
+├── servers.json         # Human-readable server definitions (no secrets)
+├── secrets.env.example  # Template — commit this, not secrets.env
+└── secrets.env          # Live secrets — gitignored, never commit
+```
+
+### Rotating credentials
+
+Edit `~/.claude/mcp/secrets.env`, then re-run:
+```bash
+bash ~/.claude/mcp/mcp-ensure.sh
+```
 
 ## Structure
 
 ```
 ~/.claude/
-├── CLAUDE.md               # Main constitution - core rules & identity
-├── settings.json           # Hooks connecting events to scripts
+├── CLAUDE.md               # Main constitution — core rules & identity
+├── opencode.json           # OpenCode config (MCP, providers, permissions)
+├── settings.json           # Claude Code hooks
+├── mcp/                    # MCP server definitions and setup (see above)
 ├── agents/                 # Sub-agent definitions
 ├── commands/               # Custom slash commands (/quality-check, etc.)
-├── scripts/                # Automation logic
-│   ├── session-init.sh     # Session initialization (stack detection, CLAUDE.md generation)
-│   ├── generate-project-claude.sh  # Creates project-specific CLAUDE.md
-│   └── detect-project.sh  # Scans for libraries to recommend skills
-├── skills/                 # Lazy-loaded specialized knowledge
-│   ├── core/               # Core engineering patterns
-│   ├── extended/          # Lazy-loaded (database, algorithms, error handling)
-│   └── railway-*/         # Railway platform skills (deploy, database, etc.)
+├── rules/                  # Path-scoped instruction files
+├── scripts/                # Automation scripts
+│   ├── session-init.sh     # Session start: stack detection, CLAUDE.md generation
+│   ├── generate-project-claude.sh
+│   └── detect-project.sh
+├── skills/                 # Lazy-loaded specialised knowledge
 └── templates/traits/       # Building blocks for project CLAUDE.md
 ```
 
 ## How It Works
 
-### Session Initialization
+### Session Initialisation
 
-When you start a session, `session-init.sh` triggers:
-1. **Stack Detection**: Scans for package.json, Cargo.toml, go.mod, pyproject.toml
-2. **Project CLAUDE.md Generation**: Creates `.claude/CLAUDE.md` if missing, built from templates
-3. **Autonomous Development Flow**: Copies docs for new projects
+`session-init.sh` runs on session start (via `settings.json` hooks):
+1. Detects stack from `package.json`, `Cargo.toml`, `go.mod`, `pyproject.toml`
+2. Generates `.claude/CLAUDE.md` for the project if missing
+3. Copies autonomous development flow docs for new projects
 
-### MCP Tools
+### MCP Tool Priority
 
-| Tool | Purpose |
-|------|---------|
-| `code-graph-rag` | Code relationships, function calls, dependency analysis |
-| `memory` | Cross-session state, decisions, milestones |
-| `knowledge` | Document search, ingested documentation |
+See `rules/mcp-tools.md` for the full decision tree. Short version:
+- Code relationships → `cgr-local` first, then grep/glob
+- Cross-session context → `memory` first
+- Document search → `kdb-local` / `kdb-remote` first
 
-### Dynamic Context Loading
+### Dynamic Skill Loading
 
-Skills load on keyword detection:
-- "add postgres" or "database" → Railway database skill
+Skills in `skills/` are loaded on keyword detection or explicit request:
+- "add postgres" / "database" → database skill
 - "deploy to railway" → Railway deploy skill
-- "production" or "readiness" → Production readiness review
+- "production readiness" → production readiness review
 
-## Usage Tips
+## Commands
 
-- **Edit project CLAUDE.md**: Each project gets its own `.claude/CLAUDE.md` - edit to add project patterns
-- **Trigger skills manually**: "Read `.claude/skills/railway-database/SKILL.md`"
-- **Use commands**: `/quality-check`, `/git-process`, `/production-readiness-review`
+| Command | Purpose |
+|---------|---------|
+| `/quality-check` | Lint, type-check, test coverage gate |
+| `/git-process` | Commit and PR workflow |
+| `/production-readiness-review` | Full pre-deploy checklist |
 
 ## Extending
 
-- **Add a skill**: Create `.claude/skills/extended/{skill-name}/SKILL.md`
-- **Add a command**: Create `.claude/commands/{command-name}.md`
+- **Add a skill**: create `skills/{name}/SKILL.md`
+- **Add a command**: create `commands/{name}.md`
+- **Add an MCP server**: add to `mcp/servers.json`, update `mcp/mcp-ensure.sh`, re-run it

@@ -1,0 +1,628 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "share": "disabled",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 12000
+  },
+  "experimental": {
+    "openTelemetry": false
+  },
+  "mcp": {
+    "memory": {
+      "type": "local",
+      "command": [
+        "/Users/andrewgibson/.local/share/fnm/node-versions/v24.14.0/installation/bin/mcp-server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "/Users/andrewgibson/.local/share/mcp-memory/memory.jsonl"
+      },
+      "enabled": true,
+      "timeout": 3600000
+    },
+    "cgr-local": {
+      "type": "local",
+      "command": [
+        "/Users/andrewgibson/.local/share/uv/tools/code-graph-rag/bin/cgr",
+        "mcp-server"
+      ],
+      "env": {
+        "MEMGRAPH_HOST": "localhost",
+        "MEMGRAPH_PORT": "7689",
+        "ORCHESTRATOR_PROVIDER": "openai",
+        "ORCHESTRATOR_MODEL": "claude-sonnet-4-6",
+        "ORCHESTRATOR_ENDPOINT": "https://api.nextgen-beta.ica.ibm.com/ica/v1",
+        "ORCHESTRATOR_API_KEY": "REDACTED",
+        "CYPHER_PROVIDER": "openai",
+        "CYPHER_MODEL": "claude-sonnet-4-6",
+        "CYPHER_ENDPOINT": "https://api.nextgen-beta.ica.ibm.com/ica/v1",
+        "CYPHER_API_KEY": "REDACTED"
+      },
+      "enabled": true,
+      "timeout": 600000
+    },
+    "kdb-local": {
+      "type": "local",
+      "command": [
+        "/Users/andrewgibson/.local/share/fnm/node-versions/v24.14.0/installation/bin/mcp-local-rag"
+      ],
+      "env": {
+        "DB_PATH": "/Users/andrewgibson/.local/share/mcp-knowledge",
+        "MODEL_NAME": "Xenova/all-MiniLM-L6-v2",
+        "CACHE_DIR": "/Users/andrewgibson/.cache/huggingface",
+        "HF_HUB_OFFLINE": "0"
+      },
+      "enabled": true,
+      "timeout": 3600000
+    },
+    "kdb-remote": {
+      "type": "local",
+      "command": [
+        "/Users/andrewgibson/.local/share/kdb-remote/start-mcp-server.sh"
+      ],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "enabled": true,
+      "timeout": 3600000
+    }
+  },
+  "permission": {
+    "*": "deny",
+    "read": "allow",
+    "edit": "allow",
+    "grep": "allow",
+    "glob": "allow",
+    "list": "allow",
+    "webfetch": "allow",
+    "websearch": "allow",
+    "kdb-remote_*": "allow",
+    "cgr-local_*": "allow",
+    "kdb-local_*": "allow",
+    "knowledge_*": "allow",
+    "memory_*": "allow",
+    "mcp_*": "deny",
+    "bash": {
+      "*": "ask",
+      "ls *": "allow",
+      "bob *": "allow",
+      "cat *": "allow",
+      "head *": "allow",
+      "tail *": "allow",
+      "pwd": "allow",
+      "which *": "allow",
+      "docker *": "allow",
+      "opencode *": "allow",
+      "whoami": "allow",
+      "id": "allow",
+      "hostname": "allow",
+      "uname *": "allow",
+      "arch": "allow",
+      "date *": "allow",
+      "uptime": "allow",
+      "echo *": "allow",
+      "printf *": "allow",
+      "env": "allow",
+      "printenv *": "allow",
+      "type *": "allow",
+      "stat *": "allow",
+      "file *": "allow",
+      "basename *": "allow",
+      "dirname *": "allow",
+      "realpath *": "allow",
+      "readlink *": "allow",
+      "mkdir *": "allow",
+      "touch *": "allow",
+      "cp *": "allow",
+      "mv *": "allow",
+      "ln *": "ask",
+      "rm *": "ask",
+      "find *": "allow",
+      "locate *": "allow",
+      "tree *": "allow",
+      "wc *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "diff *": "allow",
+      "cmp *": "allow",
+      "uv *": "allow",
+      "grep *": "allow",
+      "egrep *": "allow",
+      "fgrep *": "allow",
+      "rg *": "allow",
+      "sed *": "allow",
+      "awk *": "allow",
+      "cut *": "allow",
+      "tr *": "allow",
+      "rev *": "allow",
+      "fold *": "allow",
+      "paste *": "allow",
+      "nohup *": "allow",
+      "join *": "allow",
+      "less *": "allow",
+      "more *": "allow",
+      "jq *": "allow",
+      "yq *": "allow",
+      "tomlq *": "allow",
+      "xq *": "allow",
+      "md5sum *": "allow",
+      "sha256sum *": "allow",
+      "sha512sum *": "allow",
+      "shasum *": "allow",
+      "base64 *": "allow",
+      "od *": "allow",
+      "hexdump *": "allow",
+      "strings *": "allow",
+      "git *": "allow",
+      "./gradlew *": "allow",
+      "python *": "allow",
+      "python3 *": "allow",
+      "java *": "deny",
+      "javac *": "deny",
+      "jar *": "deny",
+      "node *": "allow",
+      "ps *": "allow",
+      "pgrep *": "allow",
+      "pkill *": "ask",
+      "kill *": "ask",
+      "killall *": "ask",
+      "top": "allow",
+      "htop": "allow",
+      "df *": "allow",
+      "du *": "allow",
+      "free *": "allow",
+      "tee *": "allow",
+      "xargs *": "allow",
+      "time *": "allow",
+      "timeout *": "allow",
+      "watch *": "allow",
+      "column *": "allow",
+      "script *": "ask",
+      "xclip *": "allow",
+      "xsel *": "allow",
+      "pbcopy *": "allow",
+      "pbpaste *": "allow",
+      "ping *": "ask",
+      "dig *": "allow",
+      "nslookup *": "allow",
+      "host *": "allow",
+      "netstat *": "allow",
+      "ss *": "allow",
+      "lsof *": "allow",
+      "ip *": "allow",
+      "ifconfig *": "allow",
+      "xz *": "ask",
+      "bzip2 *": "ask",
+      "bunzip2 *": "ask",
+      "7z *": "ask",
+      "npx *": "allow",
+      "cgr *": "allow",
+      "~/scripts/ingest-knowledge.sh *": "allow",
+      "~/scripts/ingest-via-mcp.mjs *": "allow",
+      "ingest-knowledge.sh *": "allow",
+      "sqlite3 *": "allow",
+      "psql *": "allow",
+      "openssl *": "allow",
+      "gpg *": "ask",
+      "envsubst *": "allow",
+      "chmod *": "ask",
+      "chown *": "ask",
+      "tar *": "ask",
+      "unzip *": "ask",
+      "zip *": "ask",
+      "gzip *": "ask",
+      "gunzip *": "ask",
+      "curl *": "allow",
+      "wget *": "allow",
+      "nc *": "deny",
+      "netcat *": "deny",
+      "ssh *": "deny",
+      "scp *": "deny",
+      "rsync *": "deny",
+      "npm *": "deny",
+      "yarn *": "deny",
+      "pnpm *": "deny",
+      "pip *": "deny",
+      "cargo *": "deny",
+      "gradle *": "deny",
+      "mvn *": "deny",
+      "ALLOW_BUILD=1 npm *": "allow",
+      "ALLOW_BUILD=1 yarn *": "allow",
+      "ALLOW_BUILD=1 pnpm *": "allow",
+      "ALLOW_BUILD=1 pip *": "allow",
+      "ALLOW_BUILD=1 pip3 *": "allow",
+      "ALLOW_BUILD=1 cargo *": "allow",
+      "ALLOW_BUILD=1 gradle *": "allow",
+      "GRADLE_ALLOW_BUILD=1 gradle *": "allow",
+      "ALLOW_BUILD=1 ./gradlew *": "allow",
+      "GRADLE_ALLOW_BUILD=1 ./gradlew *": "allow",
+      "MVN_ALLOW_BUILD=1 mvn *": "allow",
+      "make *": "ask"
+    }
+  },
+  "provider": {
+    "blackbox": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "https://api.blackbox.ai",
+        "timeout": 120000,
+        "chunkTimeout": 60000
+      },
+      "models": {
+        "claude-haiku-4-5-20251001": {
+          "name": "claude haiku 4 5 20251001"
+        },
+        "claude-sonnet-4-5-20250514": {
+          "name": "claude sonnet 4 5 20250514"
+        },
+        "blackboxai/blackbox-pro": {
+          "name": "blackbox pro"
+        },
+        "blackboxai/openai/gpt-5.3-codex": {
+          "name": "gpt 5.3 codex"
+        },
+        "blackboxai/x-ai/grok-code-fast-1:free": {
+          "name": "grok code fast 1:free"
+        },
+        "blackboxai/minimax/minimax-m2.5": {
+          "name": "minimax m2.5"
+        },
+        "blackboxai/anthropic/claude-opus-4.6": {
+          "name": "claude opus 4.6"
+        },
+        "blackboxai/google/gemini-3.1-pro-preview": {
+          "name": "gemini 3.1 pro preview"
+        },
+        "blackboxai/anthropic/claude-sonnet-4.6": {
+          "name": "claude sonnet 4.6"
+        },
+        "blackboxai/minimax/minimax-free": {
+          "name": "minimax free"
+        },
+        "blackboxai/moonshotai/kimi-k2.6": {
+          "name": "kimi k2.6"
+        },
+        "blackboxai/minimax/minimax-m2.7": {
+          "name": "minimax m2.7"
+        },
+        "blackboxai/anthropic/claude-sonnet-4.5": {
+          "name": "claude sonnet 4.5"
+        },
+        "blackboxai/anthropic/claude-opus-4.7": {
+          "name": "claude opus 4.7"
+        },
+        "blackboxai/google/veo-3-fast": {
+          "name": "veo 3 fast"
+        },
+        "blackboxai/google/veo-2": {
+          "name": "veo 2"
+        },
+        "blackboxai/google/nano-banana": {
+          "name": "nano banana"
+        },
+        "blackboxai/google/nano-banana-pro": {
+          "name": "nano banana pro"
+        },
+        "blackboxai/black-forest-labs/flux-1.1-pro": {
+          "name": "flux 1.1 pro"
+        },
+        "blackboxai/veo-3.1": {
+          "name": "veo 3.1"
+        },
+        "blackboxai/veo-3.1-fast": {
+          "name": "veo 3.1 fast"
+        },
+        "blackboxai/black-forest-labs/flux-kontext-pro": {
+          "name": "flux kontext pro"
+        },
+        "blackboxai/black-forest-labs/flux-schnell": {
+          "name": "flux schnell"
+        },
+        "blackboxai/black-forest-labs/flux-1.1-pro-ultra": {
+          "name": "flux 1.1 pro ultra"
+        },
+        "blackboxai/stability-ai/stable-diffusion": {
+          "name": "stable diffusion"
+        },
+        "blackboxai/google/veo-3": {
+          "name": "veo 3"
+        },
+        "blackboxai/mochi-v1": {
+          "name": "mochi v1"
+        },
+        "blackboxai/sora-2-text-to-video": {
+          "name": "sora 2 text to video"
+        },
+        "blackboxai/sora-2-text-to-video-pro": {
+          "name": "sora 2 text to video pro"
+        },
+        "blackboxai/sora-2-image-to-video": {
+          "name": "sora 2 image to video"
+        },
+        "blackboxai/sora-2-image-to-video-pro": {
+          "name": "sora 2 image to video pro"
+        },
+        "blackboxai/sora-2-video-remix": {
+          "name": "sora 2 video remix"
+        },
+        "blackboxai/hunyuan-video-lora": {
+          "name": "hunyuan video lora"
+        },
+        "blackboxai/ray-2": {
+          "name": "ray 2"
+        },
+        "blackboxai/fast-animatediff": {
+          "name": "fast animatediff"
+        },
+        "blackboxai/fast-svd": {
+          "name": "fast svd"
+        },
+        "blackboxai/fast-svd-lcm": {
+          "name": "fast svd lcm"
+        },
+        "blackboxai/cogvideox-5b": {
+          "name": "cogvideox 5b"
+        },
+        "blackboxai/bytedance/seedream-3": {
+          "name": "seedream 3"
+        },
+        "blackboxai/bytedance/seedream-4": {
+          "name": "seedream 4"
+        },
+        "blackboxai/google/imagen-4-fast": {
+          "name": "imagen 4 fast"
+        },
+        "blackboxai/qwen/qwen-image": {
+          "name": "qwen image"
+        },
+        "blackboxai/black-forest-labs/flux-kontext-max": {
+          "name": "flux kontext max"
+        },
+        "blackboxai/prunaai/hidream-l1-fast": {
+          "name": "hidream l1 fast"
+        },
+        "blackboxai/recraft-ai/recraft-v3": {
+          "name": "recraft v3"
+        },
+        "blackboxai/recraft-ai/recraft-v3-svg": {
+          "name": "recraft v3 svg"
+        },
+        "blackboxai/ideogram-ai/ideogram-v2a-turbo": {
+          "name": "ideogram v2a turbo"
+        },
+        "blackboxai/ideogram-ai/ideogram-v2": {
+          "name": "ideogram v2"
+        },
+        "blackboxai/ideogram-ai/ideogram-v3": {
+          "name": "ideogram v3"
+        },
+        "blackboxai/ideogram-ai/ideogram-v2a": {
+          "name": "ideogram v2a"
+        },
+        "blackboxai/ideogram-ai/ideogram-v2-turbo": {
+          "name": "ideogram v2 turbo"
+        },
+        "blackboxai/bria/fibo": {
+          "name": "fibo"
+        },
+        "blackboxai/bria/image-3.2": {
+          "name": "image 3.2"
+        },
+        "blackboxai/stability-ai/stable-diffusion-3.5-medium": {
+          "name": "stable diffusion 3.5 medium"
+        },
+        "blackboxai/google/imagen-4": {
+          "name": "imagen 4"
+        },
+        "blackboxai/stability-ai/stable-diffusion-3.5-large": {
+          "name": "stable diffusion 3.5 large"
+        },
+        "blackboxai/google/imagen-4-ultra": {
+          "name": "imagen 4 ultra"
+        },
+        "blackboxai/google/imagen-3-fast": {
+          "name": "imagen 3 fast"
+        },
+        "blackboxai/google/imagen-3": {
+          "name": "imagen 3"
+        },
+        "blackboxai/minimax/image-01": {
+          "name": "image 01"
+        },
+        "blackboxai/luma/photon-flash": {
+          "name": "photon flash"
+        },
+        "blackboxai/tencent/hunyuan-image-3": {
+          "name": "hunyuan image 3"
+        },
+        "blackboxai/nvidia/sana-sprint-1.6b": {
+          "name": "sana sprint 1.6b"
+        },
+        "blackboxai/prunaai/wan-2.2-image": {
+          "name": "wan 2.2 image"
+        },
+        "blackboxai/prunaai/hidream-l1-full": {
+          "name": "hidream l1 full"
+        },
+        "blackboxai/prunaai/hidream-l1-dev": {
+          "name": "hidream l1 dev"
+        },
+        "blackboxai/black-forest-labs/flux-dev": {
+          "name": "flux dev"
+        },
+        "blackboxai/nvidia/sana": {
+          "name": "sana"
+        },
+        "blackboxai/luma/photon": {
+          "name": "photon"
+        },
+        "blackboxai/nano-banana-pro/edit": {
+          "name": "edit"
+        },
+        "blackboxai/nano-banana/edit": {
+          "name": "edit"
+        },
+        "blackboxai/gemini-3-pro-image-preview/edit": {
+          "name": "edit"
+        },
+        "blackboxai/gemini-25-flash-image/edit": {
+          "name": "edit"
+        },
+        "blackboxai/gemini-flash-edit": {
+          "name": "gemini flash edit"
+        },
+        "blackboxai/gemini-flash-edit/multi": {
+          "name": "multi"
+        },
+        "blackboxai/gpt-image-1-mini/edit": {
+          "name": "edit"
+        },
+        "blackboxai/gpt-image-1/edit-image": {
+          "name": "edit image"
+        },
+        "blackboxai/playgroundai/playground-v25": {
+          "name": "playground v25"
+        },
+        "blackboxai/lucataco/dreamshaper": {
+          "name": "dreamshaper"
+        },
+        "blackboxai/qwen3-max": {
+          "name": "qwen3 max"
+        },
+        "blackboxai/qwen3-coder": {
+          "name": "qwen3 coder"
+        },
+        "blackboxai/qwen3-vl-235b-a22b": {
+          "name": "qwen3 vl 235b a22b"
+        },
+        "blackboxai/qwen3-vl-32b": {
+          "name": "qwen3 vl 32b"
+        }
+      }
+    },
+    "local-server": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Local Llama Server",
+      "options": {
+        "baseURL": "http://localhost:8080/v1"
+      },
+      "models": {
+        "qwen3.6-35b-a3b-ud-q4_k_xl": {
+          "name": "Qwen 3.6 35B A3B UD Q4_K_XL (Local)",
+          "limit": {
+            "context": 81072,
+            "input": 81072,
+            "output": 8192
+          }
+        }
+      }
+    },
+    "ibm-ica": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "IBM watsonx (ICA)",
+      "options": {
+        "baseURL": "https://api.nextgen-beta.ica.ibm.com/ica/v1",
+        "apiKey": "REDACTED"
+      },
+      "models": {
+        "gpt-4o": {
+          "name": "gpt-4o",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "meta-llama/llama-4-maverick-17b-128e-instruct-fp8": {
+          "name": "meta-llama/llama-4-maverick-17b-128e-instruct-fp8",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "claude-haiku-4-5": {
+          "name": "claude-haiku-4-5",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "ibm/granite-4-h-small": {
+          "name": "ibm/granite-4-h-small",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "gemma-4-26b-a4b-it": {
+          "name": "gemma-4-26b-a4b-it",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "claude-sonnet-4-5": {
+          "name": "claude-sonnet-4-5",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "claude-sonnet-4-6": {
+          "name": "claude-sonnet-4-6",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "claude-opus-4-7": {
+          "name": "claude-opus-4-7",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "gpt-5.4-gus": {
+          "name": "gpt-5.4-gus",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "gpt-5.1-chat-gus": {
+          "name": "gpt-5.1-chat-gus",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        },
+        "gemini-3.1-pro-preview": {
+          "name": "gemini-3.1-pro-preview",
+          "limit": {
+            "context": 200000,
+            "input": 200000,
+            "output": 8192
+          }
+        }
+      }
+    }
+  }
+}

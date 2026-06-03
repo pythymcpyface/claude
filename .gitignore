@@ -39,3 +39,6 @@ __pycache__/
 .env
 .env.*
 !.env.example
+
+# MCP secrets (copy from secrets.env.example)
+mcp/secrets.env
