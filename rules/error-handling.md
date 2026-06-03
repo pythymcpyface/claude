@@ -9,7 +9,7 @@ paths:
 
 # Error Handling
 
-Detail: `.claude/skills/extended/error-classification-recovery.md`.
+Detail: `.claude/docs/skill-references/extended/error-classification-recovery.md`.
 
 - Classify errors before handling: transient (retry), permanent (fail fast), programmer (throw).
 - No bare `catch` that swallows errors. Either handle, log + rethrow, or wrap with context.

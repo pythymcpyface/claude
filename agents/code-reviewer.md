@@ -1,8 +1,8 @@
 ---
 name: code-reviewer
-description: Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions, using confidence-based filtering to report only high-priority issues that truly matter
+description: Use PROACTIVELY after writing or modifying code to review for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions. Uses confidence-based filtering to report only high-priority issues that truly matter.
 tools: Glob, Grep, Read, TodoWrite, WebSearch
-model: sonnet
+model: opus
 color: red
 ---
 

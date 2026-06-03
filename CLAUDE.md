@@ -68,7 +68,7 @@ For multi-step tasks, state a brief plan with verification per step:
 
 ## Security Baseline
 OWASP: parameterized queries, bcrypt/Argon2, sanitize input, escape output, secrets in env vars only.
-Detail in `skills/core/core-engineering.md`.
+Detail in `docs/skill-references/core/core-engineering.md`.
 
 ## Response Format
 - Tables over prose. Bullets over paragraphs.
@@ -83,7 +83,8 @@ Detail in `skills/core/core-engineering.md`.
 |------|----------|
 | MCP tool selection (code-graph-rag, memory, knowledge) | `.claude/rules/mcp-tools.md` |
 | Path-scoped instructions (DB, errors, e2e, etc.) | `.claude/rules/*.md` |
-| On-demand domain expertise | `.claude/skills/{core,extended}/` |
+| On-demand domain expertise (auto-discovered) | `.claude/skills/<name>/SKILL.md` |
+| Reference documentation | `.claude/docs/skill-references/{core,extended}/` |
 | Repeatable workflows | `.claude/commands/*.md` (`/quality-check`, `/git-process`, `/production-readiness-review`) |
 | Hard enforcement (lint, secret scan) | `.claude/hooks/` |
 

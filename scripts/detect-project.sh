@@ -103,7 +103,7 @@ if [ ${#SKILLS_TO_LOAD[@]} -gt 0 ]; then
   echo "RECOMMENDED_SKILLS:"
   printf '%s\n' "${SKILLS_TO_LOAD[@]}" | sort -u
   echo "---"
-  echo "Load with: Read ~/.claude/skills/extended/[skill-name].md"
+  echo "Load with: Read ~/.claude/docs/skill-references/extended/[skill-name].md"
 fi
 
 # Ensure .claude directory exists in the project before writing cache

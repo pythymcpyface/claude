@@ -14,31 +14,42 @@
     "CLAUDE_CODE_DISABLE_TERMINAL_TITLE": "1",
     "MAX_THINKING_TOKENS": "0"
   },
-  "defaultMode": "acceptEdits",
+  "defaultMode": "default",
   "permissions": {
-    "allow": []
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(cat:*)",
+      "Bash(du:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(chmod:*)",
+      "Bash(brew cleanup:*)",
+      "Bash(numfmt:*)",
+      "Bash(bc:*)",
+      "Bash(xargs:*)",
+      "Bash(docker:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf*)",
+      "Bash(rm -fr*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fdx*)",
+      "Bash(:(){ :|:& };:*)",
+      "Bash(dd if=*)",
+      "Bash(mkfs*)",
+      "Bash(chmod -R 777*)",
+      "Write(./.git/**)",
+      "Edit(./.git/**)",
+      "Write(./.claude/hooks/**)",
+      "Edit(./.claude/hooks/**)",
+      "Write(./.env*)",
+      "Edit(./.env*)"
+    ]
   },
   "includeCoAuthoredBy": false,
   "model": "opus",
-  "mcpServers": {
-    "code-graph-rag": {
-      "command": "code-graph-rag",
-      "args": ["mcp-server"],
-      "env": {
-        "TARGET_REPO_PATH": "/Users/andrewgibson/Projects/personal",
-        "ORCHESTRATOR_PROVIDER": "openai",
-        "ORCHESTRATOR_MODEL": "glm-5.1",
-        "ORCHESTRATOR_ENDPOINT": "https://api.z.ai/api/anthropic",
-        "ORCHESTRATOR_API_KEY": "${ANTHROPIC_AUTH_TOKEN}",
-        "CYPHER_PROVIDER": "openai",
-        "CYPHER_MODEL": "glm-5.1",
-        "CYPHER_ENDPOINT": "https://api.z.ai/api/anthropic",
-        "CYPHER_API_KEY": "${ANTHROPIC_AUTH_TOKEN}",
-        "MEMGRAPH_HOST": "127.0.0.1",
-        "MEMGRAPH_PORT": "7689"
-      }
-    }
-  },
   "hooks": {
     "SessionStart": [
       {
@@ -46,6 +57,16 @@
           {
             "type": "command",
             "command": "bash ~/.claude/scripts/session-init.sh \"$PWD\""
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/generate-project-claude.sh \"$PWD\"",
+            "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/scripts/detect-project.sh \"$PWD\"",
+            "timeout": 5000
           }
         ]
       }
@@ -66,7 +87,31 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash ~/.claude/hooks/block-destructive.sh \"$ARGUMENTS\""
+          },
+          {
+            "type": "command",
             "command": "bash ~/.claude/scripts/delegate-check.sh \"$ARGUMENTS\""
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/scan-ai-attribution.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/auto-format.sh"
           }
         ]
       }
@@ -94,32 +139,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/ralph-stop-hook.sh"
+            "command": "bash ~/.claude/hooks/post-response-tokens.sh --update"
           },
           {
             "type": "command",
-            "command": "bash ~/.claude/hooks/post-response-tokens.sh --update"
+            "command": "bash ~/.claude/scripts/context-summary.sh",
+            "timeout": 5000
           }
         ]
       }
     ]
   },
   "enabledPlugins": {
-    "claude-mem@thedotmack": false,
     "everything-claude-code@everything-claude-code": true,
-    "context-management@claude-code-workflows": false,
-    "tdd-workflows@claude-code-workflows": false,
-    "full-stack-orchestration@claude-code-workflows": false,
-    "agent-orchestration@claude-code-workflows": false,
-    "seo-content-creation@claude-code-workflows": false,
-    "seo-technical-optimization@claude-code-workflows": false,
-    "security-scanning@claude-code-workflows": false,
-    "security-compliance@claude-code-workflows": false,
-    "seo-analysis-monitoring@claude-code-workflows": false,
-    "hr-legal-compliance@claude-code-workflows": false,
-    "content-marketing@claude-code-workflows": false,
-    "accessibility-compliance@claude-code-workflows": false,
-    "unit-testing@claude-code-workflows": false,
     "rust-analyzer-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
@@ -130,5 +162,5 @@
       }
     }
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": false
 }

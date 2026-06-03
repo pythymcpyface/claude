@@ -1,8 +1,8 @@
 ---
 name: code-architect
-description: Designs feature architectures by analyzing existing codebase patterns and conventions, then providing comprehensive implementation blueprints with specific files to create/modify, component designs, data flows, and build sequences
+description: Use PROACTIVELY when the user asks to design, plan, scaffold, or architect a new feature, module, or service. Designs feature architectures by analyzing existing codebase patterns and conventions, then provides comprehensive implementation blueprints with specific files to create/modify, component designs, data flows, and build sequences.
 tools: Glob, Grep, Read, TodoWrite, WebSearch
-model: sonnet
+model: opus
 color: green
 ---
 

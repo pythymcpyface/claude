@@ -1,6 +1,19 @@
 ---
 name: observability-review
 description: Production readiness review for monitoring and observability. Reviews code for logging, metrics, distributed tracing, alerting, and SLO compliance. Use PROACTIVELY before production releases, when adding new API endpoints, services, or critical features.
+paths:
+  - "**/logging/**"
+  - "**/metrics/**"
+  - "**/tracing/**"
+  - "**/observability/**"
+  - "**/monitoring/**"
+  - "**/*logger*"
+  - "**/*metric*"
+  - "**/prometheus*"
+  - "**/grafana*"
+  - "**/datadog*"
+  - "**/opentelemetry*"
+  - "**/otel*"
 tools: Read, Grep, Glob, Bash, AskUserQuestion
 ---
 

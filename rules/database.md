@@ -9,7 +9,7 @@ paths:
 
 # Database Work
 
-Detail: `.claude/skills/extended/database-integrity.md`.
+Detail: `.claude/docs/skill-references/extended/database-integrity.md`.
 
 - Migrations are append-only. Never edit a migration after it's applied to any environment.
 - Every schema change needs an up and a tested rollback path.

@@ -1,11 +1,12 @@
 #!/bin/bash
-# MCP Delegation Pre-Hook
-# Suggests delegation to Gemini for expensive operations
+# Bash command pre-check hook
+# Surfaces delegation hints for expensive operations
 # Called by PreToolUse hook for Bash commands
 
 COMMAND="$1"
 
-# Patterns that should be delegated to Gemini
+# Patterns where output volume is typically large enough to warrant
+# delegation to a subagent (keeps main context lean)
 EXPENSIVE_PATTERNS=(
   "npm test"
   "npm run test"
@@ -30,16 +31,14 @@ EXPENSIVE_PATTERNS=(
 # Check if command matches expensive patterns
 for pattern in "${EXPENSIVE_PATTERNS[@]}"; do
   if [[ "$COMMAND" == *"$pattern"* ]]; then
-    echo "DELEGATE_SUGGESTION: Consider delegating '$pattern' to Gemini via ultra-mcp"
-    echo "Tool: mcp__ultra-mcp__debug-issue for tests/builds"
-    echo "Tool: mcp__ultra-mcp__analyze-code for logs/diffs"
+    echo "HINT: '$pattern' often produces verbose output. Consider delegating to a subagent (Task tool with general-purpose or Explore agent) to keep main context lean."
     exit 0
   fi
 done
 
 # Large file indicators
-if [[ "$COMMAND" == *"cat "* ]] || [[ "$COMMAND" == *"less "* ]]; then
-  echo "DELEGATE_SUGGESTION: For large files, consider mcp__ultra-mcp__analyze-code"
+if [[ "$COMMAND" == "cat "* ]] || [[ "$COMMAND" == "less "* ]] || [[ "$COMMAND" == "head "* ]] || [[ "$COMMAND" == "tail "* ]]; then
+  echo "HINT: Use the Read tool instead of cat/less/head/tail for file inspection."
   exit 0
 fi
 
