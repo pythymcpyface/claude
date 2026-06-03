@@ -106,6 +106,10 @@
           {
             "type": "command",
             "command": "bash ~/.claude/hooks/auto-format.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/lint-on-edit.sh"
           }
         ]
       }
